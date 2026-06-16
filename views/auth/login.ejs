@@ -1,0 +1,14 @@
+<%- include('../partials/head', { title, active }) %>
+<%- include('../partials/nav', { user, active }) %>
+<section class="auth-card panel">
+  <h1>登录克隆体账号</h1>
+  <% if (error) { %><div class="alert danger"><%= error %></div><% } %>
+  <form method="post" action="/login" class="form-stack">
+    <input type="hidden" name="next" value="<%= next %>">
+    <label>账号<input name="username" autocomplete="username" required></label>
+    <label>密码<input name="password" type="password" autocomplete="current-password" required></label>
+    <button class="button">登录</button>
+  </form>
+  <p class="muted">演示账号：demo / demo1234</p>
+</section>
+<%- include('../partials/footer') %>

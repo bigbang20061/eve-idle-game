@@ -1,0 +1,28 @@
+<%- include('../partials/head', { title, active }) %>
+<%- include('../partials/nav', { user, active }) %>
+<section class="grid two">
+  <article class="panel">
+    <h1>管理员：SDE 导入</h1>
+    <% if (error) { %><div class="alert danger"><%= error %></div><% } %>
+    <% if (result) { %><div class="alert success"><pre><%= JSON.stringify(result, null, 2) %></pre></div><% } %>
+    <div class="stat-cards">
+      <div><b><%= counts.types %></b><span>Types</span></div>
+      <div><b><%= counts.systems %></b><span>Systems</span></div>
+      <div><b><%= counts.blueprints %></b><span>Blueprints</span></div>
+      <div><b><%= counts.groups %></b><span>Groups</span></div>
+    </div>
+    <form method="post" action="/admin/sde/import" class="form-stack">
+      <label>服务器 JSONL SDE 目录<input name="dir" placeholder="/app/sde-jsonl 或 ./sde-jsonl"></label>
+      <label>测试导入限制，0 表示不限制<input name="limit" type="number" min="0" value="0"></label>
+      <button class="button">开始导入到 MongoDB</button>
+    </form>
+  </article>
+  <article class="panel rich-text">
+    <h2>预置种子</h2>
+    <p>没准备完整 SDE 时，可以重置内置轻量种子，保证所有玩法可跑。</p>
+    <form method="post" action="/admin/sde/seed-reset"><button class="button ghost">重置轻量 SDE 种子</button></form>
+    <h2>推荐文件</h2>
+    <ul><li>types.jsonl</li><li>groups.jsonl</li><li>categories.jsonl</li><li>marketGroups.jsonl</li><li>mapSolarSystems.jsonl</li><li>blueprints.jsonl</li></ul>
+  </article>
+</section>
+<%- include('../partials/footer') %>

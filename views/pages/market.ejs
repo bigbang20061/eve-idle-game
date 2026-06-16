@@ -1,0 +1,8 @@
+<%- include('../partials/head', { title, active }) %>
+<%- include('../partials/nav', { user, active }) %>
+<section class="panel">
+  <div class="panel-title"><h1>区域市场</h1><span>价格由 SDE basePrice、星系安等、每日波动派生</span></div>
+  <form id="market-search" class="toolbar"><input name="q" placeholder="搜索舰船/装备/材料"><select name="kind"><option value="">全部</option><option value="ship">舰船</option><option value="module">装备</option><option value="ore">矿石</option><option value="mineral">矿物</option><option value="salvage">打捞件</option><option value="data">数据件</option></select><button class="button small">搜索</button></form>
+  <div id="market-results" class="market-grid"></div>
+</section>
+<%- include('../partials/footer') %>

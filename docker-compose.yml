@@ -1,0 +1,32 @@
+services:
+  mongo:
+    image: mongo:8
+    container_name: eve_idle_game_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    command: ["mongod", "--wiredTigerCacheSizeGB", "1"]
+
+  app:
+    build: .
+    container_name: eve_idle_game_app
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      PUBLIC_ORIGIN: http://localhost:3000
+      MONGODB_URI: mongodb://mongo:27017/eve_idle_game
+      SESSION_SECRET: change-this-before-internet
+      AUTO_SEED: "true"
+      CREATE_DEMO_USERS: "true"
+    volumes:
+      - ./data:/app/data:ro
+
+volumes:
+  mongo_data:

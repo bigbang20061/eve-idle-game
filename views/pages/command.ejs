@@ -1,0 +1,43 @@
+<%- include('../partials/head', { title, active }) %>
+<%- include('../partials/nav', { user, active }) %>
+<section class="grid command-grid">
+  <div class="panel viewport-panel">
+    <div class="panel-title"><h1>指挥室</h1><span id="server-clock"></span></div>
+    <canvas id="space-canvas" width="960" height="540" aria-label="space viewport"></canvas>
+    <div class="quick-actions">
+      <button class="button small" data-action="dock">立即撤离</button>
+      <button class="button small ghost" data-toggle-autopilot>切换挂机</button>
+      <a class="button small ghost" href="/star-map">打开星图</a>
+    </div>
+  </div>
+  <aside class="panel hud-panel">
+    <h2><%= character?.name %></h2>
+    <div id="hud-stats" class="stat-cards"></div>
+    <form id="autopilot-form" class="form-stack compact">
+      <label>作业类型
+        <select name="activity">
+          <% for (const v of ['mining','ratting','relic','data','hauling','combat']) { %>
+            <option value="<%= v %>" <%= character?.autopilot?.activity===v?'selected':'' %>><%= ({mining:'采矿',ratting:'刷怪',relic:'遗迹',data:'数据',hauling:'运输',combat:'战斗'})[v] %></option>
+          <% } %>
+        </select>
+      </label>
+      <label>风险阈值 <input name="risk" type="range" min="0.05" max="1.2" step="0.05" value="<%= character?.autopilot?.risk || 0.35 %>"></label>
+      <label>撤离血线 <input name="minShieldPct" type="range" min="0.1" max="0.9" step="0.05" value="<%= character?.autopilot?.minShieldPct || 0.35 %>"></label>
+      <label><input type="checkbox" name="enabled" <%= character?.autopilot?.enabled?'checked':'' %>> 开启挂机</label>
+      <label><input type="checkbox" name="sellExcess" <%= character?.autopilot?.sellExcess?'checked':'' %>> 撤离后卖出超额库存</label>
+      <button class="button small">保存调度</button>
+    </form>
+  </aside>
+</section>
+<section class="grid two">
+  <article class="panel">
+    <h2>远征日志</h2>
+    <div id="expedition-log" class="event-list small-list"></div>
+  </article>
+  <article class="panel">
+    <h2>本地通讯</h2>
+    <div id="chat-box" class="chat-box"></div>
+    <form id="chat-form" class="chat-form"><select name="channel"><option value="global">全域</option><option value="system">本地</option><option value="fleet">舰队</option></select><input name="text" placeholder="发送消息"><button>发送</button></form>
+  </article>
+</section>
+<%- include('../partials/footer') %>

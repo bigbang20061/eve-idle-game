@@ -1,0 +1,19 @@
+<%- include('../partials/head', { title, active }) %>
+<%- include('../partials/nav', { user, active }) %>
+<section class="grid two">
+  <article class="panel">
+    <h1>当前舰船</h1>
+    <div id="ship-card" class="ship-card"></div>
+    <h2>已装配模块</h2>
+    <div id="fitting-list" class="card-list"></div>
+  </article>
+  <article class="panel">
+    <h1>模块仓库</h1>
+    <div id="module-inventory" class="card-list"></div>
+  </article>
+</section>
+<section class="panel">
+  <h2>备用舰船</h2>
+  <div id="hangar-ships" class="card-grid"></div>
+</section>
+<%- include('../partials/footer') %>

@@ -1,0 +1,2222 @@
+{
+  "meta": {
+    "name": "EVE Idle Game Lite Seed",
+    "source": "SDE-shaped built-in seed; replace/extend with official JSONL/YAML SDE",
+    "generatedAt": "2026-06-12T00:00:00-07:00",
+    "buildNumber": null,
+    "usedFiles": [
+      "types",
+      "groups",
+      "categories",
+      "marketGroups",
+      "mapSolarSystems",
+      "blueprints",
+      "typeMaterials",
+      "typeDogma"
+    ],
+    "counts": {
+      "items": 48,
+      "ships": 10,
+      "modules": 18,
+      "systems": 16,
+      "blueprints": 6,
+      "refine": 10
+    },
+    "note": "Names are public game data flavored seed. Gameplay values are simplified and not live EVE market or ship balance."
+  },
+  "items": [
+    {
+      "id": "34",
+      "typeID": 34,
+      "name": "Tritanium",
+      "zh": "三钛合金",
+      "kind": "mineral",
+      "volume": 0.01,
+      "baseValue": 6,
+      "basePrice": 6,
+      "rarity": 1.0,
+      "tier": 1,
+      "group": "Mineral",
+      "category": "Material",
+      "marketGroup": "Minerals",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "35",
+      "typeID": 35,
+      "name": "Pyerite",
+      "zh": "类晶体胶矿",
+      "kind": "mineral",
+      "volume": 0.01,
+      "baseValue": 12,
+      "basePrice": 12,
+      "rarity": 1.2,
+      "tier": 1,
+      "group": "Mineral",
+      "category": "Material",
+      "marketGroup": "Minerals",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "36",
+      "typeID": 36,
+      "name": "Mexallon",
+      "zh": "类银超金属",
+      "kind": "mineral",
+      "volume": 0.01,
+      "baseValue": 28,
+      "basePrice": 28,
+      "rarity": 1.6,
+      "tier": 2,
+      "group": "Mineral",
+      "category": "Material",
+      "marketGroup": "Minerals",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "37",
+      "typeID": 37,
+      "name": "Isogen",
+      "zh": "同位聚合体",
+      "kind": "mineral",
+      "volume": 0.01,
+      "baseValue": 55,
+      "basePrice": 55,
+      "rarity": 2.2,
+      "tier": 2,
+      "group": "Mineral",
+      "category": "Material",
+      "marketGroup": "Minerals",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "38",
+      "typeID": 38,
+      "name": "Nocxium",
+      "zh": "超新星诺克石",
+      "kind": "mineral",
+      "volume": 0.01,
+      "baseValue": 118,
+      "basePrice": 118,
+      "rarity": 3.1,
+      "tier": 3,
+      "group": "Mineral",
+      "category": "Material",
+      "marketGroup": "Minerals",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "39",
+      "typeID": 39,
+      "name": "Zydrine",
+      "zh": "晶状石英核岩",
+      "kind": "mineral",
+      "volume": 0.01,
+      "baseValue": 245,
+      "basePrice": 245,
+      "rarity": 4.6,
+      "tier": 4,
+      "group": "Mineral",
+      "category": "Material",
+      "marketGroup": "Minerals",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "40",
+      "typeID": 40,
+      "name": "Megacyte",
+      "zh": "超噬矿",
+      "kind": "mineral",
+      "volume": 0.01,
+      "baseValue": 440,
+      "basePrice": 440,
+      "rarity": 6.2,
+      "tier": 5,
+      "group": "Mineral",
+      "category": "Material",
+      "marketGroup": "Minerals",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "11399",
+      "typeID": 11399,
+      "name": "Morphite",
+      "zh": "超噬矿精华",
+      "kind": "mineral",
+      "volume": 0.01,
+      "baseValue": 980,
+      "basePrice": 980,
+      "rarity": 8.0,
+      "tier": 6,
+      "group": "Mineral",
+      "category": "Material",
+      "marketGroup": "Minerals",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "1230",
+      "typeID": 1230,
+      "name": "Veldspar",
+      "zh": "凡晶石",
+      "kind": "ore",
+      "volume": 0.1,
+      "baseValue": 9,
+      "basePrice": 9,
+      "rarity": 1.0,
+      "tier": 1,
+      "group": "Veldspar",
+      "category": "Asteroid",
+      "marketGroup": "Standard Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "1228",
+      "typeID": 1228,
+      "name": "Scordite",
+      "zh": "灼烧岩",
+      "kind": "ore",
+      "volume": 0.15,
+      "baseValue": 18,
+      "basePrice": 18,
+      "rarity": 1.3,
+      "tier": 1,
+      "group": "Scordite",
+      "category": "Asteroid",
+      "marketGroup": "Standard Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "1224",
+      "typeID": 1224,
+      "name": "Pyroxeres",
+      "zh": "干焦岩",
+      "kind": "ore",
+      "volume": 0.3,
+      "baseValue": 45,
+      "basePrice": 45,
+      "rarity": 1.8,
+      "tier": 2,
+      "group": "Pyroxeres",
+      "category": "Asteroid",
+      "marketGroup": "Standard Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "18",
+      "typeID": 18,
+      "name": "Plagioclase",
+      "zh": "斜长岩",
+      "kind": "ore",
+      "volume": 0.35,
+      "baseValue": 68,
+      "basePrice": 68,
+      "rarity": 2.2,
+      "tier": 2,
+      "group": "Plagioclase",
+      "category": "Asteroid",
+      "marketGroup": "Standard Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "1227",
+      "typeID": 1227,
+      "name": "Omber",
+      "zh": "奥贝尔石",
+      "kind": "ore",
+      "volume": 0.6,
+      "baseValue": 110,
+      "basePrice": 110,
+      "rarity": 2.8,
+      "tier": 3,
+      "group": "Omber",
+      "category": "Asteroid",
+      "marketGroup": "Standard Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "20",
+      "typeID": 20,
+      "name": "Kernite",
+      "zh": "水硼砂",
+      "kind": "ore",
+      "volume": 1.2,
+      "baseValue": 145,
+      "basePrice": 145,
+      "rarity": 3.0,
+      "tier": 3,
+      "group": "Kernite",
+      "category": "Asteroid",
+      "marketGroup": "Standard Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "1226",
+      "typeID": 1226,
+      "name": "Jaspet",
+      "zh": "杰斯贝矿",
+      "kind": "ore",
+      "volume": 2.0,
+      "baseValue": 230,
+      "basePrice": 230,
+      "rarity": 3.8,
+      "tier": 4,
+      "group": "Jaspet",
+      "category": "Asteroid",
+      "marketGroup": "Standard Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "1232",
+      "typeID": 1232,
+      "name": "Hemorphite",
+      "zh": "希莫非特",
+      "kind": "ore",
+      "volume": 3.0,
+      "baseValue": 310,
+      "basePrice": 310,
+      "rarity": 4.5,
+      "tier": 4,
+      "group": "Hemorphite",
+      "category": "Asteroid",
+      "marketGroup": "Standard Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "21",
+      "typeID": 21,
+      "name": "Hedbergite",
+      "zh": "赫莫戈石",
+      "kind": "ore",
+      "volume": 3.0,
+      "baseValue": 360,
+      "basePrice": 360,
+      "rarity": 4.8,
+      "tier": 4,
+      "group": "Hedbergite",
+      "category": "Asteroid",
+      "marketGroup": "Standard Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "1229",
+      "typeID": 1229,
+      "name": "Gneiss",
+      "zh": "片麻岩",
+      "kind": "ore",
+      "volume": 5.0,
+      "baseValue": 520,
+      "basePrice": 520,
+      "rarity": 5.4,
+      "tier": 5,
+      "group": "Gneiss",
+      "category": "Asteroid",
+      "marketGroup": "Nullsec Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "1231",
+      "typeID": 1231,
+      "name": "Dark Ochre",
+      "zh": "黑赭石",
+      "kind": "ore",
+      "volume": 8.0,
+      "baseValue": 760,
+      "basePrice": 760,
+      "rarity": 6.3,
+      "tier": 5,
+      "group": "Dark Ochre",
+      "category": "Asteroid",
+      "marketGroup": "Nullsec Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "22",
+      "typeID": 22,
+      "name": "Arkonor",
+      "zh": "艾克诺岩",
+      "kind": "ore",
+      "volume": 16.0,
+      "baseValue": 1400,
+      "basePrice": 1400,
+      "rarity": 7.6,
+      "tier": 6,
+      "group": "Arkonor",
+      "category": "Asteroid",
+      "marketGroup": "Nullsec Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "1225",
+      "typeID": 1225,
+      "name": "Bistot",
+      "zh": "双多特石",
+      "kind": "ore",
+      "volume": 16.0,
+      "baseValue": 1320,
+      "basePrice": 1320,
+      "rarity": 7.3,
+      "tier": 6,
+      "group": "Bistot",
+      "category": "Asteroid",
+      "marketGroup": "Nullsec Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "1223",
+      "typeID": 1223,
+      "name": "Crokite",
+      "zh": "克洛基石",
+      "kind": "ore",
+      "volume": 16.0,
+      "baseValue": 1260,
+      "basePrice": 1260,
+      "rarity": 7.0,
+      "tier": 6,
+      "group": "Crokite",
+      "category": "Asteroid",
+      "marketGroup": "Nullsec Ores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25619",
+      "typeID": 25619,
+      "name": "Burned Logic Circuit",
+      "zh": "烧毁的逻辑电路",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 130,
+      "basePrice": 130,
+      "rarity": 2.2,
+      "tier": 2,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25615",
+      "typeID": 25615,
+      "name": "Tripped Power Circuit",
+      "zh": "跳断的电源线路",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 90,
+      "basePrice": 90,
+      "rarity": 2.0,
+      "tier": 2,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25595",
+      "typeID": 25595,
+      "name": "Alloyed Tritanium Bar",
+      "zh": "合金三钛棒",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 210,
+      "basePrice": 210,
+      "rarity": 3.2,
+      "tier": 3,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25599",
+      "typeID": 25599,
+      "name": "Charred Micro Circuit",
+      "zh": "烧焦的微电路",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 74,
+      "basePrice": 74,
+      "rarity": 1.8,
+      "tier": 1,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25603",
+      "typeID": 25603,
+      "name": "Fried Interface Circuit",
+      "zh": "烧毁的接口电路",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 165,
+      "basePrice": 165,
+      "rarity": 2.8,
+      "tier": 3,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25607",
+      "typeID": 25607,
+      "name": "Malfunctioning Shield Emitter",
+      "zh": "故障护盾发射器",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 240,
+      "basePrice": 240,
+      "rarity": 3.5,
+      "tier": 3,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25611",
+      "typeID": 25611,
+      "name": "Contaminated Nanite Compound",
+      "zh": "污染纳米聚合物",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 320,
+      "basePrice": 320,
+      "rarity": 4.4,
+      "tier": 4,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25623",
+      "typeID": 25623,
+      "name": "Melted Capacitor Console",
+      "zh": "熔毁电容控制台",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 410,
+      "basePrice": 410,
+      "rarity": 5.0,
+      "tier": 4,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25707",
+      "typeID": 25707,
+      "name": "Intact Armor Plates",
+      "zh": "完整装甲板",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 720,
+      "basePrice": 720,
+      "rarity": 6.0,
+      "tier": 5,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25711",
+      "typeID": 25711,
+      "name": "Power Circuit",
+      "zh": "电源电路",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 840,
+      "basePrice": 840,
+      "rarity": 6.8,
+      "tier": 5,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25715",
+      "typeID": 25715,
+      "name": "Thruster Console",
+      "zh": "推进控制台",
+      "kind": "salvage",
+      "volume": 0.01,
+      "baseValue": 1150,
+      "basePrice": 1150,
+      "rarity": 7.3,
+      "tier": 6,
+      "group": "Salvaged Materials",
+      "category": "Material",
+      "marketGroup": "Salvage Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "20410",
+      "typeID": 20410,
+      "name": "Datacore - Electronic Engineering",
+      "zh": "电子工程数据核心",
+      "kind": "data",
+      "volume": 0.1,
+      "baseValue": 520,
+      "basePrice": 520,
+      "rarity": 3.2,
+      "tier": 3,
+      "group": "Datacores",
+      "category": "Commodity",
+      "marketGroup": "Datacores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "20418",
+      "typeID": 20418,
+      "name": "Datacore - Mechanical Engineering",
+      "zh": "机械工程数据核心",
+      "kind": "data",
+      "volume": 0.1,
+      "baseValue": 560,
+      "basePrice": 560,
+      "rarity": 3.4,
+      "tier": 3,
+      "group": "Datacores",
+      "category": "Commodity",
+      "marketGroup": "Datacores",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "34201",
+      "typeID": 34201,
+      "name": "Symmetry Decryptor",
+      "zh": "对称解密器",
+      "kind": "data",
+      "volume": 0.1,
+      "baseValue": 870,
+      "basePrice": 870,
+      "rarity": 4.8,
+      "tier": 4,
+      "group": "Decryptors",
+      "category": "Commodity",
+      "marketGroup": "Decryptors",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "30018",
+      "typeID": 30018,
+      "name": "Ancient Coordinates",
+      "zh": "古旧坐标片段",
+      "kind": "data",
+      "volume": 0.02,
+      "baseValue": 260,
+      "basePrice": 260,
+      "rarity": 2.8,
+      "tier": 2,
+      "group": "Data Fragments",
+      "category": "Commodity",
+      "marketGroup": "Data Fragments",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "30019",
+      "typeID": 30019,
+      "name": "Encrypted Relay Key",
+      "zh": "加密中继密钥",
+      "kind": "data",
+      "volume": 0.02,
+      "baseValue": 520,
+      "basePrice": 520,
+      "rarity": 4.8,
+      "tier": 4,
+      "group": "Data Fragments",
+      "category": "Commodity",
+      "marketGroup": "Data Fragments",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "30020",
+      "typeID": 30020,
+      "name": "Sleeper Cache Shard",
+      "zh": "冬眠者缓存碎片",
+      "kind": "data",
+      "volume": 0.03,
+      "baseValue": 980,
+      "basePrice": 980,
+      "rarity": 6.8,
+      "tier": 5,
+      "group": "Ancient Salvage",
+      "category": "Commodity",
+      "marketGroup": "Ancient Relics",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "30021",
+      "typeID": 30021,
+      "name": "Relic Logic Mesh",
+      "zh": "遗迹逻辑网格",
+      "kind": "data",
+      "volume": 0.03,
+      "baseValue": 1250,
+      "basePrice": 1250,
+      "rarity": 7.8,
+      "tier": 6,
+      "group": "Ancient Salvage",
+      "category": "Commodity",
+      "marketGroup": "Ancient Relics",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "30370",
+      "typeID": 30370,
+      "name": "Fullerite-C28",
+      "zh": "富勒烯-C28",
+      "kind": "gas",
+      "volume": 10.0,
+      "baseValue": 140,
+      "basePrice": 140,
+      "rarity": 3.1,
+      "tier": 3,
+      "group": "Harvestable Cloud",
+      "category": "Gas Cloud",
+      "marketGroup": "Fullerites",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "30371",
+      "typeID": 30371,
+      "name": "Fullerite-C32",
+      "zh": "富勒烯-C32",
+      "kind": "gas",
+      "volume": 10.0,
+      "baseValue": 210,
+      "basePrice": 210,
+      "rarity": 4.0,
+      "tier": 4,
+      "group": "Harvestable Cloud",
+      "category": "Gas Cloud",
+      "marketGroup": "Fullerites",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "30372",
+      "typeID": 30372,
+      "name": "Fullerite-C50",
+      "zh": "富勒烯-C50",
+      "kind": "gas",
+      "volume": 10.0,
+      "baseValue": 360,
+      "basePrice": 360,
+      "rarity": 5.0,
+      "tier": 5,
+      "group": "Harvestable Cloud",
+      "category": "Gas Cloud",
+      "marketGroup": "Fullerites",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "25279",
+      "typeID": 25279,
+      "name": "Cytoserocin",
+      "zh": "细胞丝胶质",
+      "kind": "gas",
+      "volume": 10.0,
+      "baseValue": 90,
+      "basePrice": 90,
+      "rarity": 2.5,
+      "tier": 2,
+      "group": "Harvestable Cloud",
+      "category": "Gas Cloud",
+      "marketGroup": "Gas Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "28695",
+      "typeID": 28695,
+      "name": "Mykoserocin",
+      "zh": "菌丝胶质",
+      "kind": "gas",
+      "volume": 10.0,
+      "baseValue": 80,
+      "basePrice": 80,
+      "rarity": 2.2,
+      "tier": 2,
+      "group": "Harvestable Cloud",
+      "category": "Gas Cloud",
+      "marketGroup": "Gas Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "3683",
+      "typeID": 3683,
+      "name": "Mechanical Parts",
+      "zh": "机械元件",
+      "kind": "component",
+      "volume": 0.01,
+      "baseValue": 160,
+      "basePrice": 160,
+      "rarity": 2.3,
+      "tier": 2,
+      "group": "Commodities",
+      "category": "Commodity",
+      "marketGroup": "Planetary Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "3689",
+      "typeID": 3689,
+      "name": "Electronic Parts",
+      "zh": "电子元件",
+      "kind": "component",
+      "volume": 0.01,
+      "baseValue": 190,
+      "basePrice": 190,
+      "rarity": 2.6,
+      "tier": 2,
+      "group": "Commodities",
+      "category": "Commodity",
+      "marketGroup": "Planetary Materials",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "3828",
+      "typeID": 3828,
+      "name": "Construction Blocks",
+      "zh": "建筑模块",
+      "kind": "component",
+      "volume": 1.5,
+      "baseValue": 320,
+      "basePrice": 320,
+      "rarity": 3.2,
+      "tier": 3,
+      "group": "Commodities",
+      "category": "Commodity",
+      "marketGroup": "Planetary Materials",
+      "source": "seed-sde-lite"
+    }
+  ],
+  "systems": [
+    {
+      "id": "30000142",
+      "name": "Jita",
+      "zh": "吉他",
+      "security": 0.945,
+      "region": "The Forge",
+      "x": 62,
+      "y": 20,
+      "hub": true,
+      "kind": "trade",
+      "richness": 0.78,
+      "danger": 0.08
+    },
+    {
+      "id": "30000144",
+      "name": "Perimeter",
+      "zh": "佩里米特",
+      "security": 0.953,
+      "region": "The Forge",
+      "x": 57,
+      "y": 25,
+      "hub": true,
+      "kind": "high",
+      "richness": 0.82,
+      "danger": 0.08
+    },
+    {
+      "id": "30001394",
+      "name": "Sobaseki",
+      "zh": "索巴塞基",
+      "security": 0.802,
+      "region": "Lonetrek",
+      "x": 46,
+      "y": 28,
+      "kind": "high",
+      "richness": 0.94,
+      "danger": 0.12
+    },
+    {
+      "id": "30002187",
+      "name": "Amarr",
+      "zh": "艾玛",
+      "security": 1.0,
+      "region": "Domain",
+      "x": 78,
+      "y": 60,
+      "hub": true,
+      "kind": "trade",
+      "richness": 0.75,
+      "danger": 0.06
+    },
+    {
+      "id": "30002659",
+      "name": "Dodixie",
+      "zh": "多迪克西",
+      "security": 0.902,
+      "region": "Sinq Laison",
+      "x": 42,
+      "y": 64,
+      "hub": true,
+      "kind": "trade",
+      "richness": 0.8,
+      "danger": 0.08
+    },
+    {
+      "id": "30002510",
+      "name": "Rens",
+      "zh": "伦斯",
+      "security": 0.898,
+      "region": "Heimatar",
+      "x": 25,
+      "y": 50,
+      "hub": true,
+      "kind": "high",
+      "richness": 0.86,
+      "danger": 0.1
+    },
+    {
+      "id": "30002053",
+      "name": "Hek",
+      "zh": "赫克",
+      "security": 0.515,
+      "region": "Metropolis",
+      "x": 28,
+      "y": 56,
+      "hub": true,
+      "kind": "border",
+      "richness": 1.05,
+      "danger": 0.22
+    },
+    {
+      "id": "30002813",
+      "name": "Tama",
+      "zh": "塔玛",
+      "security": 0.306,
+      "region": "The Citadel",
+      "x": 63,
+      "y": 35,
+      "kind": "low",
+      "richness": 1.45,
+      "danger": 0.43
+    },
+    {
+      "id": "30002537",
+      "name": "Amamake",
+      "zh": "阿玛玛克",
+      "security": 0.442,
+      "region": "Heimatar",
+      "x": 20,
+      "y": 58,
+      "kind": "low",
+      "richness": 1.3,
+      "danger": 0.39
+    },
+    {
+      "id": "30003068",
+      "name": "Rancer",
+      "zh": "兰瑟",
+      "security": 0.39,
+      "region": "Sinq Laison",
+      "x": 36,
+      "y": 70,
+      "kind": "low",
+      "richness": 1.42,
+      "danger": 0.45
+    },
+    {
+      "id": "30005000",
+      "name": "Old Man Star",
+      "zh": "老人星",
+      "security": 0.309,
+      "region": "Placid",
+      "x": 33,
+      "y": 44,
+      "kind": "low",
+      "richness": 1.52,
+      "danger": 0.5
+    },
+    {
+      "id": "30045344",
+      "name": "M-OEE8",
+      "zh": "M-OEE8",
+      "security": 0.0,
+      "region": "Tribute",
+      "x": 70,
+      "y": 22,
+      "kind": "null",
+      "richness": 2.1,
+      "danger": 0.66
+    },
+    {
+      "id": "30004759",
+      "name": "1DQ1-A",
+      "zh": "1DQ1-A",
+      "security": -0.28,
+      "region": "Delve",
+      "x": 15,
+      "y": 80,
+      "kind": "null",
+      "richness": 2.45,
+      "danger": 0.74
+    },
+    {
+      "id": "30004797",
+      "name": "NOL-M9",
+      "zh": "NOL-M9",
+      "security": -0.44,
+      "region": "Delve",
+      "x": 18,
+      "y": 86,
+      "kind": "null",
+      "richness": 2.55,
+      "danger": 0.78
+    },
+    {
+      "id": "31000005",
+      "name": "Thera",
+      "zh": "希拉",
+      "security": -0.99,
+      "region": "Anoikis",
+      "x": 49,
+      "y": 84,
+      "kind": "wormhole",
+      "richness": 3.1,
+      "danger": 0.88
+    },
+    {
+      "id": "31002345",
+      "name": "J-Space C3 Pocket",
+      "zh": "C3虫洞口袋",
+      "security": -1.0,
+      "region": "Anoikis",
+      "x": 60,
+      "y": 86,
+      "kind": "wormhole",
+      "richness": 3.35,
+      "danger": 0.92
+    }
+  ],
+  "ships": [
+    {
+      "id": "32880",
+      "name": "Venture",
+      "zh": "探索级采矿护卫舰",
+      "class": "Mining Frigate",
+      "role": "miner",
+      "cargo": 150,
+      "oreHold": 5000,
+      "shield": 90,
+      "armor": 55,
+      "hull": 75,
+      "dps": 7,
+      "mining": 13,
+      "hack": 4,
+      "scan": 7,
+      "extract": 5,
+      "cost": 0,
+      "slots": {
+        "high": 2,
+        "mid": 3,
+        "low": 1,
+        "rig": 1
+      },
+      "group": "Mining Frigate",
+      "category": "Ship",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "603",
+      "name": "Merlin",
+      "zh": "小鹰级护卫舰",
+      "class": "Frigate",
+      "role": "combat",
+      "cargo": 95,
+      "shield": 145,
+      "armor": 75,
+      "hull": 95,
+      "dps": 22,
+      "mining": 2,
+      "hack": 2,
+      "scan": 2,
+      "extract": 3,
+      "cost": 1600,
+      "slots": {
+        "high": 3,
+        "mid": 4,
+        "low": 2,
+        "rig": 1
+      },
+      "group": "Frigate",
+      "category": "Ship",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "586",
+      "name": "Probe",
+      "zh": "探索者级护卫舰",
+      "class": "Frigate",
+      "role": "scanner",
+      "cargo": 120,
+      "shield": 90,
+      "armor": 75,
+      "hull": 70,
+      "dps": 12,
+      "mining": 3,
+      "hack": 14,
+      "scan": 17,
+      "extract": 10,
+      "cost": 2400,
+      "slots": {
+        "high": 3,
+        "mid": 4,
+        "low": 3,
+        "rig": 2
+      },
+      "group": "Frigate",
+      "category": "Ship",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "587",
+      "name": "Rifter",
+      "zh": "裂谷级护卫舰",
+      "class": "Frigate",
+      "role": "raider",
+      "cargo": 105,
+      "shield": 95,
+      "armor": 92,
+      "hull": 110,
+      "dps": 25,
+      "mining": 2,
+      "hack": 3,
+      "scan": 4,
+      "extract": 8,
+      "cost": 2800,
+      "slots": {
+        "high": 3,
+        "mid": 3,
+        "low": 3,
+        "rig": 2
+      },
+      "group": "Frigate",
+      "category": "Ship",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "593",
+      "name": "Tristan",
+      "zh": "特里斯坦级护卫舰",
+      "class": "Frigate",
+      "role": "drone",
+      "cargo": 115,
+      "shield": 85,
+      "armor": 110,
+      "hull": 112,
+      "dps": 24,
+      "mining": 2,
+      "hack": 4,
+      "scan": 5,
+      "extract": 5,
+      "cost": 3200,
+      "slots": {
+        "high": 3,
+        "mid": 3,
+        "low": 3,
+        "rig": 2
+      },
+      "group": "Frigate",
+      "category": "Ship",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "16238",
+      "name": "Cormorant",
+      "zh": "鸬鹚级驱逐舰",
+      "class": "Destroyer",
+      "role": "gunboat",
+      "cargo": 170,
+      "shield": 235,
+      "armor": 120,
+      "hull": 160,
+      "dps": 48,
+      "mining": 2,
+      "hack": 2,
+      "scan": 1,
+      "extract": 0,
+      "cost": 7200,
+      "slots": {
+        "high": 7,
+        "mid": 4,
+        "low": 2,
+        "rig": 2
+      },
+      "group": "Destroyer",
+      "category": "Ship",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "16240",
+      "name": "Catalyst",
+      "zh": "促进级驱逐舰",
+      "class": "Destroyer",
+      "role": "gunboat",
+      "cargo": 165,
+      "shield": 110,
+      "armor": 210,
+      "hull": 190,
+      "dps": 56,
+      "mining": 2,
+      "hack": 1,
+      "scan": 1,
+      "extract": -1,
+      "cost": 7600,
+      "slots": {
+        "high": 7,
+        "mid": 2,
+        "low": 4,
+        "rig": 2
+      },
+      "group": "Destroyer",
+      "category": "Ship",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "626",
+      "name": "Vexor",
+      "zh": "狂怒者级巡洋舰",
+      "class": "Cruiser",
+      "role": "drone cruiser",
+      "cargo": 420,
+      "shield": 420,
+      "armor": 520,
+      "hull": 470,
+      "dps": 86,
+      "mining": 3,
+      "hack": 2,
+      "scan": 0,
+      "extract": -4,
+      "cost": 28000,
+      "slots": {
+        "high": 4,
+        "mid": 4,
+        "low": 5,
+        "rig": 3
+      },
+      "group": "Cruiser",
+      "category": "Ship",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "17478",
+      "name": "Retriever",
+      "zh": "猎获级采矿驳船",
+      "class": "Mining Barge",
+      "role": "barge",
+      "cargo": 320,
+      "oreHold": 12000,
+      "shield": 310,
+      "armor": 190,
+      "hull": 260,
+      "dps": 5,
+      "mining": 48,
+      "hack": 0,
+      "scan": -3,
+      "extract": -8,
+      "cost": 42000,
+      "slots": {
+        "high": 2,
+        "mid": 3,
+        "low": 2,
+        "rig": 3
+      },
+      "group": "Mining Barge",
+      "category": "Ship",
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "33697",
+      "name": "Prospect",
+      "zh": "勘探者级深空采集舰",
+      "class": "Expedition Frigate",
+      "role": "deep miner",
+      "cargo": 260,
+      "oreHold": 10000,
+      "shield": 170,
+      "armor": 130,
+      "hull": 150,
+      "dps": 13,
+      "mining": 30,
+      "hack": 12,
+      "scan": 16,
+      "extract": 18,
+      "cost": 68000,
+      "slots": {
+        "high": 3,
+        "mid": 4,
+        "low": 4,
+        "rig": 2
+      },
+      "group": "Expedition Frigate",
+      "category": "Ship",
+      "source": "seed-sde-lite"
+    }
+  ],
+  "modules": [
+    {
+      "id": "miner_i",
+      "typeID": 483,
+      "name": "Miner I",
+      "zh": "采矿器 I",
+      "slot": "high",
+      "kind": "miner",
+      "effects": {
+        "mining": 8
+      },
+      "cost": 800,
+      "tier": 1,
+      "group": "Mining Laser",
+      "category": "Module"
+    },
+    {
+      "id": "salvager_i",
+      "typeID": 25861,
+      "name": "Salvager I",
+      "zh": "打捞器 I",
+      "slot": "high",
+      "kind": "salvage",
+      "effects": {
+        "salvage": 8,
+        "lootBonus": 0.06
+      },
+      "cost": 1200,
+      "tier": 1,
+      "group": "Salvager",
+      "category": "Module"
+    },
+    {
+      "id": "railgun_i",
+      "typeID": 565,
+      "name": "150mm Railgun I",
+      "zh": "150mm磁轨炮 I",
+      "slot": "high",
+      "kind": "weapon",
+      "effects": {
+        "dps": 14
+      },
+      "cost": 1600,
+      "tier": 1,
+      "group": "Hybrid Weapon",
+      "category": "Module"
+    },
+    {
+      "id": "blaster_i",
+      "typeID": 561,
+      "name": "Light Electron Blaster I",
+      "zh": "轻型电子疾速炮 I",
+      "slot": "high",
+      "kind": "weapon",
+      "effects": {
+        "dps": 18,
+        "extract": -1
+      },
+      "cost": 1700,
+      "tier": 1,
+      "group": "Hybrid Weapon",
+      "category": "Module"
+    },
+    {
+      "id": "analyzer_data",
+      "typeID": 22175,
+      "name": "Data Analyzer I",
+      "zh": "数据分析仪 I",
+      "slot": "mid",
+      "kind": "hacking",
+      "effects": {
+        "hack": 12,
+        "scan": 4
+      },
+      "cost": 2500,
+      "tier": 1,
+      "group": "Data Miners",
+      "category": "Module"
+    },
+    {
+      "id": "analyzer_relic",
+      "typeID": 22177,
+      "name": "Relic Analyzer I",
+      "zh": "遗迹分析仪 I",
+      "slot": "mid",
+      "kind": "hacking",
+      "effects": {
+        "hack": 10,
+        "salvage": 5
+      },
+      "cost": 2500,
+      "tier": 1,
+      "group": "Relic Analyzer",
+      "category": "Module"
+    },
+    {
+      "id": "afterburner",
+      "typeID": 439,
+      "name": "1MN Afterburner I",
+      "zh": "1MN加力燃烧器 I",
+      "slot": "mid",
+      "kind": "propulsion",
+      "effects": {
+        "extract": 7,
+        "speed": 18
+      },
+      "cost": 2200,
+      "tier": 1,
+      "group": "Afterburner",
+      "category": "Module"
+    },
+    {
+      "id": "shield_extender",
+      "typeID": 3829,
+      "name": "Medium Shield Extender I",
+      "zh": "中型护盾扩展装置 I",
+      "slot": "mid",
+      "kind": "shield",
+      "effects": {
+        "shield": 120
+      },
+      "cost": 5200,
+      "tier": 2,
+      "group": "Shield Extender",
+      "category": "Module"
+    },
+    {
+      "id": "shield_booster",
+      "typeID": 399,
+      "name": "Small Shield Booster I",
+      "zh": "小型护盾回充器 I",
+      "slot": "mid",
+      "kind": "shield",
+      "effects": {
+        "regen": 2.5,
+        "shield": 40
+      },
+      "cost": 3400,
+      "tier": 1,
+      "group": "Shield Booster",
+      "category": "Module"
+    },
+    {
+      "id": "survey_scanner",
+      "typeID": 444,
+      "name": "Survey Scanner I",
+      "zh": "测量扫描器 I",
+      "slot": "mid",
+      "kind": "scanner",
+      "effects": {
+        "scan": 12,
+        "mining": 3
+      },
+      "cost": 2600,
+      "tier": 1,
+      "group": "Survey Scanner",
+      "category": "Module"
+    },
+    {
+      "id": "cargo_expander",
+      "typeID": 1317,
+      "name": "Expanded Cargohold I",
+      "zh": "扩充货柜舱 I",
+      "slot": "low",
+      "kind": "cargo",
+      "effects": {
+        "cargo": 95,
+        "extract": -2
+      },
+      "cost": 1800,
+      "tier": 1,
+      "group": "Cargo Enhancer",
+      "category": "Module"
+    },
+    {
+      "id": "warp_core",
+      "typeID": 10998,
+      "name": "Warp Core Stabilizer I",
+      "zh": "跃迁核心稳定器 I",
+      "slot": "low",
+      "kind": "escape",
+      "effects": {
+        "extract": 14,
+        "warpStrength": 1,
+        "dps": -3
+      },
+      "cost": 4600,
+      "tier": 2,
+      "group": "Warp Core Stabilizer",
+      "category": "Module"
+    },
+    {
+      "id": "nanofiber",
+      "typeID": 2605,
+      "name": "Nanofiber Internal Structure I",
+      "zh": "纳米纤维内部构架 I",
+      "slot": "low",
+      "kind": "speed",
+      "effects": {
+        "extract": 8,
+        "speed": 15,
+        "hull": -10
+      },
+      "cost": 3200,
+      "tier": 1,
+      "group": "Hull Upgrades",
+      "category": "Module"
+    },
+    {
+      "id": "drone_amp",
+      "typeID": 4393,
+      "name": "Drone Damage Amplifier I",
+      "zh": "无人机伤害增效装置 I",
+      "slot": "low",
+      "kind": "drone",
+      "effects": {
+        "dps": 16,
+        "drone": 1
+      },
+      "cost": 5600,
+      "tier": 2,
+      "group": "Drone Upgrade",
+      "category": "Module"
+    },
+    {
+      "id": "probe_launcher",
+      "typeID": 17938,
+      "name": "Core Probe Launcher I",
+      "zh": "核心探针发射器 I",
+      "slot": "high",
+      "kind": "scanner",
+      "effects": {
+        "scan": 18,
+        "hack": 3
+      },
+      "cost": 3000,
+      "tier": 1,
+      "group": "Scan Probe Launcher",
+      "category": "Module"
+    },
+    {
+      "id": "covert_rig",
+      "typeID": 31360,
+      "name": "Small Emission Scope Sharpener I",
+      "zh": "小型发射镜锐化装置 I",
+      "slot": "rig",
+      "kind": "hacking",
+      "effects": {
+        "hack": 16
+      },
+      "cost": 8600,
+      "tier": 2,
+      "group": "Rig",
+      "category": "Module"
+    },
+    {
+      "id": "cargo_rig",
+      "typeID": 31260,
+      "name": "Small Cargohold Optimization I",
+      "zh": "小型货柜优化装置 I",
+      "slot": "rig",
+      "kind": "cargo",
+      "effects": {
+        "cargo": 160
+      },
+      "cost": 9200,
+      "tier": 2,
+      "group": "Rig",
+      "category": "Module"
+    },
+    {
+      "id": "shield_rig",
+      "typeID": 31718,
+      "name": "Small Core Defense Field Extender I",
+      "zh": "小型核心防御力场扩张装置 I",
+      "slot": "rig",
+      "kind": "shield",
+      "effects": {
+        "shield": 160
+      },
+      "cost": 11000,
+      "tier": 2,
+      "group": "Rig",
+      "category": "Module"
+    }
+  ],
+  "blueprints": [
+    {
+      "id": "bp_shield_extender",
+      "blueprintTypeID": "3829-bp",
+      "name": "Medium Shield Extender I Blueprint",
+      "zh": "中型护盾扩展装置 I 蓝图",
+      "productTypeID": "shield_extender",
+      "productName": "Medium Shield Extender I",
+      "productKind": "module",
+      "quantity": 1,
+      "time": 38,
+      "materials": [
+        {
+          "typeID": "34",
+          "quantity": 240
+        },
+        {
+          "typeID": "36",
+          "quantity": 45
+        },
+        {
+          "typeID": "25607",
+          "quantity": 3
+        }
+      ],
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "bp_warp_core",
+      "blueprintTypeID": "10998-bp",
+      "name": "Warp Core Stabilizer I Blueprint",
+      "zh": "跃迁核心稳定器 I 蓝图",
+      "productTypeID": "warp_core",
+      "productName": "Warp Core Stabilizer I",
+      "productKind": "module",
+      "quantity": 1,
+      "time": 52,
+      "materials": [
+        {
+          "typeID": "37",
+          "quantity": 80
+        },
+        {
+          "typeID": "25603",
+          "quantity": 8
+        },
+        {
+          "typeID": "30019",
+          "quantity": 1
+        }
+      ],
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "bp_cargo_rig",
+      "blueprintTypeID": "31260-bp",
+      "name": "Small Cargohold Optimization I Blueprint",
+      "zh": "小型货柜优化装置 I 蓝图",
+      "productTypeID": "cargo_rig",
+      "productName": "Small Cargohold Optimization I",
+      "productKind": "module",
+      "quantity": 1,
+      "time": 70,
+      "materials": [
+        {
+          "typeID": "25595",
+          "quantity": 6
+        },
+        {
+          "typeID": "25619",
+          "quantity": 8
+        },
+        {
+          "typeID": "35",
+          "quantity": 220
+        }
+      ],
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "bp_probe",
+      "blueprintTypeID": "586-bp",
+      "name": "Probe Blueprint",
+      "zh": "探索者级蓝图",
+      "productTypeID": "586",
+      "productName": "Probe",
+      "productKind": "ship",
+      "quantity": 1,
+      "time": 120,
+      "materials": [
+        {
+          "typeID": "34",
+          "quantity": 1600
+        },
+        {
+          "typeID": "35",
+          "quantity": 620
+        },
+        {
+          "typeID": "36",
+          "quantity": 180
+        },
+        {
+          "typeID": "25619",
+          "quantity": 12
+        }
+      ],
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "bp_cormorant",
+      "blueprintTypeID": "16238-bp",
+      "name": "Cormorant Blueprint",
+      "zh": "鸬鹚级蓝图",
+      "productTypeID": "16238",
+      "productName": "Cormorant",
+      "productKind": "ship",
+      "quantity": 1,
+      "time": 240,
+      "materials": [
+        {
+          "typeID": "34",
+          "quantity": 5200
+        },
+        {
+          "typeID": "35",
+          "quantity": 1600
+        },
+        {
+          "typeID": "36",
+          "quantity": 840
+        },
+        {
+          "typeID": "37",
+          "quantity": 210
+        },
+        {
+          "typeID": "25615",
+          "quantity": 18
+        }
+      ],
+      "source": "seed-sde-lite"
+    },
+    {
+      "id": "bp_prospect",
+      "blueprintTypeID": "33697-bp",
+      "name": "Prospect Blueprint",
+      "zh": "勘探者级蓝图",
+      "productTypeID": "33697",
+      "productName": "Prospect",
+      "productKind": "ship",
+      "quantity": 1,
+      "time": 420,
+      "materials": [
+        {
+          "typeID": "38",
+          "quantity": 260
+        },
+        {
+          "typeID": "39",
+          "quantity": 90
+        },
+        {
+          "typeID": "40",
+          "quantity": 30
+        },
+        {
+          "typeID": "30020",
+          "quantity": 6
+        },
+        {
+          "typeID": "30371",
+          "quantity": 12
+        }
+      ],
+      "source": "seed-sde-lite"
+    }
+  ],
+  "refine": [
+    {
+      "typeID": "1230",
+      "name": "Veldspar",
+      "materials": [
+        {
+          "typeID": "34",
+          "quantity": 7
+        }
+      ]
+    },
+    {
+      "typeID": "1228",
+      "name": "Scordite",
+      "materials": [
+        {
+          "typeID": "34",
+          "quantity": 5
+        },
+        {
+          "typeID": "35",
+          "quantity": 3
+        }
+      ]
+    },
+    {
+      "typeID": "1224",
+      "name": "Pyroxeres",
+      "materials": [
+        {
+          "typeID": "34",
+          "quantity": 7
+        },
+        {
+          "typeID": "35",
+          "quantity": 4
+        },
+        {
+          "typeID": "36",
+          "quantity": 2
+        },
+        {
+          "typeID": "37",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "typeID": "18",
+      "name": "Plagioclase",
+      "materials": [
+        {
+          "typeID": "34",
+          "quantity": 6
+        },
+        {
+          "typeID": "36",
+          "quantity": 4
+        }
+      ]
+    },
+    {
+      "typeID": "1227",
+      "name": "Omber",
+      "materials": [
+        {
+          "typeID": "34",
+          "quantity": 8
+        },
+        {
+          "typeID": "35",
+          "quantity": 3
+        },
+        {
+          "typeID": "37",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "typeID": "20",
+      "name": "Kernite",
+      "materials": [
+        {
+          "typeID": "36",
+          "quantity": 7
+        },
+        {
+          "typeID": "37",
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "typeID": "1226",
+      "name": "Jaspet",
+      "materials": [
+        {
+          "typeID": "36",
+          "quantity": 6
+        },
+        {
+          "typeID": "37",
+          "quantity": 3
+        },
+        {
+          "typeID": "38",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "typeID": "1232",
+      "name": "Hemorphite",
+      "materials": [
+        {
+          "typeID": "37",
+          "quantity": 5
+        },
+        {
+          "typeID": "38",
+          "quantity": 4
+        },
+        {
+          "typeID": "39",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "typeID": "1229",
+      "name": "Gneiss",
+      "materials": [
+        {
+          "typeID": "35",
+          "quantity": 12
+        },
+        {
+          "typeID": "36",
+          "quantity": 8
+        },
+        {
+          "typeID": "39",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "typeID": "22",
+      "name": "Arkonor",
+      "materials": [
+        {
+          "typeID": "39",
+          "quantity": 10
+        },
+        {
+          "typeID": "40",
+          "quantity": 7
+        },
+        {
+          "typeID": "11399",
+          "quantity": 1
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": "6",
+      "name": "Ship",
+      "zh": "舰船"
+    },
+    {
+      "id": "7",
+      "name": "Module",
+      "zh": "装备"
+    },
+    {
+      "id": "25",
+      "name": "Asteroid",
+      "zh": "小行星"
+    },
+    {
+      "id": "4",
+      "name": "Material",
+      "zh": "材料"
+    },
+    {
+      "id": "9",
+      "name": "Blueprint",
+      "zh": "蓝图"
+    },
+    {
+      "id": "24",
+      "name": "Commodity",
+      "zh": "商品"
+    }
+  ],
+  "groups": [
+    {
+      "id": "100",
+      "name": "Afterburner",
+      "zh": "Afterburner",
+      "category": "seed"
+    },
+    {
+      "id": "101",
+      "name": "Ancient Salvage",
+      "zh": "Ancient Salvage",
+      "category": "seed"
+    },
+    {
+      "id": "102",
+      "name": "Arkonor",
+      "zh": "Arkonor",
+      "category": "seed"
+    },
+    {
+      "id": "103",
+      "name": "Bistot",
+      "zh": "Bistot",
+      "category": "seed"
+    },
+    {
+      "id": "104",
+      "name": "Cargo Enhancer",
+      "zh": "Cargo Enhancer",
+      "category": "seed"
+    },
+    {
+      "id": "105",
+      "name": "Commodities",
+      "zh": "Commodities",
+      "category": "seed"
+    },
+    {
+      "id": "106",
+      "name": "Crokite",
+      "zh": "Crokite",
+      "category": "seed"
+    },
+    {
+      "id": "107",
+      "name": "Cruiser",
+      "zh": "Cruiser",
+      "category": "seed"
+    },
+    {
+      "id": "108",
+      "name": "Dark Ochre",
+      "zh": "Dark Ochre",
+      "category": "seed"
+    },
+    {
+      "id": "109",
+      "name": "Data Fragments",
+      "zh": "Data Fragments",
+      "category": "seed"
+    },
+    {
+      "id": "110",
+      "name": "Data Miners",
+      "zh": "Data Miners",
+      "category": "seed"
+    },
+    {
+      "id": "111",
+      "name": "Datacores",
+      "zh": "Datacores",
+      "category": "seed"
+    },
+    {
+      "id": "112",
+      "name": "Decryptors",
+      "zh": "Decryptors",
+      "category": "seed"
+    },
+    {
+      "id": "113",
+      "name": "Destroyer",
+      "zh": "Destroyer",
+      "category": "seed"
+    },
+    {
+      "id": "114",
+      "name": "Drone Upgrade",
+      "zh": "Drone Upgrade",
+      "category": "seed"
+    },
+    {
+      "id": "115",
+      "name": "Expedition Frigate",
+      "zh": "Expedition Frigate",
+      "category": "seed"
+    },
+    {
+      "id": "116",
+      "name": "Frigate",
+      "zh": "Frigate",
+      "category": "seed"
+    },
+    {
+      "id": "117",
+      "name": "Gneiss",
+      "zh": "Gneiss",
+      "category": "seed"
+    },
+    {
+      "id": "118",
+      "name": "Harvestable Cloud",
+      "zh": "Harvestable Cloud",
+      "category": "seed"
+    },
+    {
+      "id": "119",
+      "name": "Hedbergite",
+      "zh": "Hedbergite",
+      "category": "seed"
+    },
+    {
+      "id": "120",
+      "name": "Hemorphite",
+      "zh": "Hemorphite",
+      "category": "seed"
+    },
+    {
+      "id": "121",
+      "name": "Hull Upgrades",
+      "zh": "Hull Upgrades",
+      "category": "seed"
+    },
+    {
+      "id": "122",
+      "name": "Hybrid Weapon",
+      "zh": "Hybrid Weapon",
+      "category": "seed"
+    },
+    {
+      "id": "123",
+      "name": "Jaspet",
+      "zh": "Jaspet",
+      "category": "seed"
+    },
+    {
+      "id": "124",
+      "name": "Kernite",
+      "zh": "Kernite",
+      "category": "seed"
+    },
+    {
+      "id": "125",
+      "name": "Mineral",
+      "zh": "Mineral",
+      "category": "seed"
+    },
+    {
+      "id": "126",
+      "name": "Mining Barge",
+      "zh": "Mining Barge",
+      "category": "seed"
+    },
+    {
+      "id": "127",
+      "name": "Mining Frigate",
+      "zh": "Mining Frigate",
+      "category": "seed"
+    },
+    {
+      "id": "128",
+      "name": "Mining Laser",
+      "zh": "Mining Laser",
+      "category": "seed"
+    },
+    {
+      "id": "129",
+      "name": "Omber",
+      "zh": "Omber",
+      "category": "seed"
+    },
+    {
+      "id": "130",
+      "name": "Plagioclase",
+      "zh": "Plagioclase",
+      "category": "seed"
+    },
+    {
+      "id": "131",
+      "name": "Pyroxeres",
+      "zh": "Pyroxeres",
+      "category": "seed"
+    },
+    {
+      "id": "132",
+      "name": "Relic Analyzer",
+      "zh": "Relic Analyzer",
+      "category": "seed"
+    },
+    {
+      "id": "133",
+      "name": "Rig",
+      "zh": "Rig",
+      "category": "seed"
+    },
+    {
+      "id": "134",
+      "name": "Salvaged Materials",
+      "zh": "Salvaged Materials",
+      "category": "seed"
+    },
+    {
+      "id": "135",
+      "name": "Salvager",
+      "zh": "Salvager",
+      "category": "seed"
+    },
+    {
+      "id": "136",
+      "name": "Scan Probe Launcher",
+      "zh": "Scan Probe Launcher",
+      "category": "seed"
+    },
+    {
+      "id": "137",
+      "name": "Scordite",
+      "zh": "Scordite",
+      "category": "seed"
+    },
+    {
+      "id": "138",
+      "name": "Shield Booster",
+      "zh": "Shield Booster",
+      "category": "seed"
+    },
+    {
+      "id": "139",
+      "name": "Shield Extender",
+      "zh": "Shield Extender",
+      "category": "seed"
+    },
+    {
+      "id": "140",
+      "name": "Survey Scanner",
+      "zh": "Survey Scanner",
+      "category": "seed"
+    },
+    {
+      "id": "141",
+      "name": "Veldspar",
+      "zh": "Veldspar",
+      "category": "seed"
+    },
+    {
+      "id": "142",
+      "name": "Warp Core Stabilizer",
+      "zh": "Warp Core Stabilizer",
+      "category": "seed"
+    }
+  ],
+  "marketGroups": [
+    {
+      "id": "2",
+      "name": "Ships",
+      "zh": "舰船",
+      "parent": null
+    },
+    {
+      "id": "4",
+      "name": "Ship Equipment",
+      "zh": "舰船装备",
+      "parent": null
+    },
+    {
+      "id": "1332",
+      "name": "Minerals",
+      "zh": "矿物",
+      "parent": null
+    },
+    {
+      "id": "1857",
+      "name": "Standard Ores",
+      "zh": "标准矿石",
+      "parent": null
+    },
+    {
+      "id": "1035",
+      "name": "Salvage Materials",
+      "zh": "打捞材料",
+      "parent": null
+    },
+    {
+      "id": "1508",
+      "name": "Datacores",
+      "zh": "数据核心",
+      "parent": null
+    }
+  ]
+}

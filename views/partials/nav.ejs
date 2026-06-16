@@ -1,0 +1,27 @@
+<header class="topbar">
+  <a class="brand" href="/">
+    <img src="/public/assets/ui_logo.png" alt="logo">
+    <span>EVE Idle Game</span>
+  </a>
+  <nav class="navlinks">
+    <% if (user) { %>
+      <a class="<%= active==='command'?'active':'' %>" href="/command">指挥室</a>
+      <a class="<%= active==='star-map'?'active':'' %>" href="/star-map">星图</a>
+      <a class="<%= active==='hangar'?'active':'' %>" href="/hangar">船坞</a>
+      <a class="<%= active==='warehouse'?'active':'' %>" href="/warehouse">仓库</a>
+      <a class="<%= active==='market'?'active':'' %>" href="/market">市场</a>
+      <a class="<%= active==='industry'?'active':'' %>" href="/industry">工业</a>
+      <a class="<%= active==='fleet'?'active':'' %>" href="/fleet">舰队</a>
+      <a class="<%= active==='sde'?'active':'' %>" href="/sde">SDE</a>
+      <a class="<%= active==='leaderboard'?'active':'' %>" href="/leaderboard">榜单</a>
+      <% if (user.role === 'admin') { %><a href="/admin/sde">管理</a><% } %>
+    <% } else { %>
+      <a href="/login">登录</a>
+      <a href="/register" class="button small">注册</a>
+    <% } %>
+  </nav>
+  <% if (user) { %>
+    <form action="/logout" method="post" class="logout"><span><%= user.username %></span><button>退出</button></form>
+  <% } %>
+</header>
+<main class="page-shell">

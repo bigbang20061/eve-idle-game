@@ -1,0 +1,18 @@
+<%- include('../partials/head', { title, active }) %>
+<%- include('../partials/nav', { user, active }) %>
+<section class="grid two">
+  <article class="panel">
+    <div class="panel-title"><h1>工业制造</h1><span>蓝图来自 SDE blueprints</span></div>
+    <form id="blueprint-search" class="toolbar"><input name="q" placeholder="搜索蓝图/产物"><button class="button small">搜索</button></form>
+    <div id="blueprint-results" class="card-list"></div>
+  </article>
+  <article class="panel">
+    <h1>生产队列</h1>
+    <div id="industry-jobs" class="card-list">
+      <% for (const job of jobs || []) { %>
+        <div class="mini-card"><b><%= job.productName %></b><span>完成时间：<%= shortDate(job.readyAt) %></span><span>状态：<%= job.status %></span></div>
+      <% } %>
+    </div>
+  </article>
+</section>
+<%- include('../partials/footer') %>

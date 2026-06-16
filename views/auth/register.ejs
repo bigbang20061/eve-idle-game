@@ -1,0 +1,14 @@
+<%- include('../partials/head', { title, active }) %>
+<%- include('../partials/nav', { user, active }) %>
+<section class="auth-card panel">
+  <h1>注册新克隆体</h1>
+  <% if (error) { %><div class="alert danger"><%= error %></div><% } %>
+  <form method="post" action="/register" class="form-stack">
+    <label>账号<input name="username" value="<%= values.username || '' %>" required></label>
+    <label>角色名<input name="characterName" value="<%= values.characterName || '' %>" required></label>
+    <label>密码<input name="password" type="password" required minlength="6"></label>
+    <label>管理员邀请码，可空<input name="inviteCode" value="<%= values.inviteCode || '' %>"></label>
+    <button class="button">创建账号</button>
+  </form>
+</section>
+<%- include('../partials/footer') %>
