@@ -1,0 +1,70 @@
+{
+  "version": "starter-kits-v1",
+  "defaultRace": "caldari",
+  "races": {
+    "caldari": {
+      "label": "加达里",
+      "description": "护盾、导弹和动能输出，适合稳健刷怪。",
+      "credits": 28000,
+      "homeSystemQuery": ["Jita", "Kisogo", "加达里"],
+      "shipQuery": ["Merlin", "Kestrel", "Condor", "Corvette"],
+      "fallbackShip": { "typeId": "starter-caldari-frigate", "name": "State Rookie Frigate", "zh": "加达里新手护卫舰", "kind": "ship", "groupName": "Frigate", "role": "missile_shield", "stats": { "shield": 135, "armor": 65, "hull": 80, "dps": 6, "mining": 4, "scan": 5, "hack": 2, "salvage": 1, "cargo": 160, "oreHold": 0, "extract": 4, "warpStability": 0, "capacitor": 180, "capacitorRecharge": 2.6 }, "slots": { "high": 2, "mid": 3, "low": 1, "rig": 1 }, "fitting": { "cpu": 95, "powergrid": 42, "calibration": 40, "turretHardpoints": 1, "launcherHardpoints": 2 } },
+      "skills": { "combat": 1, "weaponSystems": 1, "missiles": 1, "shieldOperation": 1, "capacitorManagement": 1, "caldariFrigate": 1, "mining": 1, "scanning": 1, "industry": 1, "trade": 1, "command": 1, "salvage": 1, "security": 1, "navigation": 1 },
+      "modules": [
+        { "query": ["Light Missile Launcher", "Rocket Launcher", "Missile"], "fallback": { "typeId": "starter-caldari-launcher", "name": "Civilian Light Missile Launcher", "zh": "民用轻型导弹发射器", "kind": "module", "slot": "high", "effects": { "dps": 8 }, "tier": 1, "volume": 5, "basePrice": 900 } },
+        { "query": ["Shield Booster", "Medium Shield", "Shield"], "fallback": { "typeId": "starter-caldari-shield", "name": "Civilian Shield Booster", "zh": "民用护盾回充器", "kind": "module", "slot": "mid", "effects": { "shield": 18 }, "tier": 1, "volume": 5, "basePrice": 850 } },
+        { "query": ["Scanner", "Analyzer"], "fallback": { "typeId": "starter-caldari-scanner", "name": "Civilian Scanner", "zh": "民用扫描器", "kind": "module", "slot": "mid", "effects": { "scan": 3 }, "tier": 1, "volume": 5, "basePrice": 700 } }
+      ],
+      "chargeRace": "caldari",
+      "warehouse": [ { "typeId": "34", "name": "Tritanium", "zh": "三钛合金", "kind": "mineral", "quantity": 800, "volume": 0.01, "basePrice": 6, "locked": true } ]
+    },
+    "gallente": {
+      "label": "盖伦特",
+      "description": "装甲、混合炮和无人机，适合近战和遗迹战利品。",
+      "credits": 26000,
+      "homeSystemQuery": ["Dodixie", "Trossere", "盖伦特"],
+      "shipQuery": ["Tristan", "Incursus", "Atron", "Corvette"],
+      "fallbackShip": { "typeId": "starter-gallente-frigate", "name": "Federation Rookie Frigate", "zh": "盖伦特新手护卫舰", "kind": "ship", "groupName": "Frigate", "role": "hybrid_armor", "stats": { "shield": 85, "armor": 120, "hull": 105, "dps": 7, "mining": 4, "scan": 5, "hack": 3, "salvage": 2, "cargo": 175, "oreHold": 0, "extract": 4, "warpStability": 0, "capacitor": 190, "capacitorRecharge": 2.5 }, "slots": { "high": 2, "mid": 2, "low": 2, "rig": 1 }, "fitting": { "cpu": 82, "powergrid": 50, "calibration": 40, "turretHardpoints": 2, "launcherHardpoints": 0 } },
+      "skills": { "combat": 1, "weaponSystems": 1, "gunnery": 1, "drones": 1, "armorRepairSystems": 1, "gallenteFrigate": 1, "mining": 1, "scanning": 1, "industry": 1, "trade": 1, "command": 1, "salvage": 1, "security": 1, "navigation": 1 },
+      "modules": [
+        { "query": ["Light Electron Blaster", "Railgun", "Blaster"], "fallback": { "typeId": "starter-gallente-blaster", "name": "Civilian Hybrid Blaster", "zh": "民用混合炮", "kind": "module", "slot": "high", "effects": { "dps": 8 }, "tier": 1, "volume": 5, "basePrice": 900 } },
+        { "query": ["Armor Repairer", "Armor"], "fallback": { "typeId": "starter-gallente-repairer", "name": "Civilian Armor Repairer", "zh": "民用装甲维修器", "kind": "module", "slot": "low", "effects": { "armor": 18 }, "tier": 1, "volume": 5, "basePrice": 850 } },
+        { "query": ["Analyzer", "Scanner"], "fallback": { "typeId": "starter-gallente-analyzer", "name": "Civilian Analyzer", "zh": "民用分析器", "kind": "module", "slot": "mid", "effects": { "scan": 2, "hack": 2 }, "tier": 1, "volume": 5, "basePrice": 700 } }
+      ],
+      "chargeRace": "gallente",
+      "warehouse": [ { "typeId": "35", "name": "Pyerite", "zh": "类晶体胶矿", "kind": "mineral", "quantity": 600, "volume": 0.01, "basePrice": 12, "locked": false } ]
+    },
+    "amarr": {
+      "label": "艾玛",
+      "description": "电容、激光和装甲，适合持续作战。",
+      "credits": 27000,
+      "homeSystemQuery": ["Amarr", "Deepari", "艾玛"],
+      "shipQuery": ["Punisher", "Tormentor", "Executioner", "Corvette"],
+      "fallbackShip": { "typeId": "starter-amarr-frigate", "name": "Imperial Rookie Frigate", "zh": "艾玛新手护卫舰", "kind": "ship", "groupName": "Frigate", "role": "laser_armor", "stats": { "shield": 75, "armor": 140, "hull": 95, "dps": 7, "mining": 4, "scan": 4, "hack": 2, "salvage": 1, "cargo": 150, "oreHold": 0, "extract": 3.8, "warpStability": 0, "capacitor": 230, "capacitorRecharge": 3.0 }, "slots": { "high": 2, "mid": 2, "low": 3, "rig": 1 }, "fitting": { "cpu": 78, "powergrid": 58, "calibration": 40, "turretHardpoints": 2, "launcherHardpoints": 0 } },
+      "skills": { "combat": 1, "weaponSystems": 1, "gunnery": 1, "capacitorManagement": 2, "armorRepairSystems": 1, "amarrFrigate": 1, "mining": 1, "scanning": 1, "industry": 1, "trade": 1, "command": 1, "salvage": 1, "security": 1, "navigation": 1 },
+      "modules": [
+        { "query": ["Pulse Laser", "Beam Laser", "Laser"], "fallback": { "typeId": "starter-amarr-laser", "name": "Civilian Pulse Laser", "zh": "民用脉冲激光炮", "kind": "module", "slot": "high", "effects": { "dps": 8 }, "tier": 1, "volume": 5, "basePrice": 900 } },
+        { "query": ["Armor Repairer", "Energized", "Armor"], "fallback": { "typeId": "starter-amarr-plating", "name": "Civilian Armor Plate", "zh": "民用装甲板", "kind": "module", "slot": "low", "effects": { "armor": 24 }, "tier": 1, "volume": 5, "basePrice": 850 } },
+        { "query": ["Cap Recharger", "Capacitor"], "fallback": { "typeId": "starter-amarr-cap", "name": "Civilian Capacitor Recharger", "zh": "民用电容回充器", "kind": "module", "slot": "mid", "effects": { "capacitorRecharge": 0.4 }, "tier": 1, "volume": 5, "basePrice": 700 } }
+      ],
+      "chargeRace": "amarr",
+      "warehouse": [ { "typeId": "34", "name": "Tritanium", "zh": "三钛合金", "kind": "mineral", "quantity": 700, "volume": 0.01, "basePrice": 6, "locked": true } ]
+    },
+    "minmatar": {
+      "label": "米玛塔尔",
+      "description": "机动、弹丸和撤离，适合高风险搜打撤。",
+      "credits": 25000,
+      "homeSystemQuery": ["Rens", "Hek", "米玛塔尔"],
+      "shipQuery": ["Rifter", "Slasher", "Breacher", "Corvette"],
+      "fallbackShip": { "typeId": "starter-minmatar-frigate", "name": "Republic Rookie Frigate", "zh": "米玛塔尔新手护卫舰", "kind": "ship", "groupName": "Frigate", "role": "projectile_speed", "stats": { "shield": 95, "armor": 85, "hull": 110, "dps": 7, "mining": 4, "scan": 5, "hack": 2, "salvage": 2, "cargo": 165, "oreHold": 0, "extract": 5, "warpStability": 0, "capacitor": 165, "capacitorRecharge": 2.4 }, "slots": { "high": 2, "mid": 3, "low": 2, "rig": 1 }, "fitting": { "cpu": 85, "powergrid": 48, "calibration": 40, "turretHardpoints": 2, "launcherHardpoints": 1 } },
+      "skills": { "combat": 1, "weaponSystems": 1, "gunnery": 1, "navigation": 2, "shieldOperation": 1, "minmatarFrigate": 1, "mining": 1, "scanning": 1, "industry": 1, "trade": 1, "command": 1, "salvage": 1, "security": 1 },
+      "modules": [
+        { "query": ["Autocannon", "Artillery", "Cannon"], "fallback": { "typeId": "starter-minmatar-autocannon", "name": "Civilian Autocannon", "zh": "民用自动加农炮", "kind": "module", "slot": "high", "effects": { "dps": 8 }, "tier": 1, "volume": 5, "basePrice": 900 } },
+        { "query": ["Afterburner", "Propulsion"], "fallback": { "typeId": "starter-minmatar-afterburner", "name": "Civilian Afterburner", "zh": "民用加力燃烧器", "kind": "module", "slot": "mid", "effects": { "extract": 2 }, "tier": 1, "volume": 5, "basePrice": 850 } },
+        { "query": ["Salvager", "Scanner"], "fallback": { "typeId": "starter-minmatar-salvager", "name": "Civilian Salvager", "zh": "民用打捞器", "kind": "module", "slot": "high", "effects": { "salvage": 3 }, "tier": 1, "volume": 5, "basePrice": 700 } }
+      ],
+      "chargeRace": "minmatar",
+      "warehouse": [ { "typeId": "36", "name": "Mexallon", "zh": "类银超金属", "kind": "mineral", "quantity": 120, "volume": 0.01, "basePrice": 45, "locked": false } ]
+    }
+  }
+}
