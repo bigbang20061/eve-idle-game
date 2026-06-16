@@ -1,17 +1,19 @@
 {
   "name": "eve-idle-game",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "type": "module",
-  "description": "EVE Idle Game, a multiplayer idle extraction game with Express, Socket.IO and MongoDB.",
+  "description": "EVE Idle Game, a multiplayer idle extraction game with separated static frontend, Express API, Socket.IO and MongoDB.",
   "main": "src/server.js",
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "seed": "node scripts/seedDatabase.js",
     "import:sde": "node scripts/importSde.js",
-    "smoke": "node tests/smoke-no-db.js",
-    "check": "node tests/check-syntax.js"
+    "smoke": "node tests/smoke-no-db.js && node tests/combat-system-smoke.js && node tests/dogma-mapper-smoke.js",
+    "check": "node tests/check-syntax.js",
+    "smoke:combat": "node tests/combat-system-smoke.js",
+    "smoke:dogma": "node tests/dogma-mapper-smoke.js"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -21,7 +23,6 @@
     "compression": "^1.8.0",
     "connect-mongo": "^6.0.0",
     "dotenv": "^16.4.7",
-    "ejs": "^3.1.10",
     "express": "^5.2.1",
     "express-rate-limit": "^8.1.0",
     "express-session": "^1.18.1",

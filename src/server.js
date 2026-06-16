@@ -11,10 +11,10 @@ import bcrypt from 'bcryptjs';
 import { env } from './config/env.js';
 import { connectDatabase } from './db.js';
 import { attachUser, attachCharacter } from './middleware/auth.js';
-import { authRoutes } from './routes/authRoutes.js';
-import { pageRoutes } from './routes/pageRoutes.js';
+import { authApiRoutes } from './routes/authApiRoutes.js';
 import { apiRoutes } from './routes/apiRoutes.js';
-import { adminRoutes } from './routes/adminRoutes.js';
+import { adminApiRoutes } from './routes/adminApiRoutes.js';
+import { combatApiRoutes } from './routes/combatApiRoutes.js';
 import { createSocketServer } from './socket/index.js';
 import { ensureCatalogSeeded } from './services/catalog.js';
 import { startGameLoop } from './services/gameEngine.js';
@@ -23,6 +23,7 @@ import { createStarterCharacter } from './services/characterFactory.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
+const clientRoot = path.join(root, 'client');
 
 async function maybeCreateDemoUsers() {
   if (!env.createDemoUsers) return;
@@ -39,37 +40,22 @@ async function maybeCreateDemoUsers() {
 
 async function main() {
   await connectDatabase();
-  if (env.autoSeed) {
-    const summary = await ensureCatalogSeeded();
-    console.log('[catalog]', summary);
-  }
+  if (env.autoSeed) console.log('[catalog]', await ensureCatalogSeeded());
   await maybeCreateDemoUsers();
 
   const app = express();
   const server = http.createServer(app);
-
   const sessionMiddleware = session({
-    name: 'eve_idle_game_sid',
+    name: 'deep_sid',
     secret: env.sessionSecret,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: env.mongoUri, dbName: env.mongoDbName, collectionName: 'sessions', ttl: 14 * 24 * 60 * 60 }),
-    cookie: {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: env.isProduction && env.publicOrigin.startsWith('https:'),
-      maxAge: 14 * 24 * 60 * 60 * 1000
-    }
+    cookie: { httpOnly: true, sameSite: 'lax', secure: env.isProduction && env.publicOrigin.startsWith('https:'), maxAge: 14 * 24 * 60 * 60 * 1000 }
   });
 
   const io = createSocketServer(server, sessionMiddleware);
   app.set('io', io);
-  app.set('view engine', 'ejs');
-  app.set('views', path.join(root, 'views'));
-  app.locals.env = env;
-  app.locals.formatNumber = value => Number(value || 0).toLocaleString('zh-CN');
-  app.locals.shortDate = value => value ? new Date(value).toLocaleString('zh-CN', { hour12: false }) : '';
-
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(compression());
   app.use(morgan(env.isProduction ? 'combined' : 'dev'));
@@ -78,25 +64,21 @@ async function main() {
   app.use(sessionMiddleware);
   app.use(attachUser);
   app.use(attachCharacter);
-  app.use('/public', express.static(path.join(root, 'public'), { maxAge: env.isProduction ? '7d' : 0 }));
-
-  app.use(authRoutes);
-  app.use(pageRoutes);
+  app.use('/api/auth', authApiRoutes);
+  app.use('/api/admin', adminApiRoutes);
+  app.use('/api/combat', combatApiRoutes);
   app.use('/api', apiRoutes);
-  app.use('/admin', adminRoutes);
-
-  app.use((req, res) => res.status(404).render('pages/error', { title: '404', active: '', message: '没有找到这个星门。' }));
+  app.use(express.static(clientRoot, { extensions: ['html'], maxAge: env.isProduction ? '1d' : 0 }));
+  app.use('/api', (req, res) => res.status(404).json({ ok: false, error: 'API not found' }));
+  app.use((req, res) => res.status(404).sendFile(path.join(clientRoot, '404.html')));
   app.use((err, req, res, next) => {
     console.error(err);
     if (res.headersSent) return next(err);
-    res.status(500).render('pages/error', { title: '服务器错误', active: '', message: env.isProduction ? '服务器异常。' : err.stack });
+    if (req.originalUrl.startsWith('/api')) return res.status(500).json({ ok: false, error: env.isProduction ? '服务器异常。' : err.message });
+    return res.status(500).sendFile(path.join(clientRoot, '500.html'));
   });
-
   await startGameLoop(io, { tickMs: env.tickMs });
-
-  server.listen(env.port, () => {
-    console.log(`EVE Idle Game listening on ${env.publicOrigin} / port ${env.port}`);
-  });
+  server.listen(env.port, () => console.log(`EVE Idle Game listening on ${env.publicOrigin} / port ${env.port}`));
 }
 
 main().catch(error => {
