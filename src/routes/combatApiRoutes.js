@@ -3,6 +3,8 @@ import { Character } from '../models/index.js';
 import { requireAuth, asyncHandler } from '../middleware/auth.js';
 import { combatUiOptions } from '../services/combatRules.js';
 import { dogmaUiSummary } from '../services/dogmaMapper.js';
+import { fittingUiOptions } from '../services/fittingSystem.js';
+import { skillOptions } from '../services/skillSystem.js';
 
 export const combatApiRoutes = express.Router();
 combatApiRoutes.use(requireAuth);
@@ -14,7 +16,7 @@ async function getCharacter(req) {
 }
 
 combatApiRoutes.get('/options', asyncHandler(async (req, res) => {
-  res.json({ ok: true, combat: combatUiOptions(), dogma: dogmaUiSummary() });
+  res.json({ ok: true, combat: combatUiOptions(), dogma: dogmaUiSummary(), fitting: fittingUiOptions(), skills: skillOptions() });
 }));
 
 combatApiRoutes.post('/settings', asyncHandler(async (req, res) => {
