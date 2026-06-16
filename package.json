@@ -11,11 +11,12 @@
     "seed": "node scripts/seedDatabase.js",
     "import:sde": "node scripts/importSde.js",
     "scan:sde": "node scripts/scanSdeDictionary.js",
-    "smoke": "node tests/smoke-no-db.js && node tests/combat-system-smoke.js && node tests/dogma-mapper-smoke.js && node tests/sde-dictionary-smoke.js",
+    "smoke": "node tests/smoke-no-db.js && node tests/combat-system-smoke.js && node tests/dogma-mapper-smoke.js && node tests/sde-dictionary-smoke.js && node tests/static-sde-store-smoke.js",
     "check": "node tests/check-syntax.js",
     "smoke:combat": "node tests/combat-system-smoke.js",
     "smoke:dogma": "node tests/dogma-mapper-smoke.js",
-    "smoke:sde-dictionary": "node tests/sde-dictionary-smoke.js"
+    "smoke:sde-dictionary": "node tests/sde-dictionary-smoke.js",
+    "smoke:static-sde": "node tests/static-sde-store-smoke.js"
   },
   "engines": {
     "node": ">=22.0.0"
