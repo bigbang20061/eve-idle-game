@@ -21,24 +21,8 @@ export function buildFittedModuleFromType(type, character = null) {
   const defaults = getFittingRules().moduleDefaults || {};
   const slot = type.slot || rule.slot || 'high';
   const activation = { ...(defaults.activation || {}), ...(rule.activation || {}) };
-  const mode = rule.mode || defaults.state || 'passive';
-  return {
-    instanceId: crypto.randomUUID(),
-    typeId: String(type.typeId),
-    name: type.name,
-    zh: type.zh || type.name,
-    slot,
-    kind: type.kind || 'module',
-    tier: Number(type.tier || 1),
-    groupKey: rule.id || slot,
-    mode,
-    state: mode === 'active' ? 'active' : 'passive',
-    fitting: { ...(defaults.fitting || {}), ...(rule.fitting || {}), ...(type.raw?.fitting || {}) },
-    activation,
-    effects: { ...(rule.effects || {}), ...(type.effects || {}) },
-    charge: null,
-    online: true
-  };
+  const mode = rule.mode === 'active' ? 'active' : 'passive';
+  return { instanceId: crypto.randomUUID(), typeId: String(type.typeId), name: type.name, zh: type.zh || type.name, slot, kind: type.kind || 'module', tier: Number(type.tier || 1), groupKey: rule.id || slot, mode, state: mode === 'active' ? 'active' : 'passive', fitting: { ...(defaults.fitting || {}), ...(rule.fitting || {}), ...(type.raw?.fitting || {}) }, activation, effects: { ...(rule.effects || {}), ...(type.effects || {}) }, charge: null, online: true };
 }
 
 export function fittingUsage(ship, extraModule = null) {
@@ -46,9 +30,7 @@ export function fittingUsage(ship, extraModule = null) {
   const usage = { cpu: 0, powergrid: 0, calibration: 0, turretHardpoints: 0, launcherHardpoints: 0, slots: {} };
   for (const mod of modules) {
     if (mod.online === false) continue;
-    usage.cpu += Number(mod.fitting?.cpu || 0);
-    usage.powergrid += Number(mod.fitting?.powergrid || 0);
-    usage.calibration += Number(mod.fitting?.calibration || 0);
+    usage.cpu += Number(mod.fitting?.cpu || 0); usage.powergrid += Number(mod.fitting?.powergrid || 0); usage.calibration += Number(mod.fitting?.calibration || 0);
     usage.slots[mod.slot] = Number(usage.slots[mod.slot] || 0) + 1;
     if (mod.hardpoint === 'turret' || mod.activation?.skillDamageBonus === 'turretDamage') usage.turretHardpoints += 1;
     if (mod.hardpoint === 'launcher' || mod.activation?.skillDamageBonus === 'launcherDamage') usage.launcherHardpoints += 1;
@@ -57,9 +39,7 @@ export function fittingUsage(ship, extraModule = null) {
 }
 
 export function fittingSummary(character) {
-  const ship = character.ship || {};
-  const cap = ship.fitting || {};
-  const usage = fittingUsage(ship);
+  const ship = character.ship || {}, cap = ship.fitting || {}, usage = fittingUsage(ship);
   return { capacity: cap, usage, ok: usage.cpu <= Number(cap.cpu || 0) && usage.powergrid <= Number(cap.powergrid || 0) && usage.calibration <= Number(cap.calibration || 0) };
 }
 
@@ -70,8 +50,7 @@ export function validateModuleFit(character, module) {
   if (maxSlots <= 0) throw new Error(`${module.slot} 槽不存在`);
   const usedSlots = (ship.fittedModules || []).filter(m => m.slot === module.slot).length;
   if (usedSlots >= maxSlots) throw new Error(`${module.slot} 槽位已满`);
-  const cap = ship.fitting || {};
-  const usage = fittingUsage(ship, module);
+  const cap = ship.fitting || {}, usage = fittingUsage(ship, module);
   if (usage.cpu > Number(cap.cpu || 0)) throw new Error('CPU 不足');
   if (usage.powergrid > Number(cap.powergrid || 0)) throw new Error('能栅不足');
   if (usage.calibration > Number(cap.calibration || 0)) throw new Error('校准值不足');
