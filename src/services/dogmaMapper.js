@@ -21,8 +21,12 @@ function valueFor(attrs, aliases) {
 }
 
 function extractAttributes(raw = {}) {
-  const out = { ...(raw.attributes || raw.dogmaAttributes || {}) };
-  for (const attr of raw.dogmaAttributes || []) {
+  const out = { ...(raw.attributes || {}) };
+  if (!Array.isArray(raw.dogmaAttributes) && raw.dogmaAttributes && typeof raw.dogmaAttributes === 'object') {
+    Object.assign(out, raw.dogmaAttributes);
+  }
+  const dogmaAttributes = Array.isArray(raw.dogmaAttributes) ? raw.dogmaAttributes : [];
+  for (const attr of dogmaAttributes) {
     const key = attr.attributeName || attr.name || attr.attributeID || attr.attributeId;
     const value = attr.value ?? attr.defaultValue;
     if (key !== undefined && value !== undefined) out[String(key)] = value;
