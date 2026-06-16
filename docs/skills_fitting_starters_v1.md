@@ -9,6 +9,7 @@
 | 3 | 装备效果生效 | 已完成初版 | 被动效果在 `deriveEffectiveStats()` 中生效；主动/武器模块在 `resolveCombatRound()` 中通过 `cycleActiveModules()` 消耗电容/弹药并产生 DPS、维修、推进等效果。 |
 | 4 | 武器和主动装备消耗品 | 已完成初版 | 弹药/晶体/导弹由 `chargeGroup` 驱动；战斗轮消耗 cargo 中对应 charge，并按配置修改伤害分布和 DPS。 |
 | 5 | 不同种族初始包 | 已完成初版 | `data/game/starter_loadouts.json` 定义 Amarr/Caldari/Gallente/Minmatar 的起始技能、船、装备、弹药、矿物和钱包。注册页从 `/api/auth/starter-options` 获取选项。 |
+| 6 | 公开 SDE 来源 | 已完成初版 | `data/sde/sources.json` 记录 `EVE-China/sde` 公开仓库和官方 latest JSONL/YAML 下载入口；`scripts/fetchSde.js` 可按配置下载/克隆。 |
 
 ## 架构约束
 
@@ -29,9 +30,27 @@ MongoDB / Mongoose
 data/game/skills.json
 data/game/fitting_rules.json
 data/game/starter_loadouts.json
+data/sde/sources.json
 ```
 
 业务代码只读取配置、校验和结算；技能数值、模块资源、主动循环、chargeGroup、种族起始包都不写死在路由或战斗循环里。
+
+## 公开 SDE 来源
+
+`EVE-China/sde` 是公开 SDE 仓库，本项目把它记录为可发现的公开来源之一：
+
+```bash
+npm run fetch:sde -- --source eveChinaGitHub --out ./vendor-sde
+```
+
+如果要直接导入到当前 JSONL 流式导入器，推荐走官方 latest JSON Lines ZIP：
+
+```bash
+npm run fetch:sde -- --source officialLatestJsonl --out ./sde-jsonl
+npm run import:sde -- --dir ./sde-jsonl
+```
+
+这样可以继续复用现有 `scripts/importSde.js` / `src/services/sdeImporter.js` 的大文件流式导入逻辑。
 
 ## 新增 API
 
