@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "https://github.com/EVE-China/sde",
+  "preferredInput": "yaml",
+  "supportedInputs": ["yaml", "jsonl"],
+  "notes": [
+    "This dictionary describes which SDE files are useful for game systems. It is not player-facing balance data.",
+    "Gameplay numbers should be derived by scanner/importer code from SDE records, not copied into hand-written skill or module tables.",
+    "JSON Lines is preferred for very large automated imports; YAML is preferred when using the EVE-China/sde repository clone."
+  ],
+  "sources": [
+    {
+      "key": "types",
+      "files": { "yaml": "types.yaml", "jsonl": "types.jsonl" },
+      "priority": "critical",
+      "domain": ["items", "skills", "ships", "modules", "charges", "materials", "npcTypes"],
+      "usableFor": [
+        "master item catalog",
+        "skill type discovery",
+        "ship/module/charge/material names and prices",
+        "market visibility and published flags",
+        "volume, capacity, mass and base price"
+      ],
+      "primaryFields": ["typeID", "name", "description", "groupID", "marketGroupID", "published", "volume", "capacity", "mass", "basePrice"],
+      "relations": ["groupID -> groups.groupID", "marketGroupID -> marketGroups.marketGroupID", "typeID -> typeDogma.typeID", "typeID -> typeMaterials.typeID", "typeID -> blueprints.product.typeID"],
+      "importPlan": "Import all published records. Classify using groups/categories/marketGroups instead of name regex wherever possible."
+    },
+    {
+      "key": "groups",
+      "files": { "yaml": "groups.yaml", "jsonl": "groups.jsonl" },
+      "priority": "critical",
+      "domain": ["classification"],
+      "usableFor": ["grouping skills, ships, modules, charges, blueprints, NPCs and materials"],
+      "primaryFields": ["groupID", "name", "categoryID", "published"],
+      "relations": ["categoryID -> categories.categoryID"],
+      "importPlan": "Use group/category as the first layer of type classification."
+    },
+    {
+      "key": "categories",
+      "files": { "yaml": "categories.yaml", "jsonl": "categories.jsonl" },
+      "priority": "critical",
+      "domain": ["classification"],
+      "usableFor": ["top-level split: Skill, Ship, Module, Charge, Commodity, Blueprint, Celestial, Structure, NPC"],
+      "primaryFields": ["categoryID", "name", "published"],
+      "relations": [],
+      "importPlan": "Use as category backbone for kind inference."
+    },
+    {
+      "key": "marketGroups",
+      "files": { "yaml": "marketGroups.yaml", "jsonl": "marketGroups.jsonl" },
+      "priority": "high",
+      "domain": ["classification", "market", "progression"],
+      "usableFor": ["market tree", "module families", "ammo families", "ship class discovery", "skill family browsing"],
+      "primaryFields": ["marketGroupID", "name", "parentGroupID", "description"],
+      "relations": ["parentGroupID -> marketGroups.marketGroupID", "marketGroupID <- types.marketGroupID"],
+      "importPlan": "Build parent tree and derive UI filters from market path."
+    },
+    {
+      "key": "typeDogma",
+      "files": { "yaml": "typeDogma.yaml", "jsonl": "typeDogma.jsonl" },
+      "priority": "critical",
+      "domain": ["skills", "fitting", "weapons", "activeModules", "passiveModules", "ships", "charges"],
+      "usableFor": [
+        "skill rank and training attributes",
+        "required skills on ships/modules",
+        "CPU/powergrid/capacitor/fitting restrictions",
+        "slot layout and hardpoints",
+        "weapon damage, cycle time, tracking, range and ammo consumption",
+        "shield/armor/hull repairers, boosters, propulsion, analyzers and ewar"
+      ],
+      "primaryFields": ["typeID", "dogmaAttributes", "dogmaEffects"],
+      "relations": ["typeID -> types.typeID", "dogmaAttributes.attributeID -> dogmaAttributes.attributeID", "dogmaEffects.effectID -> dogmaEffects.effectID"],
+      "importPlan": "Do not hand-write skill/module stats. Build game stats by mapping dogma attribute/effect names to game attributes."
+    },
+    {
+      "key": "dogmaAttributes",
+      "files": { "yaml": "dogmaAttributes.yaml", "jsonl": "dogmaAttributes.jsonl" },
+      "priority": "critical",
+      "domain": ["dogmaDictionary"],
+      "usableFor": ["attribute name lookup", "unit lookup", "mapping requiredSkill1..6 and requiredSkillLevel1..6", "mapping damage, resistance, slot, CPU, PG and capacitor attributes"],
+      "primaryFields": ["attributeID", "name", "displayNameID", "description", "unitID", "defaultValue", "published"],
+      "relations": ["unitID -> dogmaUnits.unitID", "categoryID -> dogmaAttributeCategories.categoryID"],
+      "importPlan": "Generate a name->attributeID dictionary and avoid hardcoded attribute IDs in gameplay code."
+    },
+    {
+      "key": "dogmaEffects",
+      "files": { "yaml": "dogmaEffects.yaml", "jsonl": "dogmaEffects.jsonl" },
+      "priority": "critical",
+      "domain": ["moduleBehavior", "activeModules", "passiveModules", "weapons"],
+      "usableFor": ["module activation mode", "passive vs active effects", "targeted effects", "offensive/defensive utility", "effect categories"],
+      "primaryFields": ["effectID", "effectName", "displayNameID", "descriptionID", "effectCategory", "preExpression", "postExpression"],
+      "relations": ["effectID <- typeDogma.dogmaEffects.effectID"],
+      "importPlan": "Use effect category and effect names to decide passive, active, targeted, offensive or defensive behavior."
+    },
+    {
+      "key": "dogmaUnits",
+      "files": { "yaml": "dogmaUnits.yaml", "jsonl": "dogmaUnits.jsonl" },
+      "priority": "medium",
+      "domain": ["dogmaDictionary", "ui"],
+      "usableFor": ["human-readable units: seconds, percent, hitpoints, GJ, m, kg, m3"],
+      "primaryFields": ["unitID", "unitName", "displayNameID", "descriptionID"],
+      "relations": ["unitID <- dogmaAttributes.unitID"],
+      "importPlan": "Attach units to generated dictionary and UI tooltips."
+    },
+    {
+      "key": "typeBonus",
+      "files": { "yaml": "typeBonus.yaml", "jsonl": "typeBonus.jsonl" },
+      "priority": "high",
+      "domain": ["ships", "skills", "progression"],
+      "usableFor": ["ship role bonuses", "skill-per-level bonuses", "faction/ship class identity"],
+      "primaryFields": ["typeID", "bonuses", "importance", "bonusText"],
+      "relations": ["typeID -> types.typeID"],
+      "importPlan": "Convert role/per-level bonuses into game stat multipliers when the bonus references known dogma attributes."
+    },
+    {
+      "key": "certificates",
+      "files": { "yaml": "certificates.yaml", "jsonl": "certificates.jsonl" },
+      "priority": "medium",
+      "domain": ["skills", "tutorial", "progression"],
+      "usableFor": ["recommended skill bundles", "career goals", "ship mastery requirements"],
+      "primaryFields": ["certificateID", "name", "description", "skills"],
+      "relations": ["skills.typeID -> types.typeID"],
+      "importPlan": "Use as suggested training paths, not mandatory stats."
+    },
+    {
+      "key": "masteries",
+      "files": { "yaml": "masteries.yaml", "jsonl": "masteries.jsonl" },
+      "priority": "medium",
+      "domain": ["skills", "ships", "progression"],
+      "usableFor": ["ship mastery levels", "recommended ship skill progression"],
+      "primaryFields": ["typeID", "masteryLevel", "certificateIDs"],
+      "relations": ["typeID -> types.typeID", "certificateIDs -> certificates.certificateID"],
+      "importPlan": "Use to generate recommended skill queue for a selected ship."
+    },
+    {
+      "key": "races",
+      "files": { "yaml": "races.yaml", "jsonl": "races.jsonl" },
+      "priority": "high",
+      "domain": ["characterCreation", "starterPackages"],
+      "usableFor": ["race names, descriptions, icons, faction identity", "starter package selection"],
+      "primaryFields": ["raceID", "name", "description", "iconID"],
+      "relations": ["raceID <- bloodlines.raceID"],
+      "importPlan": "Use as the visible character creation race list; starter packages should be generated from race/faction preferences plus SDE ship/module groups."
+    },
+    {
+      "key": "bloodlines",
+      "files": { "yaml": "bloodlines.yaml", "jsonl": "bloodlines.jsonl" },
+      "priority": "medium",
+      "domain": ["characterCreation", "starterPackages"],
+      "usableFor": ["bloodline flavor", "starting attribute distribution", "race subdivision"],
+      "primaryFields": ["bloodlineID", "raceID", "name", "description", "charisma", "intelligence", "memory", "perception", "willpower"],
+      "relations": ["raceID -> races.raceID"],
+      "importPlan": "Use for starting attribute flavor and optional skill training speed modifiers."
+    },
+    {
+      "key": "ancestries",
+      "files": { "yaml": "ancestries.yaml", "jsonl": "ancestries.jsonl" },
+      "priority": "low",
+      "domain": ["characterCreation", "flavor"],
+      "usableFor": ["lore/flavor text", "minor starting variance"],
+      "primaryFields": ["ancestryID", "bloodlineID", "name", "description"],
+      "relations": ["bloodlineID -> bloodlines.bloodlineID"],
+      "importPlan": "Use for flavor or optional cosmetic starter differences."
+    },
+    {
+      "key": "blueprints",
+      "files": { "yaml": "blueprints.yaml", "jsonl": "blueprints.jsonl" },
+      "priority": "critical",
+      "domain": ["industry", "crafting", "economy"],
+      "usableFor": ["manufacturing jobs", "materials", "output quantity", "research/copy/invention hooks", "production time"],
+      "primaryFields": ["blueprintTypeID", "activities.manufacturing.materials", "activities.manufacturing.products", "activities.manufacturing.time"],
+      "relations": ["blueprintTypeID -> types.typeID", "materials.typeID -> types.typeID", "products.typeID -> types.typeID"],
+      "importPlan": "Drive all manufacturing from blueprint activities."
+    },
+    {
+      "key": "typeMaterials",
+      "files": { "yaml": "typeMaterials.yaml", "jsonl": "typeMaterials.jsonl" },
+      "priority": "high",
+      "domain": ["refining", "salvage", "industry"],
+      "usableFor": ["reprocessing output", "material sink/source", "loot decomposition"],
+      "primaryFields": ["typeID", "materials.typeID", "materials.quantity"],
+      "relations": ["typeID -> types.typeID", "materials.typeID -> types.typeID"],
+      "importPlan": "Use for refining/reprocessing instead of hardcoded Tritanium/Pyerite recipes."
+    },
+    {
+      "key": "mapSolarSystems",
+      "files": { "yaml": "mapSolarSystems.yaml", "jsonl": "mapSolarSystems.jsonl" },
+      "priority": "critical",
+      "domain": ["starMap", "risk", "travel"],
+      "usableFor": ["system names", "security status", "region/constellation relation", "coordinates", "risk/reward generation"],
+      "primaryFields": ["solarSystemID", "solarSystemName", "regionID", "constellationID", "security", "securityStatus", "center"],
+      "relations": ["regionID -> mapRegions.regionID", "constellationID -> mapConstellations.constellationID"],
+      "importPlan": "Generate star map, security band, danger and richness from real system metadata."
+    },
+    {
+      "key": "mapStargates",
+      "files": { "yaml": "mapStargates.yaml", "jsonl": "mapStargates.jsonl" },
+      "priority": "high",
+      "domain": ["starMap", "travel"],
+      "usableFor": ["system adjacency", "route distance", "hauling risk", "fleet pathing"],
+      "primaryFields": ["stargateID", "solarSystemID", "destination.solarSystemID", "destination.stargateID"],
+      "relations": ["solarSystemID -> mapSolarSystems.solarSystemID", "destination.solarSystemID -> mapSolarSystems.solarSystemID"],
+      "importPlan": "Build graph edges for travel and route risk."
+    },
+    {
+      "key": "mapRegions",
+      "files": { "yaml": "mapRegions.yaml", "jsonl": "mapRegions.jsonl" },
+      "priority": "medium",
+      "domain": ["starMap", "market", "territory"],
+      "usableFor": ["regional markets", "region identity", "route grouping"],
+      "primaryFields": ["regionID", "regionName", "center"],
+      "relations": ["regionID <- mapSolarSystems.regionID"],
+      "importPlan": "Use for market hubs and regional economy UI."
+    },
+    {
+      "key": "mapConstellations",
+      "files": { "yaml": "mapConstellations.yaml", "jsonl": "mapConstellations.jsonl" },
+      "priority": "low",
+      "domain": ["starMap"],
+      "usableFor": ["mid-level map grouping"],
+      "primaryFields": ["constellationID", "constellationName", "regionID", "center"],
+      "relations": ["regionID -> mapRegions.regionID"],
+      "importPlan": "Use as optional star-map grouping."
+    },
+    {
+      "key": "factions",
+      "files": { "yaml": "factions.yaml", "jsonl": "factions.jsonl" },
+      "priority": "high",
+      "domain": ["npc", "starterPackages", "standing", "loot"],
+      "usableFor": ["faction names", "enemy identity", "standing changes", "race/faction starter flavor"],
+      "primaryFields": ["factionID", "name", "description", "raceIDs", "corporationID", "militiaCorporationID"],
+      "relations": ["raceIDs -> races.raceID"],
+      "importPlan": "Use to map NPC/site factions and race identities."
+    },
+    {
+      "key": "npcCorporations",
+      "files": { "yaml": "npcCorporations.yaml", "jsonl": "npcCorporations.jsonl" },
+      "priority": "medium",
+      "domain": ["npc", "market", "stations"],
+      "usableFor": ["NPC corp identity", "station ownership", "LP/store hooks", "standing"],
+      "primaryFields": ["corporationID", "name", "factionID", "raceID", "stationID"],
+      "relations": ["factionID -> factions.factionID", "raceID -> races.raceID"],
+      "importPlan": "Use for world flavor and station ownership."
+    },
+    {
+      "key": "npcStations",
+      "files": { "yaml": "npcStations.yaml", "jsonl": "npcStations.jsonl" },
+      "priority": "medium",
+      "domain": ["stations", "market", "industry"],
+      "usableFor": ["docking locations", "station services", "regional market hubs", "home station options"],
+      "primaryFields": ["stationID", "stationName", "solarSystemID", "corporationID", "operationID", "stationTypeID"],
+      "relations": ["solarSystemID -> mapSolarSystems.solarSystemID", "corporationID -> npcCorporations.corporationID"],
+      "importPlan": "Use for docking, market/industry service availability and clone station choices."
+    },
+    {
+      "key": "dungeons",
+      "files": { "yaml": "dungeons.yaml", "jsonl": "dungeons.jsonl" },
+      "priority": "medium",
+      "domain": ["pveSites", "combat", "exploration"],
+      "usableFor": ["PvE site templates", "rooms", "spawn groups", "site names"],
+      "primaryFields": ["dungeonID", "name", "description", "roomObjects", "groups"],
+      "relations": [],
+      "importPlan": "Use to seed anomaly/site templates; simplify into idle-game waves and loot containers."
+    },
+    {
+      "key": "icons",
+      "files": { "yaml": "icons.yaml", "jsonl": "icons.jsonl" },
+      "priority": "low",
+      "domain": ["ui", "assets"],
+      "usableFor": ["item/skill/category icon lookup"],
+      "primaryFields": ["iconID", "iconFile"],
+      "relations": ["iconID <- races.iconID", "iconID <- types.iconID"],
+      "importPlan": "Use as metadata for generated pixel/icon mapping, not as shipped copyrighted asset blobs."
+    },
+    {
+      "key": "graphics",
+      "files": { "yaml": "graphics.yaml", "jsonl": "graphics.jsonl" },
+      "priority": "low",
+      "domain": ["ui", "assets"],
+      "usableFor": ["ship/model/graphic metadata", "visual grouping"],
+      "primaryFields": ["graphicID", "graphicFile", "sofFactionName", "sofHullName"],
+      "relations": ["graphicID <- types.graphicID"],
+      "importPlan": "Use as metadata for procedural pixel sprite variants."
+    }
+  ]
+}
