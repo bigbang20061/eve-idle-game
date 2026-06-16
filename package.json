@@ -10,6 +10,7 @@
     "start": "node src/server.js",
     "seed": "node scripts/seedDatabase.js",
     "import:sde": "node scripts/importSde.js",
+    "scan:sde": "node scripts/scanSdeDictionary.js",
     "smoke": "node tests/smoke-no-db.js && node tests/combat-system-smoke.js && node tests/dogma-mapper-smoke.js",
     "check": "node tests/check-syntax.js",
     "smoke:combat": "node tests/combat-system-smoke.js",
@@ -30,7 +31,8 @@
     "mongoose": "^9.7.0",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "yaml": "^2.7.0"
   },
   "devDependencies": {}
 }
