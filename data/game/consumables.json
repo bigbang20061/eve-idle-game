@@ -1,0 +1,37 @@
+{
+  "version": "consumables-v1",
+  "chargeKinds": {
+    "ammo": {
+      "label": "弹药/晶体/导弹",
+      "fallbackVolume": 0.01,
+      "profiles": {
+        "em": { "em": 1 },
+        "thermal": { "thermal": 1 },
+        "kinetic": { "kinetic": 1 },
+        "explosive": { "explosive": 1 },
+        "hybrid": { "thermal": 0.45, "kinetic": 0.55 },
+        "laser": { "em": 0.58, "thermal": 0.42 },
+        "projectile": { "explosive": 0.45, "kinetic": 0.35, "thermal": 0.2 },
+        "missile": { "kinetic": 0.5, "explosive": 0.3, "thermal": 0.2 },
+        "balanced": { "em": 0.25, "thermal": 0.25, "kinetic": 0.25, "explosive": 0.25 }
+      },
+      "keywordProfiles": [
+        { "keywords": ["antimatter", "plutonium", "railgun", "hybrid", "blaster", "混合", "反物质"], "profile": "hybrid" },
+        { "keywords": ["multifrequency", "radio", "laser", "frequency", "crystal", "激光", "晶体"], "profile": "laser" },
+        { "keywords": ["fusion", "emp", "phased", "projectile", "cannon", "弹丸", "炮弹"], "profile": "projectile" },
+        { "keywords": ["missile", "rocket", "scourge", "nova", "inferno", "导弹", "火箭"], "profile": "missile" },
+        { "keywords": ["em"], "profile": "em" },
+        { "keywords": ["thermal", "热能"], "profile": "thermal" },
+        { "keywords": ["kinetic", "动能"], "profile": "kinetic" },
+        { "keywords": ["explosive", "爆炸"], "profile": "explosive" }
+      ]
+    },
+    "booster": { "label": "增效剂", "fallbackVolume": 0.1, "profiles": {} }
+  },
+  "starterFallbackCharges": {
+    "caldari": { "typeId": "starter-caldari-ammo", "name": "Starter Scourge Light Missile", "zh": "新手灾难轻型导弹", "kind": "ammo", "quantity": 500, "loadedQuantity": 80, "volume": 0.01, "basePrice": 6, "meta": { "chargeKind": "ammo", "damageProfile": { "kinetic": 0.72, "thermal": 0.28 } } },
+    "gallente": { "typeId": "starter-gallente-ammo", "name": "Starter Antimatter Charge", "zh": "新手反物质弹药", "kind": "ammo", "quantity": 500, "loadedQuantity": 80, "volume": 0.01, "basePrice": 6, "meta": { "chargeKind": "ammo", "damageProfile": { "thermal": 0.45, "kinetic": 0.55 } } },
+    "amarr": { "typeId": "starter-amarr-crystal", "name": "Starter Multifrequency Crystal", "zh": "新手多频晶体", "kind": "ammo", "quantity": 200, "loadedQuantity": 40, "volume": 0.01, "basePrice": 10, "meta": { "chargeKind": "ammo", "damageProfile": { "em": 0.58, "thermal": 0.42 } } },
+    "minmatar": { "typeId": "starter-minmatar-ammo", "name": "Starter Fusion Projectile", "zh": "新手聚变弹丸", "kind": "ammo", "quantity": 500, "loadedQuantity": 80, "volume": 0.01, "basePrice": 6, "meta": { "chargeKind": "ammo", "damageProfile": { "explosive": 0.5, "kinetic": 0.3, "thermal": 0.2 } } }
+  }
+}
