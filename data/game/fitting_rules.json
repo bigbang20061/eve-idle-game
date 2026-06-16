@@ -1,5 +1,9 @@
 {
   "version": "fitting-rules-v1",
+  "engine": {
+    "capacitorRegenPerSecond": 0.018,
+    "defaultCycleSeconds": 6
+  },
   "shipDefaults": {
     "cpu": 120,
     "powergrid": 45,
