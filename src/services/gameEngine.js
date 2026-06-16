@@ -1,6 +1,7 @@
 import { Character, SdeSystem, SdeType, GameEvent, IndustryJob, SdeBlueprint, Fleet } from '../models/index.js';
 import { cargoVolume, chooseWeighted, clamp, deriveEffectiveStats, marketPrice, mergeStack, seededRandom, siteTemplate, systemBand } from './formulas.js';
 import { ensureCombat, resolveCombatRound, combatSnapshot } from './combatSystem.js';
+import { ensureSkillState, tickSkillTraining, deriveSkillModifiers, skillLevel } from './skillSystem.js';
 
 const MAX_OFFLINE_SECONDS = 12 * 3600;
 const STEP_SECONDS = 20;
@@ -99,6 +100,7 @@ async function startNewSite(character, system, stats, rng) {
   const activity = character.autopilot?.activity || 'mining';
   const site = siteTemplate(activity, system, character, rng);
   site.hp = { shield: stats.shield, armor: stats.armor, hull: stats.hull };
+  site.capacitor = stats.capacitor;
   site.hazard = 0;
   if (['ratting', 'combat'].includes(activity)) ensureCombat(site, stats, character, rng);
   character.currentSystemId = String(system.systemId);
@@ -138,13 +140,20 @@ async function tickIndustry(character, now, io) {
 }
 
 async function tickStep(character, dt, now, io) {
+  ensureSkillState(character);
+  const completedSkills = tickSkillTraining(character, now);
+  if (completedSkills.length) {
+    character.stats.skillsCompleted = Number(character.stats.skillsCompleted || 0) + completedSkills.length;
+    for (const skill of completedSkills) addLog(character, `技能完成：${skill.label} ${skill.level} 级。`);
+  }
   await tickIndustry(character, now, io);
-  if (!character.autopilot?.enabled) { character.skillpoints += dt * 0.015; return; }
+  const skillMods = deriveSkillModifiers(character);
+  if (!character.autopilot?.enabled) { character.skillpoints += dt * 0.015 * (1 + Number(skillMods.skillSpeedMultiplier || 0)); return; }
   const system = await getSystem(character);
   const stats = deriveEffectiveStats(character);
   const rng = seededRandom(`${character._id}:${now.getTime()}:${character.expedition.state}:${character.stats.sorties}`);
   const state = character.expedition.state || 'idle';
-  character.skillpoints += dt * 0.03 * (1 + Number(character.skills.command || 1) * 0.01);
+  character.skillpoints += dt * 0.03 * (1 + Number(skillMods.skillSpeedMultiplier || 0));
 
   if (state === 'idle') return startNewSite(character, system, stats, rng);
   if (state === 'repairing') { character.expedition.progress += dt * 2; if (character.expedition.progress >= 100) { resetExpedition(character, 'idle'); character.locationState = 'docked'; addLog(character, '维修完成，等待下一轮出站。'); } return; }
@@ -181,6 +190,8 @@ async function tickStep(character, dt, now, io) {
     character.expedition.hazard = Math.max(Number(character.expedition.hazard || 0), Number(site.hazard || 0));
     character.stats.damageDealt = Number(character.stats.damageDealt || 0) + result.dealt;
     character.stats.damageTaken = Number(character.stats.damageTaken || 0) + result.taken;
+    character.stats.modulesActivated = Number(character.stats.modulesActivated || 0) + Number(result.modulesActivated || 0);
+    character.stats.chargesConsumed = Number(character.stats.chargesConsumed || 0) + (result.chargesUsed || []).reduce((sum, c) => sum + Number(c.quantity || 0), 0);
     if (result.bounty > 0) {
       character.credits += result.bounty;
       character.stats.totalEarned += result.bounty;
@@ -226,8 +237,7 @@ async function tickStep(character, dt, now, io) {
       }
       if (site.activity === 'mining') character.stats.minedM3 += gainedM3;
       character.stats.bestLoot = Math.max(character.stats.bestLoot || 0, gainedValue);
-      const skillKey = site.activity === 'mining' ? 'mining' : site.activity === 'ratting' || site.activity === 'combat' ? 'combat' : 'scanning';
-      character.skills[skillKey] = Number(character.skills[skillKey] || 1) + Math.min(0.02, site.tier * 0.001);
+      character.skillpoints += Math.max(1, Number(site.tier || 1)) * 0.18;
       character.expedition.state = 'extracting';
       character.expedition.progress = 0;
       addLog(character, `获得约 ${Math.round(gainedValue)} ISK 战利品，准备撤离。`);
@@ -260,6 +270,10 @@ export async function tickCharacter(character, now = new Date(), io = null) {
   while (elapsed > 0) { const step = Math.min(STEP_SECONDS, elapsed); await tickStep(character, step, now, io); elapsed -= step; }
   character.lastTickAt = now;
   character.lastSeenAt = now;
+  character.markModified('skills');
+  character.markModified('skillTraining');
+  character.markModified('ship');
+  character.markModified('cargo');
   await character.save();
   if (io) io.to(`character:${character._id}`).emit('character:update', publicCharacter(character));
   return character;
@@ -270,7 +284,7 @@ export async function tickCharacterById(characterId, io = null) { const characte
 export function publicCharacter(character) {
   const obj = character.toObject ? character.toObject() : character;
   if (obj.expedition?.site?.combat) obj.expedition.site.combatPublic = combatSnapshot(obj.expedition.site);
-  return { id: String(obj._id), name: obj.name, corp: obj.corp, credits: obj.credits, skillpoints: obj.skillpoints, currentSystemId: obj.currentSystemId, homeSystemId: obj.homeSystemId, locationState: obj.locationState, ship: obj.ship, cargo: obj.cargo || [], warehouse: obj.warehouse || { items: [], capacity: 0 }, skills: obj.skills, autopilot: obj.autopilot, expedition: obj.expedition, stats: obj.stats, fleetId: obj.fleetId, updatedAt: obj.updatedAt };
+  return { id: String(obj._id), name: obj.name, race: obj.race, corp: obj.corp, credits: obj.credits, skillpoints: obj.skillpoints, skillTraining: obj.skillTraining, currentSystemId: obj.currentSystemId, homeSystemId: obj.homeSystemId, locationState: obj.locationState, ship: obj.ship, cargo: obj.cargo || [], warehouse: obj.warehouse || { items: [], capacity: 0 }, skills: obj.skills, autopilot: obj.autopilot, expedition: obj.expedition, stats: obj.stats, fleetId: obj.fleetId, updatedAt: obj.updatedAt };
 }
 
 export async function tickFleets(now = new Date(), io = null) {
@@ -316,7 +330,8 @@ export async function startIndustryJob(character, blueprintTypeId, runs = 1) {
   for (const material of bp.materials) { const have = warehouse.find(s => String(s.typeId) === String(material.typeId)); if (!have || Number(have.quantity || 0) < Number(material.quantity || 0) * runs) throw new Error(`材料不足：${material.name || material.typeId}`); }
   for (const material of bp.materials) { const stack = warehouse.find(s => String(s.typeId) === String(material.typeId)); stack.quantity -= Number(material.quantity || 0) * runs; }
   character.warehouse.items = warehouse.filter(s => Number(s.quantity || 0) > 0);
-  const seconds = Math.max(10, Number(bp.time || 60) * runs / Math.max(1, Number(character.skills.industry || 1) * 0.12));
+  const industrySpeed = 1 + Number(deriveSkillModifiers(character).industrySpeedMultiplier || 0) + skillLevel(character, 'industry') * 0.02;
+  const seconds = Math.max(10, Number(bp.time || 60) * runs / Math.max(1, industrySpeed));
   const job = await IndustryJob.create({ characterId: character._id, blueprintTypeId: String(blueprintTypeId), productTypeId: String(bp.productTypeId), productName: bp.productName, runs, status: 'running', output: { quantity: Number(bp.quantity || 1) * runs }, materials: bp.materials, startedAt: new Date(), readyAt: new Date(Date.now() + seconds * 1000) });
   await character.save();
   return job;
