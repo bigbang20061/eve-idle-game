@@ -25,8 +25,12 @@ services:
       SESSION_SECRET: change-this-before-internet
       AUTO_SEED: "true"
       CREATE_DEMO_USERS: "true"
+      SDE_STATIC_DIR: /app/sde/yaml
     volumes:
       - ./data:/app/data:ro
+      # Clone https://github.com/EVE-China/sde into ./sde.
+      # This keeps static game content outside MongoDB and outside this repository.
+      - ./sde:/app/sde:ro
 
 volumes:
   mongo_data:
