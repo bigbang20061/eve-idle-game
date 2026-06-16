@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import rateLimit from 'express-rate-limit';
 import { User } from '../models/index.js';
 import { createStarterCharacter } from '../services/characterFactory.js';
+import { starterOptions, getStarterKit } from '../services/starters.js';
 import { env } from '../config/env.js';
 import { asyncHandler } from '../middleware/auth.js';
 
@@ -19,11 +20,16 @@ authApiRoutes.get('/me', asyncHandler(async (req, res) => {
   res.json({ ok: true, user: publicUser(req.user), character: req.character || null });
 }));
 
+authApiRoutes.get('/starter-options', asyncHandler(async (req, res) => {
+  res.json({ ok: true, races: starterOptions() });
+}));
+
 authApiRoutes.post('/register', authLimiter, asyncHandler(async (req, res) => {
   const username = String(req.body.username || '').trim();
   const characterName = String(req.body.characterName || username).trim();
   const password = String(req.body.password || '');
   const inviteCode = String(req.body.inviteCode || '').trim();
+  const race = getStarterKit(req.body.race || '').raceId;
   if (!/^[\p{L}\p{N}_-]{3,24}$/u.test(username)) throw new Error('账号只能包含 3-24 位字母/数字/下划线/短横线。');
   if (characterName.length < 2 || characterName.length > 28) throw new Error('角色名需要 2-28 位。');
   if (password.length < 6) throw new Error('密码至少 6 位。');
@@ -34,7 +40,7 @@ authApiRoutes.post('/register', authLimiter, asyncHandler(async (req, res) => {
   const role = userCount === 0 || (env.adminInviteCode && inviteCode === env.adminInviteCode) ? 'admin' : 'player';
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await User.create({ username, usernameLower, passwordHash, role, lastIp: req.ip });
-  const character = await createStarterCharacter(user, characterName);
+  const character = await createStarterCharacter(user, characterName, race);
   req.session.userId = String(user._id);
   req.session.save(() => res.json({ ok: true, user: publicUser(user), character }));
 }));
