@@ -9,6 +9,7 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "seed": "node scripts/seedDatabase.js",
+    "fetch:sde": "node scripts/fetchSde.js",
     "import:sde": "node scripts/importSde.js",
     "smoke": "node tests/smoke-no-db.js && node tests/combat-system-smoke.js && node tests/dogma-mapper-smoke.js && node tests/skills-fitting-smoke.js",
     "check": "node tests/check-syntax.js",
