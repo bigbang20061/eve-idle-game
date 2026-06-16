@@ -44,6 +44,7 @@ npm run smoke:combat
 
 ```bash
 cd eve_sde_online_deep
+git submodule update --init --depth 1 sde
 docker compose up --build
 ```
 
@@ -58,11 +59,14 @@ docker compose up --build
 
 ```bash
 cd eve_sde_online_deep
+git submodule update --init --depth 1 sde
 cp .env.example .env
 npm install
 npm run seed
 npm start
 ```
+
+默认静态 SDE 路径是 `./sde/yaml`，对应项目内的 `EVE-China/sde` submodule。
 
 ## 导入官方 / EVE-China SDE
 
