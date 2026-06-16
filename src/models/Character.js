@@ -8,6 +8,7 @@ const itemStackSchema = new mongoose.Schema({
   quantity: { type: Number, default: 0 },
   volume: { type: Number, default: 0.01 },
   basePrice: { type: Number, default: 1 },
+  chargeGroup: String,
   locked: { type: Boolean, default: false },
   source: String,
   meta: mongoose.Schema.Types.Mixed
@@ -20,15 +21,24 @@ const fittedModuleSchema = new mongoose.Schema({
   zh: String,
   slot: String,
   kind: String,
+  role: String,
   tier: Number,
-  groupKey: String,
-  mode: { type: String, enum: ['passive', 'active'], default: 'passive' },
-  state: { type: String, enum: ['passive', 'active', 'idle', 'offline'], default: 'passive' },
-  fitting: mongoose.Schema.Types.Mixed,
-  activation: mongoose.Schema.Types.Mixed,
-  charge: mongoose.Schema.Types.Mixed,
+  mode: { type: String, enum: ['passive', 'active', 'weapon'], default: 'passive' },
+  cpu: { type: Number, default: 0 },
+  powergrid: { type: Number, default: 0 },
+  calibration: { type: Number, default: 0 },
+  requirements: mongoose.Schema.Types.Mixed,
+  passiveEffects: mongoose.Schema.Types.Mixed,
+  activeEffects: mongoose.Schema.Types.Mixed,
   effects: mongoose.Schema.Types.Mixed,
-  online: { type: Boolean, default: true }
+  activation: mongoose.Schema.Types.Mixed,
+  chargeGroup: String,
+  chargesLoaded: { type: Number, default: 0 },
+  online: { type: Boolean, default: true },
+  active: { type: Boolean, default: false },
+  lastActivatedAt: Date,
+  cycleEndsAt: Date,
+  meta: mongoose.Schema.Types.Mixed
 }, { _id: false });
 
 const shipSchema = new mongoose.Schema({
@@ -38,56 +48,33 @@ const shipSchema = new mongoose.Schema({
   zh: String,
   class: String,
   role: String,
+  race: String,
   stats: mongoose.Schema.Types.Mixed,
   slots: mongoose.Schema.Types.Mixed,
-  fitting: mongoose.Schema.Types.Mixed,
-  runtime: mongoose.Schema.Types.Mixed,
   fittedModules: [fittedModuleSchema],
+  activeEffects: [mongoose.Schema.Types.Mixed],
   insured: { type: Boolean, default: true },
   skin: String
 }, { _id: false });
 
-const skillJobSchema = new mongoose.Schema({
+const skillTrainingPlanSchema = new mongoose.Schema({
   skillId: String,
+  label: String,
   targetLevel: Number,
-  secondsRemaining: Number,
-  totalSeconds: Number,
-  queuedAt: Date
-}, { _id: false });
-
-const skillsSchema = new mongoose.Schema({
-  combat: { type: Number, default: 1 },
-  weaponSystems: { type: Number, default: 0 },
-  gunnery: { type: Number, default: 0 },
-  missiles: { type: Number, default: 0 },
-  drones: { type: Number, default: 0 },
-  shieldOperation: { type: Number, default: 0 },
-  armorRepairSystems: { type: Number, default: 0 },
-  capacitorManagement: { type: Number, default: 0 },
-  weaponUpgrades: { type: Number, default: 0 },
-  mining: { type: Number, default: 1 },
-  scanning: { type: Number, default: 1 },
-  industry: { type: Number, default: 1 },
-  trade: { type: Number, default: 1 },
-  command: { type: Number, default: 1 },
-  salvage: { type: Number, default: 1 },
-  security: { type: Number, default: 1 },
-  navigation: { type: Number, default: 0 },
-  caldariFrigate: { type: Number, default: 0 },
-  gallenteFrigate: { type: Number, default: 0 },
-  amarrFrigate: { type: Number, default: 0 },
-  minmatarFrigate: { type: Number, default: 0 }
+  secondsRequired: Number,
+  startedAt: Date,
+  readyAt: Date,
+  completedAt: Date
 }, { _id: false });
 
 const charSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true, index: true },
   name: { type: String, required: true, trim: true, maxlength: 28, index: true },
-  race: { type: String, default: 'caldari', index: true },
+  race: { type: String, default: 'independent', index: true },
   corp: { type: String, default: '自由深空承包人' },
   credits: { type: Number, default: 25000 },
   plex: { type: Number, default: 0 },
   skillpoints: { type: Number, default: 0 },
-  skillTraining: { queue: [skillJobSchema] },
   notoriety: { type: Number, default: 0 },
   securityStanding: { type: Number, default: 0 },
   currentSystemId: { type: String, index: true },
@@ -103,7 +90,15 @@ const charSchema = new mongoose.Schema({
     reserve: { type: Map, of: Number, default: {} }
   },
   escrow: [itemStackSchema],
-  skills: { type: skillsSchema, default: () => ({}) },
+  skills: {
+    type: mongoose.Schema.Types.Mixed,
+    default: () => ({ combat: 1, mining: 1, scanning: 1, industry: 1, trade: 1, command: 1, salvage: 1, security: 1 })
+  },
+  skillTraining: {
+    active: skillTrainingPlanSchema,
+    queue: [skillTrainingPlanSchema],
+    history: [skillTrainingPlanSchema]
+  },
   autopilot: {
     enabled: { type: Boolean, default: true },
     activity: { type: String, enum: ['mining', 'ratting', 'relic', 'data', 'hauling', 'combat'], default: 'mining' },
@@ -141,7 +136,10 @@ const charSchema = new mongoose.Schema({
     bestLoot: { type: Number, default: 0 },
     damageDealt: { type: Number, default: 0 },
     damageTaken: { type: Number, default: 0 },
-    bountyEarned: { type: Number, default: 0 }
+    bountyEarned: { type: Number, default: 0 },
+    modulesActivated: { type: Number, default: 0 },
+    chargesConsumed: { type: Number, default: 0 },
+    skillsCompleted: { type: Number, default: 0 }
   },
   walletJournal: [{ at: Date, type: String, amount: Number, note: String }],
   fleetId: { type: mongoose.Schema.Types.ObjectId, ref: 'Fleet', index: true },
@@ -152,5 +150,6 @@ const charSchema = new mongoose.Schema({
 charSchema.index({ credits: -1 });
 charSchema.index({ 'stats.totalEarned': -1 });
 charSchema.index({ currentSystemId: 1, locationState: 1 });
+charSchema.index({ race: 1, credits: -1 });
 
 export const Character = mongoose.model('Character', charSchema);

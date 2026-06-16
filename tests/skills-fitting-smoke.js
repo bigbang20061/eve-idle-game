@@ -1,27 +1,32 @@
-import { buildShipFromType } from '../src/services/shipFactory.js';
-import { buildFittedModuleFromType, fittingSummary, moduleEffectsForStats, processActiveModules, validateModuleFit } from '../src/services/fitting.js';
-import { enqueueSkillTraining, tickSkillTraining } from '../src/services/skills.js';
+import { ensureSkillState, startSkillTraining, tickSkillTraining, deriveSkillModifiers } from '../src/services/skillSystem.js';
+import { moduleInstanceFromType, validateModuleFit, cycleActiveModules } from '../src/services/fittingSystem.js';
 
 const character = {
-  skills: { combat: 1, weaponSystems: 1, gunnery: 1, shieldOperation: 1, capacitorManagement: 1, weaponUpgrades: 1 },
-  ship: buildShipFromType({ typeId: 'test-ship', name: 'Test Frigate', kind: 'ship', stats: { shield: 100, armor: 80, hull: 90, dps: 5, capacitor: 150, capacitorRecharge: 5 }, slots: { high: 2, mid: 2, low: 1, rig: 1 }, fitting: { cpu: 80, powergrid: 50, calibration: 40, turretHardpoints: 2, launcherHardpoints: 1 } }),
-  skillTraining: { queue: [] },
-  expedition: { log: [] },
-  markModified() {}
+  skills: { missiles: 1, engineering: 2, shield_operation: 1 },
+  skillTraining: { active: null, queue: [], history: [] },
+  ship: {
+    stats: { shield: 120, armor: 80, hull: 90, dps: 4, cpu: 120, powergrid: 40, capacitor: 220, launcherHardpoints: 1, turretHardpoints: 1, calibration: 100 },
+    slots: { high: 2, mid: 2, low: 1, rig: 1 },
+    fittedModules: []
+  },
+  cargo: [{ typeId: 'ammo-test', name: 'Training Missile', kind: 'charge', chargeGroup: 'missile_charge', quantity: 10, volume: 0.01, basePrice: 1 }],
+  warehouse: { items: [], reserve: new Map() },
+  stats: {}
 };
 
-const turret = buildFittedModuleFromType({ typeId: 'test-turret', name: 'Civilian Pulse Laser', kind: 'module', tier: 1, effects: { dps: 6 } }, character);
-turret.charge = { typeId: 'test-crystal', name: 'Test Crystal', zh: '测试晶体', loadedQuantity: 10, chargeKind: 'ammo', damageProfile: { em: 0.6, thermal: 0.4 } };
-validateModuleFit(character, turret);
-character.ship.fittedModules.push(turret);
-const fit = fittingSummary(character);
-if (!fit.ok || fit.usage.turretHardpoints !== 1) throw new Error('fitting summary failed');
-const effects = moduleEffectsForStats(character, { turretDamage: 1.1 });
-if (effects.dps <= 0 || !effects.damageProfile?.em) throw new Error('module effects failed');
-const site = { hp: { shield: 20, armor: 80, hull: 90 } };
-processActiveModules({ character, site, stats: { capacitor: 150, capacitorRecharge: 5, activeModuleCapCost: 1, shield: 100, armor: 80 }, dt: 20 });
-if (character.ship.fittedModules[0].charge.loadedQuantity >= 10) throw new Error('charge consumption failed');
-const job = enqueueSkillTraining(character, 'combat');
-tickSkillTraining(character, job.totalSeconds + 1);
-if (character.skills.combat < 2) throw new Error('skill training failed');
-console.log('skills fitting smoke ok', { cpu: fit.usage.cpu, chargeLeft: character.ship.fittedModules[0].charge.loadedQuantity, combat: character.skills.combat });
+ensureSkillState(character);
+startSkillTraining(character, 'engineering', { now: new Date(0) });
+character.skillTraining.active.readyAt = new Date(1);
+const done = tickSkillTraining(character, new Date(2));
+if (!done.length || character.skills.engineering < 3) throw new Error('skill training did not complete');
+const mods = deriveSkillModifiers(character);
+if (!mods.cpuMultiplier) throw new Error('skill modifiers missing');
+
+const launcher = moduleInstanceFromType({ typeId: 'launcher-test', name: 'Civilian Light Missile Launcher', kind: 'module', role: 'weapon_launcher', activeEffects: { dps: 7, damageProfile: { kinetic: 1 } }, activation: { autoCycle: true, cycleSeconds: 5, chargeGroup: 'missile_charge', chargesPerCycle: 1 } });
+const validation = validateModuleFit(character, launcher);
+if (!validation.ok) throw new Error(`launcher should fit: ${validation.errors.join(', ')}`);
+character.ship.fittedModules.push(launcher);
+const site = { hp: { shield: 100, armor: 100, hull: 100 }, capacitor: 220 };
+const active = cycleActiveModules(character, site, 10, character.ship.stats);
+if (!active.stats.dps || character.cargo[0].quantity >= 10) throw new Error('active module did not consume charges or produce dps');
+console.log('skills fitting smoke ok', { completed: done[0].skillId, dps: active.stats.dps, chargesLeft: character.cargo[0].quantity });

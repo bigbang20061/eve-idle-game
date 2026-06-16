@@ -1,82 +1,122 @@
 import { Character, SdeType, SdeSystem } from '../models/index.js';
+import { shipFromStarterConfig, shipFromType } from './shipFactory.js';
+import { moduleInstanceFromType, validateModuleFit } from './fittingSystem.js';
 import { mergeStack } from './formulas.js';
-import { buildShipFromType } from './shipFactory.js';
-import { buildFittedModuleFromType } from './fitting.js';
-import { starterChargeForRace } from './consumables.js';
-import { normaliseSkills } from './skills.js';
-import { getStarterKit } from './starters.js';
+import { ensureSkillState } from './skillSystem.js';
+import { pickStarterRace } from './starterConfig.js';
 
-function regexFromTerms(terms = []) {
-  const escaped = terms.filter(Boolean).map(v => String(v).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-  return escaped.length ? new RegExp(escaped.join('|'), 'i') : null;
+function safeRegex(text) {
+  return new RegExp(String(text || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
 }
 
-async function findTypeByQuery(queries = [], filter = {}) {
-  const regex = regexFromTerms(queries);
-  if (!regex) return null;
-  return SdeType.findOne({ ...filter, $or: [{ name: regex }, { zh: regex }, { groupName: regex }, { marketGroupName: regex }] }).sort({ basePrice: 1 }).lean();
-}
-
-async function findSystemByQuery(queries = []) {
-  const regex = regexFromTerms(queries);
-  if (!regex) return null;
-  return SdeSystem.findOne({ $or: [{ name: regex }, { zh: regex }] }).sort({ security: -1 }).lean();
-}
-
-function starterWarehouseItems(kit, charge) {
-  const items = [];
-  for (const item of kit.warehouse || []) items.push({ ...item, source: 'starter' });
-  if (charge) {
-    const remaining = Math.max(0, Number(charge.quantity || 0) - Number(charge.loadedQuantity || 0));
-    if (remaining > 0) items.push({ ...charge, quantity: remaining, source: 'starter' });
+async function findSystem(raceConfig = {}) {
+  for (const query of raceConfig.homeSystemQuery || []) {
+    const system = await SdeSystem.findOne({ $or: [{ name: safeRegex(query) }, { zh: safeRegex(query) }] }).lean();
+    if (system) return system;
   }
-  return items;
-}
-
-export async function createStarterCharacter(user, name, race = 'caldari') {
-  const { raceId, kit } = getStarterKit(race);
-  const starterShip = await findTypeByQuery(kit.shipQuery, { kind: 'ship' })
-    || await SdeType.findOne({ kind: 'ship' }).sort({ basePrice: 1 }).lean()
-    || kit.fallbackShip;
-  const starterSystem = await findSystemByQuery(kit.homeSystemQuery)
+  return await SdeSystem.findOne({ name: /Jita/i }).lean()
     || await SdeSystem.findOne({ hub: true }).lean()
     || await SdeSystem.findOne({}).sort({ security: -1 }).lean();
-  const ship = buildShipFromType(starterShip || kit.fallbackShip, { skin: `${raceId}-rookie` });
-  const charge = starterChargeForRace(kit.chargeRace || raceId);
+}
 
-  for (const entry of kit.modules || []) {
-    const type = await findTypeByQuery(entry.query, { kind: 'module' }) || entry.fallback;
-    if (!type) continue;
-    const module = buildFittedModuleFromType(type);
-    if (module.activation?.chargeKind && charge) {
-      module.charge = { typeId: charge.typeId, name: charge.name, zh: charge.zh, loadedQuantity: Number(charge.loadedQuantity || 0), damageProfile: charge.meta?.damageProfile, chargeKind: charge.meta?.chargeKind || 'ammo' };
-    }
-    ship.fittedModules.push(module);
+async function findShip(raceConfig = {}) {
+  for (const query of raceConfig.shipQuery || []) {
+    const ship = await SdeType.findOne({ kind: 'ship', $or: [{ name: safeRegex(query) }, { zh: safeRegex(query) }, { groupName: safeRegex(query) }] }).lean();
+    if (ship) return ship;
   }
+  return null;
+}
 
-  const systemId = String(starterSystem?.systemId || kit.homeSystemId || 'starter-system');
-  const warehouseItems = [];
-  for (const item of starterWarehouseItems(kit, charge)) mergeStack(warehouseItems, item);
-  const skills = normaliseSkills(kit.skills || {});
+async function findModuleByQuery(query) {
+  return await SdeType.findOne({ kind: 'module', $or: [{ name: safeRegex(query) }, { zh: safeRegex(query) }, { marketGroupName: safeRegex(query) }, { groupName: safeRegex(query) }] }).lean();
+}
 
-  return Character.create({
+async function starterModules(raceConfig = {}, character) {
+  const out = [];
+  const tryAdd = module => {
+    const original = character.ship.fittedModules || [];
+    character.ship.fittedModules = out;
+    const validation = validateModuleFit(character, module);
+    character.ship.fittedModules = original;
+    if (validation.ok) out.push(module);
+  };
+  for (const query of raceConfig.fitQueries || []) {
+    const type = await findModuleByQuery(query);
+    if (!type) continue;
+    tryAdd(moduleInstanceFromType(type));
+  }
+  for (const fallback of raceConfig.fallbackModules || []) {
+    tryAdd(moduleInstanceFromType({ kind: 'module', ...fallback, effects: fallback.effects || fallback.passiveEffects || fallback.activeEffects || {} }));
+  }
+  return out;
+}
+
+function cloneStarterStack(stack) {
+  return {
+    typeId: String(stack.typeId),
+    name: stack.name,
+    zh: stack.zh || stack.name,
+    kind: stack.kind || 'item',
+    quantity: Number(stack.quantity || 1),
+    volume: Number(stack.volume || 0.01),
+    basePrice: Number(stack.basePrice || 1),
+    chargeGroup: stack.chargeGroup,
+    locked: Boolean(stack.locked),
+    source: stack.source || 'starter',
+    meta: stack.meta || {}
+  };
+}
+
+export async function createStarterCharacter(user, name, { race = null } = {}) {
+  const picked = pickStarterRace(race);
+  const raceId = picked.id;
+  const raceConfig = picked.config || {};
+  const starterShip = await findShip(raceConfig);
+  const starterSystem = await findSystem(raceConfig);
+  const ship = starterShip ? shipFromType(starterShip, { race: raceId, skin: `${raceId}-sde` }) : shipFromStarterConfig(raceConfig.fallbackShip || {}, raceId);
+  const systemId = String(starterSystem?.systemId || '30000142');
+  const character = new Character({
     userId: user._id,
     name,
     race: raceId,
+    corp: raceConfig.corp || '自由深空承包人',
     currentSystemId: systemId,
     homeSystemId: systemId,
     cloneStationId: systemId,
     locationState: 'docked',
-    credits: Number(kit.credits || 25000),
-    skillTraining: { queue: [] },
-    skills,
+    credits: Number(raceConfig.credits || 25000),
     ship,
     hangarShips: [],
     cargo: [],
-    warehouse: { capacity: Number(kit.warehouseCapacity || 50000), items: warehouseItems, reserve: new Map() },
-    autopilot: { enabled: true, activity: 'mining', risk: 0.35, targetSystemId: systemId, allowLowSec: false, sellExcess: true, refineOre: false, minShieldPct: 0.35, loop: true },
-    expedition: { state: 'idle', progress: 0, enemyHull: 0, hazard: 0, log: [`${kit.label} 克隆体激活，领取种族新手舰装。`] },
-    walletJournal: [{ at: new Date(), type: 'grant', amount: Number(kit.credits || 25000), note: `${kit.label} 新克隆启动资金` }],
+    warehouse: { capacity: 50000, items: [], reserve: new Map() },
+    skills: { ...(raceConfig.skills || {}) },
+    skillTraining: { active: null, queue: [], history: [] },
+    autopilot: {
+      enabled: true,
+      activity: raceId === 'minmatar' ? 'hauling' : raceId === 'gallente' ? 'relic' : 'ratting',
+      risk: 0.35,
+      targetSystemId: systemId,
+      allowLowSec: false,
+      sellExcess: true,
+      refineOre: false,
+      minShieldPct: 0.35,
+      combat: { stance: 'standard', damageProfile: 'balanced', targetPriority: 'scramblers_first' },
+      loop: true
+    },
+    expedition: { state: 'idle', progress: 0, enemyHull: 0, hazard: 0, log: [`克隆体激活，选择 ${raceConfig.label || raceId} 起步包，等待调度。`] },
+    walletJournal: [{ at: new Date(), type: 'grant', amount: Number(raceConfig.credits || 25000), note: `${raceConfig.label || raceId} 新克隆启动资金` }],
     lastTickAt: new Date()
   });
+  ensureSkillState(character);
+  character.ship.fittedModules = await starterModules(raceConfig, character);
+  for (const item of raceConfig.inventory || []) {
+    const stack = cloneStarterStack(item);
+    if (stack.kind === 'charge') mergeStack(character.cargo, stack);
+    else mergeStack(character.warehouse.items, stack);
+  }
+  for (const stack of character.warehouse.items) {
+    if (stack.typeId === '34') character.warehouse.reserve.set('34', Math.min(Number(stack.quantity || 0), 500));
+    if (stack.typeId === '35') character.warehouse.reserve.set('35', Math.min(Number(stack.quantity || 0), 200));
+  }
+  return Character.create(character.toObject());
 }

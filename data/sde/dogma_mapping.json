@@ -1,5 +1,5 @@
 {
-  "version": "dogma-mapping-v1",
+  "version": "dogma-mapping-v2-fitting-active",
   "attributeAliases": {
     "capacity": ["capacity"],
     "shield": ["shieldCapacity", "shieldHP"],
@@ -10,6 +10,12 @@
     "lowSlots": ["lowSlots"],
     "launcherSlots": ["launcherSlotsLeft"],
     "turretSlots": ["turretSlotsLeft"],
+    "cpu": ["cpuOutput", "cpu"],
+    "powergrid": ["powerOutput", "powergrid"],
+    "capacitor": ["capacitorCapacity"],
+    "cpuUsage": ["cpu", "cpuNeed"],
+    "powergridUsage": ["power", "powergridUsage", "powerNeed"],
+    "calibrationUsage": ["upgradeCost"],
     "scan": ["scanResolution", "scanStrength"],
     "speed": ["maxVelocity"],
     "signature": ["signatureRadius"],
@@ -20,6 +26,11 @@
     "kineticDamage": ["kineticDamage"],
     "explosiveDamage": ["explosiveDamage"],
     "miningAmount": ["miningAmount"],
+    "shieldBoost": ["shieldBonus", "shieldBoostAmount"],
+    "armorRepair": ["armorDamageAmount", "armorRepairAmount"],
+    "shieldBonus": ["shieldCapacityBonus"],
+    "armorBonus": ["armorHPBonus"],
+    "cargoBonus": ["cargoCapacityBonus"],
     "warpScrambleStrength": ["warpScrambleStrength"],
     "shieldEmResonance": ["shieldEmDamageResonance"],
     "shieldThermalResonance": ["shieldThermalDamageResonance"],
@@ -32,7 +43,7 @@
   },
   "defaults": {
     "ship": { "shield": 120, "armor": 90, "hull": 110, "cargo": 160, "dps": 8, "mining": 3, "scan": 5, "hack": 2, "salvage": 1, "extract": 4, "warpStability": 0 },
-    "moduleEffects": { "high": { "dps": 6 }, "mid": { "shield": 30, "scan": 1 }, "low": { "cargo": 40 }, "rig": { "extract": 0.6 } },
+    "moduleEffects": { "high": {}, "mid": { "shield": 30, "scan": 1 }, "low": { "cargo": 40 }, "rig": { "extract": 0.6 } },
     "slots": { "high": 2, "mid": 2, "low": 1, "rig": 1 }
   },
   "slotKeywords": {

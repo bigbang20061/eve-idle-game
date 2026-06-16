@@ -39,30 +39,32 @@ function render() {
 
 function stat(label, value) { return `<div><b>${value}</b><span>${label}</span></div>`; }
 function options(obj, selected) { return Object.entries(obj || {}).map(([id, v]) => `<option value="${id}" ${id===selected?'selected':''}>${escapeHtml(v.label || id)}</option>`).join(''); }
-function secondsText(value) { const s = Math.max(0, Math.round(Number(value || 0))); if (s >= 3600) return `${Math.floor(s/3600)}h ${Math.floor((s%3600)/60)}m`; if (s >= 60) return `${Math.floor(s/60)}m ${s%60}s`; return `${s}s`; }
+function percent(n) { return `${Math.round(Number(n || 0) * 100)}%`; }
 
 function renderCommand() {
   const ch = state.character;
   const used = cargoVolume(ch.cargo || []);
   const cap = ch.autopilot?.activity === 'mining' && Number(ch.ship?.stats?.oreHold || 0) > 0 ? ch.ship.stats.oreHold : ch.ship?.stats?.cargo || 100;
   const combat = ch.expedition?.site?.combatPublic || ch.expedition?.site?.combat || null;
-  $('#hud-stats').innerHTML = [stat('钱包', isk(ch.credits)), stat('当前船', escapeHtml(ch.ship?.zh || ch.ship?.name || '-')), stat('种族', escapeHtml(ch.race || '-')), stat('状态', ch.expedition?.state || 'idle'), stat('货舱', `${used.toFixed(1)} / ${cap} m³`), stat('Dogma', combatMeta?.dogma?.version || '-')].join('');
+  $('#hud-stats').innerHTML = [
+    stat('钱包', isk(ch.credits)),
+    stat('势力/船', `${escapeHtml(ch.race || '-')} · ${escapeHtml(ch.ship?.zh || ch.ship?.name || '-')}`),
+    stat('状态', ch.expedition?.state || 'idle'),
+    stat('货舱', `${used.toFixed(1)} / ${cap} m³`),
+    stat('击杀/损失', `${ch.stats?.kills || 0} / ${ch.stats?.losses || 0}`),
+    stat('Dogma', combatMeta?.dogma?.version || '-')
+  ].join('');
   $('#expedition-log').innerHTML = (ch.expedition?.log || []).map(line => `<div class="event"><span>${escapeHtml(line)}</span></div>`).join('') || '<p class="muted">暂无日志</p>';
-  const combatBox = $('#combat-panel');
-  if (combatBox) combatBox.innerHTML = combat ? `<h2>战斗</h2><p>势力：${escapeHtml(combat.faction || combat.factionLabel || '-')}　波次：${(combat.currentWave || 0)+1}/${combat.waves || 1}</p><div class="card-grid">${(combat.enemies || []).map(e=>`<div class="mini-card"><b>${escapeHtml(e.label || e.role)}</b><span>${Math.round(e.hp || 0)} / ${e.maxHp || 0} HP</span></div>`).join('')}</div><p class="muted">反跳：${combat.effects?.scrammed?'是':'否'}　电子战：${Math.round(Number(combat.effects?.ewar||0)*100)}%</p>` : '<h2>战斗</h2><p class="muted">当前没有接战。</p>';
+  renderCombatPanel(combat);
+  renderSkillsPanel(true);
   renderCombatSelectors(ch);
-  renderSkillPanel();
   drawSpace(ch, combat);
 }
 
-function renderSkillPanel() {
-  const box = $('#skill-panel');
-  if (!box) return;
-  const meta = state.meta?.skills;
-  if (!meta) { box.innerHTML = '<p class="muted">技能资料未加载。</p>'; return; }
-  const queue = (meta.queue || []).map(j => `<div class="mini-card"><b>${escapeHtml(meta.skills?.[j.skillId]?.label || j.skillId)} → Lv.${j.targetLevel}</b><span>${secondsText(j.secondsRemaining)} / ${secondsText(j.totalSeconds)}</span></div>`).join('') || '<p class="muted">训练队列为空。</p>';
-  const skills = Object.entries(meta.skills || {}).slice(0, 12).map(([id, s]) => `<div class="mini-card"><b>${escapeHtml(s.label || id)} Lv.${s.level || 0}/${s.maxLevel || 5}</b><span>${escapeHtml(s.category || '')} · 下一级 ${secondsText(s.nextSeconds)}</span>${s.nextSeconds ? `<button data-train-skill="${id}">训练</button>` : ''}</div>`).join('');
-  box.innerHTML = `<div class="mini-card"><b>队列</b>${queue}</div>${skills}`;
+function renderCombatPanel(combat) {
+  const combatBox = $('#combat-panel');
+  if (!combatBox) return;
+  combatBox.innerHTML = combat ? `<h2>战斗</h2><p>势力：${escapeHtml(combat.faction || combat.factionLabel || '-')}　波次：${(combat.currentWave || 0)+1}/${combat.waves || 1}</p><div class="card-grid">${(combat.enemies || []).map(e=>`<div class="mini-card"><b>${escapeHtml(e.label || e.role)}</b><span>${Math.round(e.hp || 0)} / ${e.maxHp || 0} HP</span></div>`).join('')}</div><p class="muted">反跳：${combat.effects?.scrammed?'是':'否'}　电子战：${Math.round(Number(combat.effects?.ewar||0)*100)}%　电容：${combat.effects?.capacitor ?? '-'}</p><div class="event-list">${(combat.log || []).map(line=>`<div class="event">${escapeHtml(line)}</div>`).join('')}</div>` : '<h2>战斗</h2><p class="muted">当前没有接战。</p>';
 }
 
 function renderCombatSelectors(ch) {
@@ -70,6 +72,22 @@ function renderCombatSelectors(ch) {
   if (!box || !combatMeta) return;
   const pref = ch.autopilot?.combat || {};
   box.innerHTML = `<label>战斗姿态<select name="combatStance">${options(combatMeta.combat.stances, pref.stance || 'standard')}</select></label><label>弹药/伤害<select name="damageProfile">${options(combatMeta.combat.damageProfiles, pref.damageProfile || 'balanced')}</select></label><label>目标优先级<select name="targetPriority">${options(combatMeta.combat.targetPriorities, pref.targetPriority || 'scramblers_first')}</select></label>`;
+}
+
+function renderSkillsPanel(compact = false) {
+  const box = $('#skills-panel');
+  if (!box) return;
+  const skills = state.skills?.skills || state.character.skills || {};
+  const catalog = state.skills?.catalog || combatMeta?.skills?.skills || {};
+  const active = state.skills?.training?.active || state.character.skillTraining?.active;
+  const rows = Object.entries(catalog).slice(0, compact ? 8 : 100).map(([id, def]) => {
+    const level = Number(skills[id] || 0);
+    const max = Number(def.maxLevel || 5);
+    const disabled = level >= max || active?.skillId === id ? 'disabled' : '';
+    return `<div class="mini-card"><b>${escapeHtml(def.label || id)} ${level}/${max}</b><span>${escapeHtml(def.category || '')} · Rank ${def.rank || 1}</span><button data-train-skill="${id}" ${disabled}>训练下一级</button></div>`;
+  }).join('');
+  const activeText = active ? `<p class="muted">训练中：${escapeHtml(active.label || active.skillId)} → ${active.targetLevel}，完成：${new Date(active.readyAt).toLocaleString('zh-CN',{hour12:false})}</p>` : '<p class="muted">当前没有技能训练。</p>';
+  box.innerHTML = activeText + rows;
 }
 
 function drawSpace(ch, combat) {
@@ -88,19 +106,17 @@ function renderMap(){ const canvas=$('#map-canvas'); if(!canvas)return; const ct
 
 function renderHangar(){
   const ch=state.character;
-  $('#ship-card') && ($('#ship-card').innerHTML=`<h2>${escapeHtml(ch.ship?.zh||ch.ship?.name)}</h2><div class="stat-cards">${stat('DPS',Math.round(ch.ship?.stats?.dps||0))+stat('护盾',Math.round(ch.ship?.stats?.shield||0))+stat('货舱',Math.round(ch.ship?.stats?.cargo||0))+stat('电容',Math.round(ch.ship?.runtime?.capacitor??ch.ship?.stats?.capacitor||0))}</div>`);
-  const fit = state.meta?.fitting;
-  if ($('#fitting-summary') && fit) $('#fitting-summary').innerHTML = [stat('CPU', `${Math.round(fit.usage.cpu||0)} / ${Math.round(fit.capacity?.cpu||0)}`), stat('能栅', `${Math.round(fit.usage.powergrid||0)} / ${Math.round(fit.capacity?.powergrid||0)}`), stat('校准', `${Math.round(fit.usage.calibration||0)} / ${Math.round(fit.capacity?.calibration||0)}`), stat('挂点', `炮${fit.usage.turretHardpoints||0}/${fit.capacity?.turretHardpoints||0} 导${fit.usage.launcherHardpoints||0}/${fit.capacity?.launcherHardpoints||0}`)].join('');
-  $('#fitting-list') && ($('#fitting-list').innerHTML=(ch.ship?.fittedModules||[]).map(m=>`<div class="mini-card"><b>${escapeHtml(m.zh||m.name)}</b><span>${m.slot} · ${m.mode||'passive'} · ${m.state||'passive'} ${m.charge?.loadedQuantity?`· ${escapeHtml(m.charge.zh||m.charge.name)}×${m.charge.loadedQuantity}`:''}</span><span>${escapeHtml(JSON.stringify(m.fitting||{}))}</span>${m.mode==='active'?`<button data-module-state="${m.instanceId}" data-state="${m.state==='active'?'idle':'active'}">${m.state==='active'?'停用':'启用'}</button>`:''}<button data-unfit="${m.instanceId}">卸下</button></div>`).join('')||'<p class="muted">没有装配。</p>');
+  const fit=state.fitting || {};
+  $('#ship-card') && ($('#ship-card').innerHTML=`<h2>${escapeHtml(ch.ship?.zh||ch.ship?.name)}</h2><p class="muted">${escapeHtml(ch.ship?.class||'')} · ${escapeHtml(ch.ship?.role||'')} · ${escapeHtml(ch.ship?.race||ch.race||'')}</p><div class="stat-cards">${stat('DPS',Math.round(ch.ship?.stats?.dps||0))+stat('护盾',Math.round(ch.ship?.stats?.shield||0))+stat('货舱',Math.round(ch.ship?.stats?.cargo||0))+stat('电容',Math.round(ch.ship?.stats?.capacitor||0))}</div>`);
+  $('#fitting-summary') && ($('#fitting-summary').innerHTML=[...(Object.entries(fit.resources||{}).map(([k,v])=>`<div class="mini-card"><b>${escapeHtml(k)}</b><span>${Math.round(v.used||0)} / ${Math.round(v.max||0)}</span></div>`)),...(Object.entries(fit.slots||{}).map(([k,v])=>`<div class="mini-card"><b>${escapeHtml(k)} 槽</b><span>${v.used||0} / ${v.max||0}</span></div>`))].join('')||'<p class="muted">无装配资源。</p>');
+  $('#fitting-list') && ($('#fitting-list').innerHTML=(ch.ship?.fittedModules||[]).map(m=>`<div class="mini-card"><b>${escapeHtml(m.zh||m.name)}</b><span>${escapeHtml(m.slot)} · ${escapeHtml(m.role||'')} · ${escapeHtml(m.mode||'passive')}</span><span>CPU ${m.cpu||0} / PG ${m.powergrid||0}</span><span>${escapeHtml(JSON.stringify(m.passiveEffects||m.effects||{}))}</span><div class="actions">${m.mode!=='passive'?`<button data-module-active="${m.instanceId}" data-active="${m.active?'true':'false'}">${m.active?'停用循环':'自动循环'}</button>`:''}<button data-unfit="${m.instanceId}">卸下</button></div></div>`).join('')||'<p class="muted">没有装配。</p>');
   const modules=(ch.warehouse?.items||[]).filter(s=>s.kind==='module');
-  $('#module-inventory') && ($('#module-inventory').innerHTML=modules.map(m=>`<div class="mini-card"><b>${escapeHtml(m.zh||m.name)}</b><span>数量 ${cn.format(m.quantity||0)}</span><button data-equip="${m.typeId}">装配</button></div>`).join('')||'<p class="muted">仓库没有模块。</p>');
-  const chargeTargets=(ch.ship?.fittedModules||[]).filter(m=>m.activation?.chargeKind);
-  const charges=(ch.warehouse?.items||[]).filter(s=>s.kind==='ammo'||s.meta?.chargeKind);
-  $('#charge-inventory') && ($('#charge-inventory').innerHTML=charges.map(c=>`<div class="mini-card"><b>${escapeHtml(c.zh||c.name)}</b><span>数量 ${cn.format(c.quantity||0)}</span>${chargeTargets.map(m=>`<button data-load-charge="${c.typeId}" data-module="${m.instanceId}">装入 ${escapeHtml(m.zh||m.name)}</button>`).join('')}</div>`).join('')||'<p class="muted">仓库没有弹药/晶体/导弹。</p>');
+  $('#module-inventory') && ($('#module-inventory').innerHTML=modules.map(m=>`<div class="mini-card"><b>${escapeHtml(m.zh||m.name)}</b><span>数量 ${cn.format(m.quantity||0)}</span><button data-equip="${m.typeId}">装配</button></div>`).join('')||'<p class="muted">仓库里没有模块。</p>');
+  $('#hangar-ships') && ($('#hangar-ships').innerHTML=(ch.hangarShips||[]).map(s=>`<div class="mini-card"><b>${escapeHtml(s.zh||s.name)}</b><span>${escapeHtml(s.class||'')}</span><button data-activate-ship="${s.instanceId}">设为当前</button></div>`).join('')||'<p class="muted">没有备用舰船。</p>');
 }
 
 function renderWarehouse(){ const ch=state.character; $('#warehouse-summary') && ($('#warehouse-summary').innerHTML=[stat('仓库',`${cargoVolume(ch.warehouse?.items||[]).toFixed(1)} / ${ch.warehouse?.capacity||0} m³`),stat('货舱',`${cargoVolume(ch.cargo||[]).toFixed(1)} m³`),stat('堆叠',(ch.warehouse?.items||[]).length),stat('钱包',isk(ch.credits))].join('')); $('#warehouse-list') && ($('#warehouse-list').innerHTML=inventoryTable(ch.warehouse?.items||[],true)); $('#cargo-list') && ($('#cargo-list').innerHTML=inventoryTable(ch.cargo||[],false)); }
-function inventoryTable(items,actions){ if(!items.length)return '<p class="muted">空。</p>'; return `<table><thead><tr><th>物品</th><th>类型</th><th>数量</th><th>估值</th><th>操作</th></tr></thead><tbody>${items.map(s=>`<tr><td>${escapeHtml(s.zh||s.name||s.typeId)}</td><td>${escapeHtml(s.kind||'')}</td><td>${cn.format(s.quantity||0)}</td><td>${isk(Number(s.quantity||0)*Number(s.basePrice||1))}</td><td>${actions?`<button data-sell="${s.typeId}" data-max="${s.quantity}">卖出</button> <button data-refine="${s.typeId}" data-max="${s.quantity}">精炼</button>`:''}</td></tr>`).join('')}</tbody></table>`; }
+function inventoryTable(items,actions){ if(!items.length)return '<p class="muted">空。</p>'; return `<table><thead><tr><th>物品</th><th>类型</th><th>数量</th><th>估值</th><th>操作</th></tr></thead><tbody>${items.map(s=>`<tr><td>${escapeHtml(s.zh||s.name||s.typeId)}</td><td>${escapeHtml(s.kind||'')}${s.chargeGroup?` · ${escapeHtml(s.chargeGroup)}`:''}</td><td>${cn.format(s.quantity||0)}</td><td>${isk(Number(s.quantity||0)*Number(s.basePrice||1))}</td><td>${actions?`<button data-sell="${s.typeId}" data-max="${s.quantity}">卖出</button> <button data-refine="${s.typeId}" data-max="${s.quantity}">精炼</button>`:''}</td></tr>`).join('')}</tbody></table>`; }
 async function marketSearch(q='',kind=''){ if(!$('#market-results'))return; const data=await api(`/api/sde/search?collection=types&q=${encodeURIComponent(q)}&kind=${encodeURIComponent(kind)}`); $('#market-results').innerHTML=(data.types||[]).slice(0,80).map(t=>`<div class="mini-card"><b>${escapeHtml(t.zh||t.name)}</b><span>${escapeHtml(t.kind)} · ${escapeHtml(t.groupName||'')}</span><button data-buy="${t.typeId}">买 1</button></div>`).join('')||'<p class="muted">无结果。</p>'; }
 function renderIndustry(){ $('#industry-jobs') && ($('#industry-jobs').innerHTML=(state.jobs||[]).map(j=>`<div class="mini-card"><b>${escapeHtml(j.productName)}</b><span>${j.status} · ${new Date(j.readyAt).toLocaleString('zh-CN',{hour12:false})}</span></div>`).join('')||'<p class="muted">没有任务。</p>'); }
 function renderFleet(){ $('#fleet-list') && ($('#fleet-list').innerHTML=(state.fleets||[]).map(f=>`<div class="mini-card"><b>${escapeHtml(f.name)}</b><span>${f.status} · 成员 ${f.members?.length||0}</span><button data-join-fleet="${f._id}">加入</button><button data-start-fleet="${f._id}">开始</button></div>`).join('')||'<p class="muted">暂无舰队。</p>'); }
@@ -113,7 +129,7 @@ function bindActions(){
   $('[data-action="dock"]')?.addEventListener('click',async()=>{await api('/api/dock',{method:'POST',body:{}});toast('已下达撤离命令');});
   $('#chat-form')?.addEventListener('submit',e=>{e.preventDefault();const fd=new FormData(e.currentTarget);socket?.emit('chat:send',{channel:fd.get('channel'),text:fd.get('text')});e.currentTarget.reset();});
   $('#market-search')?.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(e.currentTarget);await marketSearch(fd.get('q'),fd.get('kind'));});
-  document.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;try{if(b.dataset.trainSkill){await api('/api/skills/train',{method:'POST',body:{skillId:b.dataset.trainSkill}});toast('技能已加入训练队列');await loadState();}if(b.dataset.buy){await api('/api/market/buy',{method:'POST',body:{typeId:b.dataset.buy,quantity:1}});toast('购买成功');await loadState();}if(b.dataset.sell){const qty=Number(prompt('卖出数量',Math.min(100,Number(b.dataset.max||1)))||0);if(qty>0){await api('/api/market/sell',{method:'POST',body:{typeId:b.dataset.sell,quantity:qty}});await loadState();}}if(b.dataset.refine){const qty=Number(prompt('精炼数量',Math.min(100,Number(b.dataset.max||1)))||0);if(qty>0){await api('/api/refine',{method:'POST',body:{typeId:b.dataset.refine,quantity:qty}});await loadState();}}if(b.dataset.equip){await api('/api/hangar/equip',{method:'POST',body:{typeId:b.dataset.equip}});toast('装配完成');await loadState();}if(b.dataset.unfit){await api('/api/hangar/unfit',{method:'POST',body:{instanceId:b.dataset.unfit}});toast('已卸下');await loadState();}if(b.dataset.moduleState){await api('/api/hangar/module-state',{method:'POST',body:{instanceId:b.dataset.moduleState,state:b.dataset.state}});await loadState();}if(b.dataset.loadCharge){const qty=Number(prompt('装填数量',80)||0);if(qty>0){await api('/api/hangar/load-charge',{method:'POST',body:{instanceId:b.dataset.module,typeId:b.dataset.loadCharge,quantity:qty}});toast('装填完成');await loadState();}}if(b.dataset.joinFleet){await api('/api/fleet/join',{method:'POST',body:{fleetId:b.dataset.joinFleet}});await loadState();}if(b.dataset.startFleet){await api('/api/fleet/start',{method:'POST',body:{fleetId:b.dataset.startFleet}});await loadState();}}catch(err){toast(err.message);}});
+  document.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;try{if(b.dataset.buy){await api('/api/market/buy',{method:'POST',body:{typeId:b.dataset.buy,quantity:1}});toast('购买成功');await loadState();}if(b.dataset.sell){const qty=Number(prompt('卖出数量',Math.min(100,Number(b.dataset.max||1)))||0);if(qty>0){await api('/api/market/sell',{method:'POST',body:{typeId:b.dataset.sell,quantity:qty}});await loadState();}}if(b.dataset.refine){const qty=Number(prompt('精炼数量',Math.min(100,Number(b.dataset.max||1)))||0);if(qty>0){await api('/api/refine',{method:'POST',body:{typeId:b.dataset.refine,quantity:qty}});await loadState();}}if(b.dataset.equip){await api('/api/hangar/equip',{method:'POST',body:{typeId:b.dataset.equip}});toast('装配完成');await loadState();}if(b.dataset.unfit){await api('/api/hangar/unfit',{method:'POST',body:{instanceId:b.dataset.unfit}});toast('已卸下');await loadState();}if(b.dataset.moduleActive){await api('/api/hangar/module/active',{method:'POST',body:{instanceId:b.dataset.moduleActive,active:b.dataset.active!=='true'}});await loadState();}if(b.dataset.activateShip){await api('/api/hangar/activate',{method:'POST',body:{instanceId:b.dataset.activateShip}});await loadState();}if(b.dataset.trainSkill){await api('/api/skills/train',{method:'POST',body:{skillId:b.dataset.trainSkill,queue:true}});toast('已加入训练队列');await loadState();}if(b.dataset.joinFleet){await api('/api/fleet/join',{method:'POST',body:{fleetId:b.dataset.joinFleet}});await loadState();}if(b.dataset.startFleet){await api('/api/fleet/start',{method:'POST',body:{fleetId:b.dataset.startFleet}});await loadState();}}catch(err){toast(err.message);}});
 }
 
 function animate(){ if(page==='command'&&state?.character) drawSpace(state.character,state.character.expedition?.site?.combatPublic||state.character.expedition?.site?.combat); requestAnimationFrame(animate); }

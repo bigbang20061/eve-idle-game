@@ -3,12 +3,10 @@ import { Character, SdeType, SdeSystem, SdeBlueprint, MarketOrder, IndustryJob, 
 import { requireAuth, asyncHandler } from '../middleware/auth.js';
 import { tickCharacter, publicCharacter, startIndustryJob } from '../services/gameEngine.js';
 import { getPublicCatalog } from '../services/catalog.js';
-import { marketPrice, mergeStack, removeStackQuantity, safeText } from '../services/formulas.js';
-import { buildShipFromType } from '../services/shipFactory.js';
-import { buildFittedModuleFromType, validateModuleFit, fittingSummary } from '../services/fitting.js';
-import { chargeStackFromType, isChargeType, damageProfileForCharge } from '../services/consumables.js';
-import { enqueueSkillTraining, skillUi } from '../services/skills.js';
-import { gameConfigSummary } from '../services/gameConfig.js';
+import { cargoVolume, marketPrice, mergeStack, removeStackQuantity, safeText } from '../services/formulas.js';
+import { shipFromType } from '../services/shipFactory.js';
+import { fitModuleFromType, fittingSummary, setModuleActive, unfitModuleToWarehouse } from '../services/fittingSystem.js';
+import { publicSkillState, skillOptions, startSkillTraining } from '../services/skillSystem.js';
 
 export const apiRoutes = express.Router();
 apiRoutes.use(requireAuth);
@@ -20,6 +18,8 @@ async function getCharacterDoc(req) {
   return character;
 }
 
+function bool(value) { return ['true', true, '1', 1, 'on'].includes(value); }
+
 apiRoutes.get('/state', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const [catalog, system, events, jobs, fleets] = await Promise.all([
@@ -29,34 +29,49 @@ apiRoutes.get('/state', asyncHandler(async (req, res) => {
     IndustryJob.find({ characterId: character._id, status: 'running' }).sort({ readyAt: 1 }).lean(),
     Fleet.find({ status: { $in: ['forming', 'running'] } }).sort({ updatedAt: -1 }).limit(12).lean()
   ]);
-  res.json({ ok: true, character: publicCharacter(character), catalog, system, events, jobs, fleets, meta: { skills: skillUi(character), fitting: fittingSummary(character), configs: gameConfigSummary() }, serverTime: new Date() });
+  res.json({ ok: true, character: publicCharacter(character), catalog, system, events, jobs, fleets, skills: publicSkillState(character), fitting: fittingSummary(character), serverTime: new Date() });
+}));
+
+apiRoutes.get('/skills', asyncHandler(async (req, res) => {
+  const character = await getCharacterDoc(req);
+  res.json({ ok: true, ...publicSkillState(character) });
 }));
 
 apiRoutes.get('/skills/options', asyncHandler(async (req, res) => {
-  const character = await getCharacterDoc(req);
-  res.json({ ok: true, skills: skillUi(character) });
+  res.json({ ok: true, ...skillOptions() });
 }));
 
 apiRoutes.post('/skills/train', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
-  const job = enqueueSkillTraining(character, String(req.body.skillId || ''));
-  character.expedition.log.unshift(`技能训练排队：${job.skillId} → Lv.${job.targetLevel}`);
+  const training = startSkillTraining(character, String(req.body.skillId || ''), { queue: req.body.queue !== false });
+  character.markModified('skills');
+  character.markModified('skillTraining');
   await character.save();
-  res.json({ ok: true, job, skills: skillUi(character), character: publicCharacter(character) });
+  res.json({ ok: true, training, skills: publicSkillState(character) });
+}));
+
+apiRoutes.get('/fitting', asyncHandler(async (req, res) => {
+  const character = await getCharacterDoc(req);
+  res.json({ ok: true, fitting: fittingSummary(character), character: publicCharacter(character) });
 }));
 
 apiRoutes.post('/autopilot', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const body = req.body || {};
   if (body.activity) character.autopilot.activity = String(body.activity);
-  if (body.enabled !== undefined) character.autopilot.enabled = ['true', true, '1', 1, 'on'].includes(body.enabled);
-  if (body.allowLowSec !== undefined) character.autopilot.allowLowSec = ['true', true, '1', 1, 'on'].includes(body.allowLowSec);
-  if (body.sellExcess !== undefined) character.autopilot.sellExcess = ['true', true, '1', 1, 'on'].includes(body.sellExcess);
-  if (body.refineOre !== undefined) character.autopilot.refineOre = ['true', true, '1', 1, 'on'].includes(body.refineOre);
+  if (body.enabled !== undefined) character.autopilot.enabled = bool(body.enabled);
+  if (body.allowLowSec !== undefined) character.autopilot.allowLowSec = bool(body.allowLowSec);
+  if (body.sellExcess !== undefined) character.autopilot.sellExcess = bool(body.sellExcess);
+  if (body.refineOre !== undefined) character.autopilot.refineOre = bool(body.refineOre);
   if (body.targetSystemId) character.autopilot.targetSystemId = String(body.targetSystemId);
   if (body.risk !== undefined) character.autopilot.risk = Math.max(0.05, Math.min(1.2, Number(body.risk)));
   if (body.minShieldPct !== undefined) character.autopilot.minShieldPct = Math.max(0.1, Math.min(0.95, Number(body.minShieldPct)));
+  if (!character.autopilot.combat) character.autopilot.combat = {};
+  if (body.combatStance) character.autopilot.combat.stance = String(body.combatStance);
+  if (body.damageProfile) character.autopilot.combat.damageProfile = String(body.damageProfile);
+  if (body.targetPriority) character.autopilot.combat.targetPriority = String(body.targetPriority);
   character.expedition.log.unshift('调度参数已更新。');
+  character.markModified('autopilot');
   await character.save();
   res.json({ ok: true, character: publicCharacter(character) });
 }));
@@ -83,7 +98,8 @@ apiRoutes.post('/warehouse/reserve', asyncHandler(async (req, res) => {
 apiRoutes.post('/sell-excess', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const system = await SdeSystem.findOne({ systemId: character.currentSystemId }).lean();
-  let sold = 0, value = 0;
+  let sold = 0;
+  let value = 0;
   for (const stack of character.warehouse.items) {
     if (stack.locked) continue;
     const reserve = Number(character.warehouse.reserve.get(String(stack.typeId)) || 0);
@@ -115,9 +131,9 @@ apiRoutes.post('/market/buy', asyncHandler(async (req, res) => {
   if (character.credits < total) throw new Error('ISK 不足');
   character.credits -= total;
   if (type.kind === 'ship') {
-    for (let i = 0; i < Math.min(10, quantity); i += 1) character.hangarShips.push(buildShipFromType(type));
+    for (let i = 0; i < Math.min(10, quantity); i += 1) character.hangarShips.push(shipFromType(type, { race: character.race || 'market' }));
   } else {
-    mergeStack(character.warehouse.items, { typeId, name: type.name, zh: type.zh || type.name, kind: isChargeType(type) ? 'ammo' : type.kind, quantity, volume: type.volume || 0.01, basePrice: type.basePrice || price, source: 'market', meta: isChargeType(type) ? { chargeKind: 'ammo', damageProfile: damageProfileForCharge(type) } : type.meta });
+    mergeStack(character.warehouse.items, { typeId, name: type.name, zh: type.zh || type.name, kind: type.kind, quantity, volume: type.volume || 0.01, basePrice: type.basePrice || price, chargeGroup: type.chargeGroup, source: 'market' });
   }
   character.stats.trades += 1;
   character.walletJournal.unshift({ at: new Date(), type: 'buy', amount: -total, note: `购买 ${type.zh || type.name} × ${quantity}` });
@@ -150,61 +166,34 @@ apiRoutes.post('/hangar/equip', asyncHandler(async (req, res) => {
   const typeId = String(req.body.typeId || '');
   const type = await SdeType.findOne({ typeId, kind: 'module' }).lean();
   if (!type) throw new Error('装备不存在');
-  const stack = character.warehouse.items.find(s => String(s.typeId) === typeId && Number(s.quantity || 0) > 0);
-  if (!stack) throw new Error('仓库里没有这件装备');
-  const fitted = buildFittedModuleFromType(type, character);
-  validateModuleFit(character, fitted);
-  removeStackQuantity(character.warehouse.items, typeId, 1);
-  character.ship.fittedModules.push(fitted);
-  character.expedition.log.unshift(`装配 ${type.zh || type.name} 到 ${fitted.slot} 槽。`);
+  const module = fitModuleFromType(character, type);
+  character.expedition.log.unshift(`装配 ${module.zh || module.name} 到 ${module.slot} 槽。`);
+  character.markModified('ship');
+  character.markModified('warehouse');
   await character.save();
-  res.json({ ok: true, fitting: fittingSummary(character), character: publicCharacter(character) });
+  res.json({ ok: true, module, fitting: fittingSummary(character), character: publicCharacter(character) });
 }));
 
 apiRoutes.post('/hangar/unfit', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const instanceId = String(req.body.instanceId || '');
-  const idx = (character.ship.fittedModules || []).findIndex(m => String(m.instanceId) === instanceId);
-  if (idx < 0) throw new Error('装备不存在');
-  const mod = character.ship.fittedModules.splice(idx, 1)[0];
-  if (mod.charge?.typeId && Number(mod.charge.loadedQuantity || 0) > 0) mergeStack(character.warehouse.items, { typeId: String(mod.charge.typeId), name: mod.charge.name, zh: mod.charge.zh || mod.charge.name, kind: 'ammo', quantity: Number(mod.charge.loadedQuantity || 0), volume: 0.01, basePrice: 1, source: 'unfit-charge', meta: { chargeKind: mod.charge.chargeKind || 'ammo', damageProfile: mod.charge.damageProfile } });
-  const type = await SdeType.findOne({ typeId: String(mod.typeId) }).lean() || mod;
-  mergeStack(character.warehouse.items, { typeId: String(mod.typeId), name: mod.name, zh: mod.zh || mod.name, kind: 'module', quantity: 1, volume: type.volume || 5, basePrice: type.basePrice || 1, source: 'unfit' });
+  const mod = (character.ship?.fittedModules || []).find(m => String(m.instanceId) === instanceId);
+  const type = mod ? await SdeType.findOne({ typeId: String(mod.typeId) }).lean() : null;
+  const removed = unfitModuleToWarehouse(character, instanceId, type || {});
+  character.expedition.log.unshift(`卸下 ${removed.zh || removed.name}。`);
+  character.markModified('ship');
+  character.markModified('warehouse');
   await character.save();
-  res.json({ ok: true, fitting: fittingSummary(character), character: publicCharacter(character) });
+  res.json({ ok: true, module: removed, fitting: fittingSummary(character), character: publicCharacter(character) });
 }));
 
-apiRoutes.post('/hangar/module-state', asyncHandler(async (req, res) => {
+apiRoutes.post('/hangar/module/active', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
-  const mod = (character.ship.fittedModules || []).find(m => String(m.instanceId) === String(req.body.instanceId || ''));
-  if (!mod) throw new Error('装备不存在');
-  const state = String(req.body.state || 'active');
-  if (!['active', 'idle', 'offline'].includes(state)) throw new Error('状态无效');
-  mod.state = mod.mode === 'passive' ? 'passive' : state;
-  mod.online = state !== 'offline';
+  const module = setModuleActive(character, String(req.body.instanceId || ''), bool(req.body.active));
+  character.expedition.log.unshift(`${module.zh || module.name} ${module.active ? '设为自动循环' : '停止自动循环'}。`);
+  character.markModified('ship');
   await character.save();
-  res.json({ ok: true, fitting: fittingSummary(character), character: publicCharacter(character) });
-}));
-
-apiRoutes.post('/hangar/load-charge', asyncHandler(async (req, res) => {
-  const character = await getCharacterDoc(req);
-  const mod = (character.ship.fittedModules || []).find(m => String(m.instanceId) === String(req.body.instanceId || ''));
-  if (!mod) throw new Error('装备不存在');
-  if (!mod.activation?.chargeKind) throw new Error('该装备不需要装填消耗品');
-  const typeId = String(req.body.typeId || '');
-  const quantity = Math.max(1, Math.min(5000, Number(req.body.quantity || 1)));
-  const stack = character.warehouse.items.find(s => String(s.typeId) === typeId && Number(s.quantity || 0) >= quantity);
-  if (!stack) throw new Error('仓库消耗品不足');
-  const type = await SdeType.findOne({ typeId }).lean() || stack;
-  if (!isChargeType(type) && !isChargeType(stack)) throw new Error('该物品不是弹药/晶体/导弹');
-  if (mod.charge?.typeId && Number(mod.charge.loadedQuantity || 0) > 0) mergeStack(character.warehouse.items, { typeId: String(mod.charge.typeId), name: mod.charge.name, zh: mod.charge.zh || mod.charge.name, kind: 'ammo', quantity: Number(mod.charge.loadedQuantity || 0), volume: 0.01, basePrice: 1, source: 'reload', meta: { chargeKind: mod.charge.chargeKind || 'ammo', damageProfile: mod.charge.damageProfile } });
-  removeStackQuantity(character.warehouse.items, typeId, quantity);
-  const charge = chargeStackFromType(type, quantity);
-  mod.charge = { typeId: charge.typeId, name: charge.name, zh: charge.zh, loadedQuantity: quantity, damageProfile: charge.meta?.damageProfile, chargeKind: charge.meta?.chargeKind || 'ammo' };
-  mod.state = 'active';
-  mod.online = true;
-  await character.save();
-  res.json({ ok: true, fitting: fittingSummary(character), character: publicCharacter(character) });
+  res.json({ ok: true, module, fitting: fittingSummary(character), character: publicCharacter(character) });
 }));
 
 apiRoutes.post('/hangar/activate', asyncHandler(async (req, res) => {
@@ -218,8 +207,9 @@ apiRoutes.post('/hangar/activate', asyncHandler(async (req, res) => {
   character.expedition.state = 'idle';
   character.locationState = 'docked';
   character.expedition.log.unshift(`切换当前舰船为 ${nextShip.zh || nextShip.name}。`);
+  character.markModified('ship');
   await character.save();
-  res.json({ ok: true, fitting: fittingSummary(character), character: publicCharacter(character) });
+  res.json({ ok: true, character: publicCharacter(character), fitting: fittingSummary(character) });
 }));
 
 apiRoutes.post('/refine', asyncHandler(async (req, res) => {
@@ -229,12 +219,13 @@ apiRoutes.post('/refine', asyncHandler(async (req, res) => {
   const stack = character.warehouse.items.find(s => String(s.typeId) === typeId && Number(s.quantity || 0) >= quantity);
   if (!stack || stack.kind !== 'ore') throw new Error('只能精炼矿石，且库存需足够');
   removeStackQuantity(character.warehouse.items, typeId, quantity);
-  const efficiency = 0.45 + Number(character.skills.industry || 1) * 0.025;
+  const industryLevel = Number(character.skills?.industry || 0);
+  const efficiency = 0.45 + industryLevel * 0.025;
   const trit = Math.round(quantity * 4 * efficiency);
   const pye = Math.round(quantity * 1.6 * efficiency);
   mergeStack(character.warehouse.items, { typeId: '34', name: 'Tritanium', zh: '三钛合金', kind: 'mineral', quantity: trit, volume: 0.01, basePrice: 6, source: 'refine' });
   mergeStack(character.warehouse.items, { typeId: '35', name: 'Pyerite', zh: '类晶体胶矿', kind: 'mineral', quantity: pye, volume: 0.01, basePrice: 12, source: 'refine' });
-  character.skills.industry += 0.005;
+  character.skillpoints += 0.4;
   character.expedition.log.unshift(`精炼 ${stack.zh || stack.name} × ${quantity}，产出矿物 ${trit + pye}。`);
   await character.save();
   res.json({ ok: true, character: publicCharacter(character) });
@@ -317,9 +308,9 @@ apiRoutes.post('/fleet/start', asyncHandler(async (req, res) => {
 }));
 
 apiRoutes.get('/leaderboard', asyncHandler(async (req, res) => {
-  const richest = await Character.find({}).sort({ credits: -1 }).limit(20).select('name corp credits stats currentSystemId').lean();
-  const earned = await Character.find({}).sort({ 'stats.totalEarned': -1 }).limit(20).select('name corp credits stats currentSystemId').lean();
-  const kills = await Character.find({}).sort({ 'stats.kills': -1 }).limit(20).select('name corp credits stats currentSystemId').lean();
+  const richest = await Character.find({}).sort({ credits: -1 }).limit(20).select('name corp race credits stats currentSystemId').lean();
+  const earned = await Character.find({}).sort({ 'stats.totalEarned': -1 }).limit(20).select('name corp race credits stats currentSystemId').lean();
+  const kills = await Character.find({}).sort({ 'stats.kills': -1 }).limit(20).select('name corp race credits stats currentSystemId').lean();
   res.json({ ok: true, richest, earned, kills });
 }));
 

@@ -19,5 +19,6 @@ export const env = Object.freeze({
   tickMs: intEnv('TICK_MS', 5000),
   autoSeed: process.env.AUTO_SEED !== 'false',
   createDemoUsers: process.env.CREATE_DEMO_USERS !== 'false',
-  adminInviteCode: process.env.ADMIN_INVITE_CODE || ''
+  adminInviteCode: process.env.ADMIN_INVITE_CODE || '',
+  sdeStaticDir: process.env.SDE_STATIC_DIR || process.env.SDE_DIR || './sde/yaml'
 });

@@ -1,54 +1,54 @@
 import crypto from 'crypto';
-import { readGameConfig } from './gameConfig.js';
+import { loadJsonConfig } from './jsonConfig.js';
 
-export function fittingRules() {
-  return readGameConfig('data/game/fitting_rules.json');
-}
-
-export function shipFittingResources(type = {}) {
-  const defaults = fittingRules().shipDefaults || {};
-  const stats = type.stats || {};
-  const rawFitting = type.raw?.fitting || type.fitting || stats.fitting || {};
-  return {
-    cpu: Number(rawFitting.cpu ?? stats.cpu ?? defaults.cpu ?? 80),
-    powergrid: Number(rawFitting.powergrid ?? stats.powergrid ?? defaults.powergrid ?? 45),
-    calibration: Number(rawFitting.calibration ?? defaults.calibration ?? 40),
-    turretHardpoints: Number(rawFitting.turretHardpoints ?? stats.turretHardpoints ?? defaults.turretHardpoints ?? 2),
-    launcherHardpoints: Number(rawFitting.launcherHardpoints ?? stats.launcherHardpoints ?? defaults.launcherHardpoints ?? 2)
+export function shipFromType(type = {}, { race = 'independent', skin = 'sde-imported' } = {}) {
+  const fitting = loadJsonConfig('data/game/fitting_rules.json');
+  const defaults = fitting.shipDefaults || {};
+  const stats = {
+    shield: Number(type.stats?.shield || 100),
+    armor: Number(type.stats?.armor || 80),
+    hull: Number(type.stats?.hull || 90),
+    dps: Number(type.stats?.dps || 6),
+    mining: Number(type.stats?.mining || 0),
+    hack: Number(type.stats?.hack || 0),
+    scan: Number(type.stats?.scan || 0),
+    salvage: Number(type.stats?.salvage || 0),
+    cargo: Number(type.stats?.cargo || type.capacity || 120),
+    oreHold: Number(type.stats?.oreHold || 0),
+    extract: Number(type.stats?.extract || 4),
+    warpStability: Number(type.stats?.warpStability || 0),
+    cpu: Number(type.stats?.cpu || defaults.cpu || 120),
+    powergrid: Number(type.stats?.powergrid || defaults.powergrid || 45),
+    capacitor: Number(type.stats?.capacitor || defaults.capacitor || 240),
+    turretHardpoints: Number(type.stats?.turretHardpoints || type.raw?.slots?.turret || defaults.turretHardpoints || 0),
+    launcherHardpoints: Number(type.stats?.launcherHardpoints || type.raw?.slots?.launcher || defaults.launcherHardpoints || 0),
+    calibration: Number(type.stats?.calibration || defaults.calibration || 100)
   };
-}
-
-export function buildShipFromType(type, { skin = 'sde-imported' } = {}) {
-  const stats = type.stats || {};
-  const defaults = fittingRules().shipDefaults || {};
   return {
     instanceId: crypto.randomUUID(),
-    typeId: String(type.typeId),
-    name: type.name,
-    zh: type.zh || type.name,
-    class: type.groupName || type.role || 'Ship',
+    typeId: String(type.typeId || `ship-${crypto.randomUUID()}`),
+    name: type.name || 'Starter Corvette',
+    zh: type.zh || type.name || '新手轻舟',
+    class: type.groupName || type.class || 'Ship',
     role: type.role || type.raw?.role || 'general',
-    stats: {
-      shield: Number(stats.shield || 100),
-      armor: Number(stats.armor || 80),
-      hull: Number(stats.hull || 90),
-      dps: Number(stats.dps || 6),
-      mining: Number(stats.mining || 0),
-      hack: Number(stats.hack || 0),
-      scan: Number(stats.scan || 0),
-      salvage: Number(stats.salvage || 0),
-      cargo: Number(stats.cargo || type.capacity || 120),
-      oreHold: Number(stats.oreHold || 0),
-      extract: Number(stats.extract || 4),
-      warpStability: Number(stats.warpStability || 0),
-      capacitor: Number(stats.capacitor || defaults.capacitor || 180),
-      capacitorRecharge: Number(stats.capacitorRecharge || defaults.capacitorRecharge || 2.4)
-    },
-    slots: type.raw?.slots || type.slots || { high: 2, mid: 2, low: 1, rig: 1 },
-    fitting: shipFittingResources(type),
+    race,
+    stats,
+    slots: type.slots || type.raw?.slots || { high: 2, mid: 2, low: 1, rig: 1 },
     fittedModules: [],
-    runtime: { capacitor: Number(stats.capacitor || defaults.capacitor || 180) },
+    activeEffects: [],
     insured: true,
     skin
   };
+}
+
+export function shipFromStarterConfig(shipConfig, race) {
+  return shipFromType({
+    typeId: shipConfig.typeId,
+    name: shipConfig.name,
+    zh: shipConfig.zh,
+    groupName: shipConfig.groupName,
+    role: shipConfig.role,
+    stats: shipConfig.stats || {},
+    slots: shipConfig.slots || { high: 2, mid: 2, low: 1, rig: 1 }
+  }, { race, skin: `${race}-starter` });
 }
