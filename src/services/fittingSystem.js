@@ -166,17 +166,27 @@ function addEffect(target, key, value) {
   target[key] = Number(target[key] || 0) + Number(value || 0);
 }
 
+function weaponSkillMultiplier(module, mods) {
+  const generic = Number(mods.dpsMultiplier || 0);
+  const role = module.role || '';
+  if (role === 'weapon_launcher') return 1 + Number(mods.missileDpsMultiplier || 0);
+  if (role === 'weapon_laser') return 1 + generic + Number(mods.laserDpsMultiplier || 0);
+  if (role === 'weapon_projectile') return 1 + generic + Number(mods.projectileDpsMultiplier || 0);
+  if (role === 'weapon_turret') return 1 + generic;
+  return 1 + generic;
+}
+
 export function cycleActiveModules(character, site, dt, baseStats = {}) {
   const rules = getFittingRules();
   const mods = deriveSkillModifiers(character);
   const maxCap = Math.max(1, Number(baseStats.capacitor || character.ship?.stats?.capacitor || rules.shipDefaults?.capacitor || 1));
-  const regen = Number(rules.engine?.capacitorRegenPerSecond || 0.018);
+  const regen = Number(rules.engine?.capacitorRegenPerSecond);
   site.capacitor = Math.min(maxCap, Number(site.capacitor ?? maxCap) + maxCap * regen * Number(dt || 0));
   const result = { stats: {}, repairs: { shield: 0, armor: 0, hull: 0 }, damageProfiles: [], chargesUsed: [], logs: [], capacitor: site.capacitor };
   for (const module of character.ship?.fittedModules || []) {
     if (module.online === false || module.active === false || module.mode === 'passive') continue;
     const activation = module.activation || {};
-    const cycleSeconds = Math.max(1, Number(activation.cycleSeconds || rules.engine?.defaultCycleSeconds || 6));
+    const cycleSeconds = Math.max(1, Number(activation.cycleSeconds || rules.engine?.defaultCycleSeconds));
     const cycles = Math.max(1, Math.floor(Number(dt || cycleSeconds) / cycleSeconds));
     const capReduction = Number(mods.activeModuleCapReduction || 0) + (module.mode === 'weapon' ? Number(mods.weaponCapReduction || 0) : 0);
     const capCost = Math.max(0, Number(activation.capacitorCost || 0) * (1 - Math.min(0.8, capReduction)) * cycles);
@@ -193,16 +203,21 @@ export function cycleActiveModules(character, site, dt, baseStats = {}) {
     site.capacitor -= capCost;
     const effects = module.activeEffects || module.effects || {};
     const chargeRules = rules.chargeGroups?.[activation.chargeGroup || module.chargeGroup] || {};
-    const dpsBonus = Number(chargeRules.bonusDpsMultiplier || 1);
+    const chargeDpsBonus = Number(chargeRules.bonusDpsMultiplier || 1);
+    const skillDpsBonus = weaponSkillMultiplier(module, mods);
+    let moduleDps = 0;
     for (const [key, value] of Object.entries(effects)) {
       if (key === 'shieldBoost') result.repairs.shield += Number(value || 0) * cycles * (1 + Number(mods.activeShieldBoostMultiplier || 0));
       else if (key === 'armorRepair') result.repairs.armor += Number(value || 0) * cycles * (1 + Number(mods.activeArmorRepairMultiplier || 0));
       else if (key === 'hullRepair') result.repairs.hull += Number(value || 0) * cycles;
-      else if (key === 'dps') addEffect(result.stats, key, Number(value || 0) * dpsBonus);
+      else if (key === 'dps') {
+        moduleDps += Number(value || 0) * chargeDpsBonus * skillDpsBonus;
+        addEffect(result.stats, key, moduleDps);
+      }
       else addEffect(result.stats, key, value);
     }
     const profile = chargeRules.damageProfile || effects.damageProfile;
-    if (profile && Number(effects.dps || result.stats.dps || 0) > 0) result.damageProfiles.push({ profile, weight: Number(effects.dps || 1) * dpsBonus });
+    if (profile && moduleDps > 0) result.damageProfiles.push({ profile, weight: moduleDps });
     if (charge.used > 0) result.chargesUsed.push({ chargeGroup: activation.chargeGroup || module.chargeGroup, quantity: charge.used, name: charge.charge?.zh || charge.charge?.name });
     module.lastActivatedAt = new Date();
   }
