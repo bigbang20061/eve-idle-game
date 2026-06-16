@@ -33,17 +33,20 @@ async function findModuleByQuery(query) {
 
 async function starterModules(raceConfig = {}, character) {
   const out = [];
+  const tryAdd = module => {
+    const original = character.ship.fittedModules || [];
+    character.ship.fittedModules = out;
+    const validation = validateModuleFit(character, module);
+    character.ship.fittedModules = original;
+    if (validation.ok) out.push(module);
+  };
   for (const query of raceConfig.fitQueries || []) {
     const type = await findModuleByQuery(query);
     if (!type) continue;
-    const module = moduleInstanceFromType(type);
-    const validation = validateModuleFit(character, module);
-    if (validation.ok) out.push(module);
+    tryAdd(moduleInstanceFromType(type));
   }
   for (const fallback of raceConfig.fallbackModules || []) {
-    const module = moduleInstanceFromType({ kind: 'module', ...fallback, effects: fallback.effects || fallback.passiveEffects || fallback.activeEffects || {} });
-    const validation = validateModuleFit(character, module);
-    if (validation.ok) out.push(module);
+    tryAdd(moduleInstanceFromType({ kind: 'module', ...fallback, effects: fallback.effects || fallback.passiveEffects || fallback.activeEffects || {} }));
   }
   return out;
 }
