@@ -1,8 +1,33 @@
-# EVE Idle Game
+
+## Combat V1 / Frontend Split
+
+当前分支已开始前后端分离：服务端只负责 Express API、Socket.IO、MongoDB 和权威战斗结算；前端在 `client/` 目录，以静态 HTML/CSS/JS 调用 JSON API。旧的 EJS SSR 入口已从服务端移除，避免多架构混用。
+
+战斗规则集中在 `data/combat/rules.json`，不要把 NPC、伤害类型、姿态、抗性、波次、赏金公式参数写进 JS。前端下拉框从 `/api/combat/options` 获取配置。
+
+常用命令：
+
+```bash
+npm run check
+npm run smoke
+npm run smoke:combat
+```
+
+# SDE 深空搜打撤 Online Deep
 
 这是把上一版单文件原型升级后的全栈网络游戏工程：多页面像素前端、Express 5 服务端、Socket.IO 实时频道、MongoDB 持久化账号和游戏状态，并提供 EVE SDE JSON Lines 导入管线。
 
 > 非官方同人/技术原型。EVE、SDE 等名称归其权利方所有。本项目的战斗、工业和经济数值是根据 SDE 字段派生的游戏化规则，不是 EVE Online 官方数值模拟器。
+
+
+## 0.4.0 更新：前后端分离 + 战斗系统 V2 + Dogma 映射
+
+- 前端迁移到 `client/` 静态页面，服务端只提供 JSON API、Socket.IO 和静态文件托管。
+- 删除 EJS 页面渲染依赖路径，避免多架构混用。
+- 战斗系统接入 `data/combat/rules.json`，NPC、波次、抗性、反跳、电子战、姿态、目标优先级全部配置化。
+- 站点生成接入 `data/combat/site_templates.json`，异常名、危险度、富集度、星系安等分段和基础敌人强度不再写死在 JS。
+- SDE Dogma 映射接入 `data/sde/dogma_mapping.json`，导入 `types.jsonl` 时会派生舰船 stats、舰船槽位、模块效果、伤害配置和抗性。
+- 新增 `npm run smoke:dogma`，用于检查 Dogma 映射配置、舰船槽位、模块伤害配置和站点规则。
 
 ## 已实现内容
 
@@ -18,7 +43,7 @@
 ## 快速启动：Docker
 
 ```bash
-cd eve-idle-game
+cd eve_sde_online_deep
 docker compose up --build
 ```
 
@@ -32,7 +57,7 @@ docker compose up --build
 ## 快速启动：本地 Node + MongoDB
 
 ```bash
-cd eve-idle-game
+cd eve_sde_online_deep
 cp .env.example .env
 npm install
 npm run seed

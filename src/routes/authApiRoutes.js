@@ -6,24 +6,20 @@ import { createStarterCharacter } from '../services/characterFactory.js';
 import { env } from '../config/env.js';
 import { asyncHandler } from '../middleware/auth.js';
 
-export const authRoutes = express.Router();
+export const authApiRoutes = express.Router();
 
-const authLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000,
-  limit: 50,
-  standardHeaders: true,
-  legacyHeaders: false
-});
+const authLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 50, standardHeaders: true, legacyHeaders: false });
 
-authRoutes.get('/login', (req, res) => {
-  res.render('auth/login', { title: '登录', active: 'login', error: '', next: req.query.next || '/command' });
-});
+function publicUser(user) {
+  if (!user) return null;
+  return { id: String(user._id), username: user.username, role: user.role };
+}
 
-authRoutes.get('/register', (req, res) => {
-  res.render('auth/register', { title: '注册', active: 'register', error: '', values: {} });
-});
+authApiRoutes.get('/me', asyncHandler(async (req, res) => {
+  res.json({ ok: true, user: publicUser(req.user), character: req.character || null });
+}));
 
-authRoutes.post('/register', authLimiter, asyncHandler(async (req, res) => {
+authApiRoutes.post('/register', authLimiter, asyncHandler(async (req, res) => {
   const username = String(req.body.username || '').trim();
   const characterName = String(req.body.characterName || username).trim();
   const password = String(req.body.password || '');
@@ -38,41 +34,30 @@ authRoutes.post('/register', authLimiter, asyncHandler(async (req, res) => {
   const role = userCount === 0 || (env.adminInviteCode && inviteCode === env.adminInviteCode) ? 'admin' : 'player';
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await User.create({ username, usernameLower, passwordHash, role, lastIp: req.ip });
-  await createStarterCharacter(user, characterName);
+  const character = await createStarterCharacter(user, characterName);
   req.session.userId = String(user._id);
-  req.session.save(() => res.redirect('/command'));
+  req.session.save(() => res.json({ ok: true, user: publicUser(user), character }));
 }));
 
-authRoutes.post('/login', authLimiter, asyncHandler(async (req, res) => {
+authApiRoutes.post('/login', authLimiter, asyncHandler(async (req, res) => {
   const usernameLower = String(req.body.username || '').trim().toLowerCase();
   const password = String(req.body.password || '');
   const user = await User.findOne({ usernameLower });
-  if (!user || user.banned) {
-    return res.status(401).render('auth/login', { title: '登录', active: 'login', error: '账号或密码错误。', next: req.body.next || '/command' });
-  }
+  if (!user || user.banned) return res.status(401).json({ ok: false, error: '账号或密码错误。' });
   const ok = await bcrypt.compare(password, user.passwordHash);
-  if (!ok) {
-    return res.status(401).render('auth/login', { title: '登录', active: 'login', error: '账号或密码错误。', next: req.body.next || '/command' });
-  }
+  if (!ok) return res.status(401).json({ ok: false, error: '账号或密码错误。' });
   user.lastLoginAt = new Date();
   user.lastIp = req.ip;
   await user.save();
   req.session.userId = String(user._id);
-  req.session.save(() => res.redirect(req.body.next || '/command'));
+  req.session.save(() => res.json({ ok: true, user: publicUser(user) }));
 }));
 
-authRoutes.post('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/'));
+authApiRoutes.post('/logout', (req, res) => {
+  req.session.destroy(() => res.json({ ok: true }));
 });
 
-authRoutes.use((err, req, res, next) => {
-  if (!['/register', '/login'].includes(req.path)) return next(err);
-  const view = req.path === '/register' ? 'auth/register' : 'auth/login';
-  res.status(400).render(view, {
-    title: req.path === '/register' ? '注册' : '登录',
-    active: req.path.slice(1),
-    error: err.message || '请求失败。',
-    values: req.body || {},
-    next: req.body?.next || '/command'
-  });
+authApiRoutes.use((err, req, res, next) => {
+  console.error('[auth-api]', err);
+  res.status(400).json({ ok: false, error: err.message || '请求失败。' });
 });

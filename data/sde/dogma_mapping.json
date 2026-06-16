@@ -1,0 +1,50 @@
+{
+  "version": "dogma-mapping-v1",
+  "attributeAliases": {
+    "capacity": ["capacity"],
+    "shield": ["shieldCapacity", "shieldHP"],
+    "armor": ["armorHP", "armorHitpoints"],
+    "hull": ["hp", "structureHP"],
+    "highSlots": ["hiSlots", "highSlots"],
+    "midSlots": ["medSlots", "mediumSlots"],
+    "lowSlots": ["lowSlots"],
+    "launcherSlots": ["launcherSlotsLeft"],
+    "turretSlots": ["turretSlotsLeft"],
+    "scan": ["scanResolution", "scanStrength"],
+    "speed": ["maxVelocity"],
+    "signature": ["signatureRadius"],
+    "damageMultiplier": ["damageMultiplier"],
+    "rateOfFire": ["speed", "duration"],
+    "emDamage": ["emDamage"],
+    "thermalDamage": ["thermalDamage"],
+    "kineticDamage": ["kineticDamage"],
+    "explosiveDamage": ["explosiveDamage"],
+    "miningAmount": ["miningAmount"],
+    "warpScrambleStrength": ["warpScrambleStrength"],
+    "shieldEmResonance": ["shieldEmDamageResonance"],
+    "shieldThermalResonance": ["shieldThermalDamageResonance"],
+    "shieldKineticResonance": ["shieldKineticDamageResonance"],
+    "shieldExplosiveResonance": ["shieldExplosiveDamageResonance"],
+    "armorEmResonance": ["armorEmDamageResonance"],
+    "armorThermalResonance": ["armorThermalDamageResonance"],
+    "armorKineticResonance": ["armorKineticDamageResonance"],
+    "armorExplosiveResonance": ["armorExplosiveDamageResonance"]
+  },
+  "defaults": {
+    "ship": { "shield": 120, "armor": 90, "hull": 110, "cargo": 160, "dps": 8, "mining": 3, "scan": 5, "hack": 2, "salvage": 1, "extract": 4, "warpStability": 0 },
+    "moduleEffects": { "high": { "dps": 6 }, "mid": { "shield": 30, "scan": 1 }, "low": { "cargo": 40 }, "rig": { "extract": 0.6 } },
+    "slots": { "high": 2, "mid": 2, "low": 1, "rig": 1 }
+  },
+  "slotKeywords": {
+    "high": ["turret", "launcher", "laser", "blaster", "railgun", "missile", "矿枪", "采矿器"],
+    "mid": ["shield", "booster", "afterburner", "scanner", "ecm", "护盾", "扫描"],
+    "low": ["armor", "plate", "damage control", "stabilizer", "expand", "装甲", "扩展"],
+    "rig": ["rig", "校准", "改装件"]
+  },
+  "roleKeywords": {
+    "miner": ["mining", "venture", "barge", "采矿", "工业"],
+    "explorer": ["probe", "scanner", "exploration", "扫描", "探索"],
+    "combat": ["frigate", "destroyer", "cruiser", "battle", "战斗", "护卫", "巡洋"]
+  },
+  "scales": { "hp": 1, "cargo": 1, "scan": 0.03, "dpsFloor": 1, "rofMsDivisor": 1000, "mining": 0.08 }
+}

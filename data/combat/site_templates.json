@@ -1,0 +1,26 @@
+{
+  "version": "site-rules-v1",
+  "securityBands": [
+    { "id": "high", "min": 0.75, "scanBonus": 0, "dangerBonus": 0, "richnessBonus": 0 },
+    { "id": "low", "min": 0.45, "scanBonus": 8, "dangerBonus": 0.12, "richnessBonus": 0.22 },
+    { "id": "null", "min": 0.05, "scanBonus": 18, "dangerBonus": 0.28, "richnessBonus": 0.48 },
+    { "id": "wormhole", "min": -1, "scanBonus": 34, "dangerBonus": 0.42, "richnessBonus": 0.72 }
+  ],
+  "activityLabels": {
+    "mining": ["贫瘠小行星带", "富矿异常", "冰矿碎片云", "深核矿脉"],
+    "ratting": ["海盗巡逻队", "走私仓库", "战列残骸场", "军阀前哨"],
+    "relic": ["遗迹信号", "沉睡者碎片", "古代数据殿", "失落保险库"],
+    "data": ["数据中继", "隐蔽监听站", "加密节点", "黑匣子阵列"],
+    "hauling": ["殖民地急单", "边境补给线", "低安走私线", "零安远征补给"],
+    "combat": ["赏金猎杀", "死斗信标", "拦截舰队", "主权骚扰战"]
+  },
+  "formula": {
+    "tier": { "securityWeight": 5, "riskWeight": 3, "randomWeight": 2, "min": 1, "max": 10 },
+    "danger": { "baseFromSecurity": true, "tierWeight": 0.035, "riskWeight": 0.25, "min": 0.02, "max": 1.5 },
+    "richness": { "base": 1.15, "securityWeight": -0.4, "tierWeight": 0.09, "min": 0.5, "max": 2.8 },
+    "scanNeed": { "base": 18, "tierWeight": 9 },
+    "lootNeed": { "base": 12, "tierWeight": 6 },
+    "enemyEhp": { "base": 30, "tierWeight": 36, "tierSquaredWeight": 3 },
+    "enemyDps": { "base": 2, "tierWeight": 2.8, "nonHighTierWeight": 1.4 }
+  }
+}

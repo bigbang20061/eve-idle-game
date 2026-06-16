@@ -1,0 +1,47 @@
+{
+  "version": "combat-rules-v2",
+  "damageTypes": ["em", "thermal", "kinetic", "explosive"],
+  "layers": ["shield", "armor", "hull"],
+  "baseLayerResists": {
+    "shield": { "em": 0.0, "thermal": 0.2, "kinetic": 0.4, "explosive": 0.5 },
+    "armor": { "em": 0.5, "thermal": 0.35, "kinetic": 0.25, "explosive": 0.1 },
+    "hull": { "em": 0.33, "thermal": 0.33, "kinetic": 0.33, "explosive": 0.33 }
+  },
+  "damageProfiles": {
+    "balanced": { "label": "均衡弹药", "damage": { "em": 0.25, "thermal": 0.25, "kinetic": 0.25, "explosive": 0.25 } },
+    "em_thermal": { "label": "电磁/热能", "damage": { "em": 0.55, "thermal": 0.45 } },
+    "kinetic_thermal": { "label": "动能/热能", "damage": { "kinetic": 0.65, "thermal": 0.35 } },
+    "explosive_kinetic": { "label": "爆炸/动能", "damage": { "explosive": 0.6, "kinetic": 0.4 } }
+  },
+  "stances": {
+    "safe": { "label": "保守距离", "dpsMultiplier": 0.82, "incomingMultiplier": 0.72, "hazardMultiplier": 0.8, "ewarResist": 0.2, "scramResist": 0.18 },
+    "standard": { "label": "标准接战", "dpsMultiplier": 1.0, "incomingMultiplier": 1.0, "hazardMultiplier": 1.0, "ewarResist": 0.0, "scramResist": 0.0 },
+    "aggressive": { "label": "贴脸强攻", "dpsMultiplier": 1.24, "incomingMultiplier": 1.18, "hazardMultiplier": 1.25, "ewarResist": -0.12, "scramResist": -0.08 }
+  },
+  "targetPriorities": {
+    "scramblers_first": { "label": "优先反跳", "roles": ["scrambler", "ewar", "logistics", "dps"] },
+    "ewar_first": { "label": "优先电子战", "roles": ["ewar", "scrambler", "logistics", "dps"] },
+    "dps_first": { "label": "优先火力", "roles": ["dps", "scrambler", "ewar", "logistics"] }
+  },
+  "factions": {
+    "guristas": { "label": "古斯塔斯", "damageProfile": "kinetic_thermal", "resistBonus": { "kinetic": 0.12, "thermal": 0.05 } },
+    "blood": { "label": "血袭者", "damageProfile": "em_thermal", "resistBonus": { "em": 0.12, "thermal": 0.05 } },
+    "angel": { "label": "天使联合", "damageProfile": "explosive_kinetic", "resistBonus": { "explosive": 0.12, "kinetic": 0.05 } },
+    "rogue": { "label": "无人机群", "damageProfile": "balanced", "resistBonus": { "em": 0.04, "thermal": 0.04, "kinetic": 0.04, "explosive": 0.04 } }
+  },
+  "archetypes": {
+    "dps": { "label": "火力舰", "ehp": 95, "dps": 6.5, "bounty": 1200, "weight": 8 },
+    "scrambler": { "label": "反跳护卫", "ehp": 70, "dps": 3.8, "bounty": 1700, "scram": 0.22, "weight": 3 },
+    "ewar": { "label": "电子战舰", "ehp": 62, "dps": 3.2, "bounty": 1600, "ewar": 0.24, "weight": 3 },
+    "logistics": { "label": "后勤舰", "ehp": 85, "dps": 1.8, "bounty": 1800, "repair": 8, "weight": 2 }
+  },
+  "wavesByActivity": {
+    "mining": [["dps"], ["dps", "scrambler"]],
+    "ratting": [["dps", "dps"], ["scrambler", "dps", "ewar"], ["logistics", "dps", "dps"]],
+    "combat": [["scrambler", "dps", "dps"], ["ewar", "logistics", "dps", "dps"], ["scrambler", "ewar", "dps", "dps"]],
+    "relic": [["ewar"], ["scrambler", "ewar"]],
+    "data": [["ewar"], ["ewar", "dps"]],
+    "hauling": [["scrambler", "dps"]]
+  },
+  "engine": { "maxRoundSeconds": 20, "bountyTierMultiplier": 0.42, "hazardPerIncomingDamage": 0.0018, "hazardPerScram": 0.04, "ewarScanPenalty": 0.18 }
+}

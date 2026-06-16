@@ -80,6 +80,11 @@ const charSchema = new mongoose.Schema({
     sellExcess: { type: Boolean, default: true },
     refineOre: { type: Boolean, default: false },
     minShieldPct: { type: Number, default: 0.35 },
+    combat: {
+      stance: String,
+      damageProfile: String,
+      targetPriority: String
+    },
     loop: { type: Boolean, default: true }
   },
   expedition: {
@@ -100,7 +105,10 @@ const charSchema = new mongoose.Schema({
     minedM3: { type: Number, default: 0 },
     manufactured: { type: Number, default: 0 },
     trades: { type: Number, default: 0 },
-    bestLoot: { type: Number, default: 0 }
+    bestLoot: { type: Number, default: 0 },
+    damageDealt: { type: Number, default: 0 },
+    damageTaken: { type: Number, default: 0 },
+    bountyEarned: { type: Number, default: 0 }
   },
   walletJournal: [{ at: Date, type: String, amount: Number, note: String }],
   fleetId: { type: mongoose.Schema.Types.ObjectId, ref: 'Fleet', index: true },

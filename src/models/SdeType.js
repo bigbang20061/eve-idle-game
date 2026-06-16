@@ -21,9 +21,11 @@ const sdeTypeSchema = new mongoose.Schema({
   tier: Number,
   slot: String,
   role: String,
+  slots: mongoose.Schema.Types.Mixed,
   effects: mongoose.Schema.Types.Mixed,
   stats: mongoose.Schema.Types.Mixed,
   attributes: mongoose.Schema.Types.Mixed,
+  dogma: mongoose.Schema.Types.Mixed,
   source: String,
   raw: mongoose.Schema.Types.Mixed
 }, { timestamps: true });

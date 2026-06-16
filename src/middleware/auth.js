@@ -13,7 +13,7 @@ export function requireAuth(req, res, next) {
 
 export function requireAdmin(req, res, next) {
   if (req.user?.role === 'admin') return next();
-  return res.status(403).render('pages/error', { title: '无权限', active: '', message: '需要管理员权限。' });
+  return res.status(403).json({ ok: false, error: '需要管理员权限。' });
 }
 
 export async function attachUser(req, res, next) {

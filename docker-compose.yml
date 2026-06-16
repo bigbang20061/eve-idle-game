@@ -1,7 +1,7 @@
 services:
   mongo:
     image: mongo:8
-    container_name: eve_idle_game_mongo
+    container_name: eve_sde_mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
@@ -11,7 +11,7 @@ services:
 
   app:
     build: .
-    container_name: eve_idle_game_app
+    container_name: eve_sde_online_game
     restart: unless-stopped
     depends_on:
       - mongo
@@ -21,7 +21,7 @@ services:
       NODE_ENV: production
       PORT: 3000
       PUBLIC_ORIGIN: http://localhost:3000
-      MONGODB_URI: mongodb://mongo:27017/eve_idle_game
+      MONGODB_URI: mongodb://mongo:27017/eve_sde_online_deep
       SESSION_SECRET: change-this-before-internet
       AUTO_SEED: "true"
       CREATE_DEMO_USERS: "true"
