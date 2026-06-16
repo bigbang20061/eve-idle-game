@@ -1,0 +1,26 @@
+{
+  "version": "fitting-rules-v1",
+  "slotOrder": ["high", "mid", "low", "rig"],
+  "slotLabels": { "high": "高槽", "mid": "中槽", "low": "低槽", "rig": "改装件" },
+  "shipDefaults": { "cpu": 80, "powergrid": 45, "calibration": 40, "capacitor": 180, "capacitorRecharge": 2.4, "turretHardpoints": 2, "launcherHardpoints": 2 },
+  "limits": { "sameGroup": 2, "rigSameGroup": 1 },
+  "moduleDefaults": { "state": "online", "fitting": { "cpu": 6, "powergrid": 3, "calibration": 0 }, "activation": { "cycleSeconds": 6, "capacitorCost": 0, "chargePerCycle": 0 } },
+  "moduleRules": [
+    { "id": "turret_weapon", "label": "炮台武器", "mode": "active", "slot": "high", "hardpoint": "turret", "match": { "keywords": ["turret", "blaster", "railgun", "laser", "cannon", "autocannon", "artillery", "beam", "pulse", "炮", "激光"] }, "fitting": { "cpu": 12, "powergrid": 8 }, "requiredSkills": { "weaponSystems": 1, "gunnery": 1 }, "activation": { "cycleSeconds": 5, "capacitorCost": 2, "chargeKind": "ammo", "chargePerCycle": 1, "damageMultiplier": 1, "skillDamageBonus": "turretDamage" } },
+    { "id": "launcher_weapon", "label": "导弹发射器", "mode": "active", "slot": "high", "hardpoint": "launcher", "match": { "keywords": ["launcher", "missile", "rocket", "torpedo", "发射器", "导弹", "火箭"] }, "fitting": { "cpu": 14, "powergrid": 6 }, "requiredSkills": { "weaponSystems": 1, "missiles": 1 }, "activation": { "cycleSeconds": 6, "capacitorCost": 0, "chargeKind": "ammo", "chargePerCycle": 1, "damageMultiplier": 1.05, "skillDamageBonus": "launcherDamage" } },
+    { "id": "miner", "label": "采矿器", "mode": "active", "slot": "high", "match": { "keywords": ["miner", "mining", "strip", "采矿"] }, "fitting": { "cpu": 10, "powergrid": 3 }, "requiredSkills": { "mining": 1 }, "activation": { "cycleSeconds": 8, "capacitorCost": 1, "effects": { "mining": 4 } } },
+    { "id": "shield_booster", "label": "护盾回充器", "mode": "active", "slot": "mid", "match": { "keywords": ["shield booster", "shield boost", "booster", "护盾回充", "护盾增效"] }, "fitting": { "cpu": 10, "powergrid": 5 }, "requiredSkills": { "shieldOperation": 1 }, "activation": { "cycleSeconds": 6, "capacitorCost": 8, "effects": { "shieldBoost": 28 } } },
+    { "id": "armor_repairer", "label": "装甲维修器", "mode": "active", "slot": "low", "match": { "keywords": ["armor repair", "repairer", "装甲维修", "维修器"] }, "fitting": { "cpu": 8, "powergrid": 7 }, "requiredSkills": { "armorRepairSystems": 1 }, "activation": { "cycleSeconds": 7, "capacitorCost": 7, "effects": { "armorRepair": 24 } } },
+    { "id": "propulsion", "label": "推进装备", "mode": "active", "slot": "mid", "match": { "keywords": ["afterburner", "microwarp", "propulsion", "推进", "加力"] }, "fitting": { "cpu": 9, "powergrid": 6 }, "requiredSkills": { "navigation": 1 }, "activation": { "cycleSeconds": 10, "capacitorCost": 5, "effects": { "extract": 3, "scramResist": 0.12 } } },
+    { "id": "scanner", "label": "扫描/分析器", "mode": "passive", "slot": "mid", "match": { "keywords": ["scanner", "analyzer", "probe", "扫描", "分析"] }, "fitting": { "cpu": 8, "powergrid": 1 }, "requiredSkills": { "scanning": 1 }, "effects": { "scan": 4, "hack": 2 } },
+    { "id": "damage_upgrade", "label": "火控/伤害升级", "mode": "passive", "slot": "low", "match": { "keywords": ["damage", "heat sink", "magnetic", "gyro", "ballistic", "火控", "伤害"] }, "fitting": { "cpu": 7, "powergrid": 1 }, "requiredSkills": { "weaponUpgrades": 1 }, "effects": { "dps": 3 } },
+    { "id": "tank_passive", "label": "被动防御", "mode": "passive", "slot": "low", "match": { "keywords": ["shield", "armor", "plating", "extender", "energized", "damage control", "护盾", "装甲", "损伤控制"] }, "fitting": { "cpu": 6, "powergrid": 4 }, "requiredSkills": {}, "effects": { "shield": 25, "armor": 18 } },
+    { "id": "rig", "label": "改装件", "mode": "passive", "slot": "rig", "match": { "keywords": ["rig", "改装件"] }, "fitting": { "cpu": 0, "powergrid": 0, "calibration": 20 }, "requiredSkills": {}, "effects": { "utility": 1 } }
+  ],
+  "fallbackBySlot": {
+    "high": { "id": "high_utility", "label": "高槽通用装备", "mode": "passive", "fitting": { "cpu": 6, "powergrid": 3 }, "effects": { "utility": 1 } },
+    "mid": { "id": "mid_utility", "label": "中槽通用装备", "mode": "passive", "fitting": { "cpu": 5, "powergrid": 2 }, "effects": { "scan": 1 } },
+    "low": { "id": "low_utility", "label": "低槽通用装备", "mode": "passive", "fitting": { "cpu": 4, "powergrid": 2 }, "effects": { "cargo": 10 } },
+    "rig": { "id": "rig_utility", "label": "通用改装件", "mode": "passive", "fitting": { "cpu": 0, "powergrid": 0, "calibration": 20 }, "effects": { "utility": 1 } }
+  }
+}
