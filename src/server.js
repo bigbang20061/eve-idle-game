@@ -15,6 +15,7 @@ import { authApiRoutes } from './routes/authApiRoutes.js';
 import { apiRoutes } from './routes/apiRoutes.js';
 import { adminApiRoutes } from './routes/adminApiRoutes.js';
 import { combatApiRoutes } from './routes/combatApiRoutes.js';
+import { staticSdeRoutes } from './routes/staticSdeRoutes.js';
 import { createSocketServer } from './socket/index.js';
 import { ensureCatalogSeeded } from './services/catalog.js';
 import { startGameLoop } from './services/gameEngine.js';
@@ -67,6 +68,7 @@ async function main() {
   app.use('/api/auth', authApiRoutes);
   app.use('/api/admin', adminApiRoutes);
   app.use('/api/combat', combatApiRoutes);
+  app.use('/api/static-sde', staticSdeRoutes);
   app.use('/api', apiRoutes);
   app.use(express.static(clientRoot, { extensions: ['html'], maxAge: env.isProduction ? '1d' : 0 }));
   app.use('/api', (req, res) => res.status(404).json({ ok: false, error: 'API not found' }));
