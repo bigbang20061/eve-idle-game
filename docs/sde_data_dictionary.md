@@ -39,17 +39,17 @@ graphics.yaml
 
 ## 使用方式
 
-先克隆公开 SDE：
+先初始化项目内置的 SDE submodule：
 
 ```bash
-git clone https://github.com/EVE-China/sde.git ../sde
+git submodule update --init --depth 1 sde
 ```
 
 然后在本项目里扫描：
 
 ```bash
 npm install
-npm run scan:sde -- --dir ../sde/yaml
+npm run scan:sde -- --dir ./sde/yaml
 ```
 
 默认输出：

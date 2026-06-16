@@ -28,8 +28,8 @@ services:
       SDE_STATIC_DIR: /app/sde/yaml
     volumes:
       - ./data:/app/data:ro
-      # Clone https://github.com/EVE-China/sde into ./sde.
-      # This keeps static game content outside MongoDB and outside this repository.
+      # Initialize the EVE-China/sde submodule before starting Docker:
+      # git submodule update --init --depth 1 sde
       - ./sde:/app/sde:ro
 
 volumes:

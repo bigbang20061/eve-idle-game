@@ -20,10 +20,10 @@ SDE 是游戏内容静态数据，不是玩家动态数据。项目不应该把 
 https://github.com/EVE-China/sde
 ```
 
-本项目不把该仓库的完整内容提交进来，而是将它作为外部静态数据目录挂载：
+本项目把该仓库作为 Git submodule 固定到 `./sde`，仓库正文只记录 submodule 指针，不提交完整 SDE 文件：
 
 ```bash
-git clone https://github.com/EVE-China/sde.git ./sde
+git submodule update --init --depth 1 sde
 cp .env.example .env
 # .env 中设置：
 SDE_STATIC_DIR=./sde/yaml
@@ -32,7 +32,7 @@ SDE_STATIC_DIR=./sde/yaml
 Docker：
 
 ```bash
-git clone https://github.com/EVE-China/sde.git ./sde
+git submodule update --init --depth 1 sde
 docker compose up --build
 ```
 

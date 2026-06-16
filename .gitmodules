@@ -1,0 +1,4 @@
+[submodule "sde"]
+	path = sde
+	url = https://github.com/EVE-China/sde.git
+	branch = main
