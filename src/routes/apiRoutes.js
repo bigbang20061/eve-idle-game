@@ -1,10 +1,12 @@
 import express from 'express';
-import crypto from 'crypto';
 import { Character, SdeType, SdeSystem, SdeBlueprint, MarketOrder, IndustryJob, Fleet, GameEvent } from '../models/index.js';
 import { requireAuth, asyncHandler } from '../middleware/auth.js';
 import { tickCharacter, publicCharacter, startIndustryJob } from '../services/gameEngine.js';
 import { getPublicCatalog } from '../services/catalog.js';
 import { cargoVolume, marketPrice, mergeStack, removeStackQuantity, safeText } from '../services/formulas.js';
+import { shipFromType } from '../services/shipFactory.js';
+import { fitModuleFromType, fittingSummary, setModuleActive, unfitModuleToWarehouse } from '../services/fittingSystem.js';
+import { publicSkillState, skillOptions, startSkillTraining } from '../services/skillSystem.js';
 
 export const apiRoutes = express.Router();
 apiRoutes.use(requireAuth);
@@ -16,26 +18,7 @@ async function getCharacterDoc(req) {
   return character;
 }
 
-function shipFromType(type) {
-  return {
-    instanceId: crypto.randomUUID(),
-    typeId: String(type.typeId),
-    name: type.name,
-    zh: type.zh || type.name,
-    class: type.groupName || 'Ship',
-    role: type.role || 'general',
-    stats: {
-      shield: Number(type.stats?.shield || 100), armor: Number(type.stats?.armor || 80), hull: Number(type.stats?.hull || 90),
-      dps: Number(type.stats?.dps || 6), mining: Number(type.stats?.mining || 0), hack: Number(type.stats?.hack || 0),
-      scan: Number(type.stats?.scan || 0), salvage: Number(type.stats?.salvage || 0), cargo: Number(type.stats?.cargo || type.capacity || 120),
-      oreHold: Number(type.stats?.oreHold || 0), extract: Number(type.stats?.extract || 4), warpStability: Number(type.stats?.warpStability || 0)
-    },
-    slots: type.raw?.slots || { high: 2, mid: 2, low: 1, rig: 1 },
-    fittedModules: [],
-    insured: true,
-    skin: 'sde-imported'
-  };
-}
+function bool(value) { return ['true', true, '1', 1, 'on'].includes(value); }
 
 apiRoutes.get('/state', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
@@ -46,21 +29,49 @@ apiRoutes.get('/state', asyncHandler(async (req, res) => {
     IndustryJob.find({ characterId: character._id, status: 'running' }).sort({ readyAt: 1 }).lean(),
     Fleet.find({ status: { $in: ['forming', 'running'] } }).sort({ updatedAt: -1 }).limit(12).lean()
   ]);
-  res.json({ ok: true, character: publicCharacter(character), catalog, system, events, jobs, fleets, serverTime: new Date() });
+  res.json({ ok: true, character: publicCharacter(character), catalog, system, events, jobs, fleets, skills: publicSkillState(character), fitting: fittingSummary(character), serverTime: new Date() });
+}));
+
+apiRoutes.get('/skills', asyncHandler(async (req, res) => {
+  const character = await getCharacterDoc(req);
+  res.json({ ok: true, ...publicSkillState(character) });
+}));
+
+apiRoutes.get('/skills/options', asyncHandler(async (req, res) => {
+  res.json({ ok: true, ...skillOptions() });
+}));
+
+apiRoutes.post('/skills/train', asyncHandler(async (req, res) => {
+  const character = await getCharacterDoc(req);
+  const training = startSkillTraining(character, String(req.body.skillId || ''), { queue: req.body.queue !== false });
+  character.markModified('skills');
+  character.markModified('skillTraining');
+  await character.save();
+  res.json({ ok: true, training, skills: publicSkillState(character) });
+}));
+
+apiRoutes.get('/fitting', asyncHandler(async (req, res) => {
+  const character = await getCharacterDoc(req);
+  res.json({ ok: true, fitting: fittingSummary(character), character: publicCharacter(character) });
 }));
 
 apiRoutes.post('/autopilot', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const body = req.body || {};
   if (body.activity) character.autopilot.activity = String(body.activity);
-  if (body.enabled !== undefined) character.autopilot.enabled = ['true', true, '1', 1, 'on'].includes(body.enabled);
-  if (body.allowLowSec !== undefined) character.autopilot.allowLowSec = ['true', true, '1', 1, 'on'].includes(body.allowLowSec);
-  if (body.sellExcess !== undefined) character.autopilot.sellExcess = ['true', true, '1', 1, 'on'].includes(body.sellExcess);
-  if (body.refineOre !== undefined) character.autopilot.refineOre = ['true', true, '1', 1, 'on'].includes(body.refineOre);
+  if (body.enabled !== undefined) character.autopilot.enabled = bool(body.enabled);
+  if (body.allowLowSec !== undefined) character.autopilot.allowLowSec = bool(body.allowLowSec);
+  if (body.sellExcess !== undefined) character.autopilot.sellExcess = bool(body.sellExcess);
+  if (body.refineOre !== undefined) character.autopilot.refineOre = bool(body.refineOre);
   if (body.targetSystemId) character.autopilot.targetSystemId = String(body.targetSystemId);
   if (body.risk !== undefined) character.autopilot.risk = Math.max(0.05, Math.min(1.2, Number(body.risk)));
   if (body.minShieldPct !== undefined) character.autopilot.minShieldPct = Math.max(0.1, Math.min(0.95, Number(body.minShieldPct)));
+  if (!character.autopilot.combat) character.autopilot.combat = {};
+  if (body.combatStance) character.autopilot.combat.stance = String(body.combatStance);
+  if (body.damageProfile) character.autopilot.combat.damageProfile = String(body.damageProfile);
+  if (body.targetPriority) character.autopilot.combat.targetPriority = String(body.targetPriority);
   character.expedition.log.unshift('调度参数已更新。');
+  character.markModified('autopilot');
   await character.save();
   res.json({ ok: true, character: publicCharacter(character) });
 }));
@@ -120,9 +131,9 @@ apiRoutes.post('/market/buy', asyncHandler(async (req, res) => {
   if (character.credits < total) throw new Error('ISK 不足');
   character.credits -= total;
   if (type.kind === 'ship') {
-    for (let i = 0; i < Math.min(10, quantity); i += 1) character.hangarShips.push(shipFromType(type));
+    for (let i = 0; i < Math.min(10, quantity); i += 1) character.hangarShips.push(shipFromType(type, { race: character.race || 'market' }));
   } else {
-    mergeStack(character.warehouse.items, { typeId, name: type.name, zh: type.zh || type.name, kind: type.kind, quantity, volume: type.volume || 0.01, basePrice: type.basePrice || price, source: 'market' });
+    mergeStack(character.warehouse.items, { typeId, name: type.name, zh: type.zh || type.name, kind: type.kind, quantity, volume: type.volume || 0.01, basePrice: type.basePrice || price, chargeGroup: type.chargeGroup, source: 'market' });
   }
   character.stats.trades += 1;
   character.walletJournal.unshift({ at: new Date(), type: 'buy', amount: -total, note: `购买 ${type.zh || type.name} × ${quantity}` });
@@ -155,29 +166,34 @@ apiRoutes.post('/hangar/equip', asyncHandler(async (req, res) => {
   const typeId = String(req.body.typeId || '');
   const type = await SdeType.findOne({ typeId, kind: 'module' }).lean();
   if (!type) throw new Error('装备不存在');
-  const stack = character.warehouse.items.find(s => String(s.typeId) === typeId && Number(s.quantity || 0) > 0);
-  if (!stack) throw new Error('仓库里没有这件装备');
-  const slot = type.slot || 'high';
-  const maxSlots = Number(character.ship?.slots?.[slot] || 0);
-  const usedSlots = (character.ship?.fittedModules || []).filter(m => m.slot === slot).length;
-  if (usedSlots >= maxSlots) throw new Error(`${slot} 槽位已满`);
-  removeStackQuantity(character.warehouse.items, typeId, 1);
-  character.ship.fittedModules.push({ instanceId: crypto.randomUUID(), typeId, name: type.name, zh: type.zh || type.name, slot, kind: type.kind, tier: type.tier || 1, effects: type.effects || {}, online: true });
-  character.expedition.log.unshift(`装配 ${type.zh || type.name} 到 ${slot} 槽。`);
+  const module = fitModuleFromType(character, type);
+  character.expedition.log.unshift(`装配 ${module.zh || module.name} 到 ${module.slot} 槽。`);
+  character.markModified('ship');
+  character.markModified('warehouse');
   await character.save();
-  res.json({ ok: true, character: publicCharacter(character) });
+  res.json({ ok: true, module, fitting: fittingSummary(character), character: publicCharacter(character) });
 }));
 
 apiRoutes.post('/hangar/unfit', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const instanceId = String(req.body.instanceId || '');
-  const idx = (character.ship.fittedModules || []).findIndex(m => String(m.instanceId) === instanceId);
-  if (idx < 0) throw new Error('装备不存在');
-  const mod = character.ship.fittedModules.splice(idx, 1)[0];
-  const type = await SdeType.findOne({ typeId: String(mod.typeId) }).lean() || mod;
-  mergeStack(character.warehouse.items, { typeId: String(mod.typeId), name: mod.name, zh: mod.zh || mod.name, kind: 'module', quantity: 1, volume: type.volume || 5, basePrice: type.basePrice || 1, source: 'unfit' });
+  const mod = (character.ship?.fittedModules || []).find(m => String(m.instanceId) === instanceId);
+  const type = mod ? await SdeType.findOne({ typeId: String(mod.typeId) }).lean() : null;
+  const removed = unfitModuleToWarehouse(character, instanceId, type || {});
+  character.expedition.log.unshift(`卸下 ${removed.zh || removed.name}。`);
+  character.markModified('ship');
+  character.markModified('warehouse');
   await character.save();
-  res.json({ ok: true, character: publicCharacter(character) });
+  res.json({ ok: true, module: removed, fitting: fittingSummary(character), character: publicCharacter(character) });
+}));
+
+apiRoutes.post('/hangar/module/active', asyncHandler(async (req, res) => {
+  const character = await getCharacterDoc(req);
+  const module = setModuleActive(character, String(req.body.instanceId || ''), bool(req.body.active));
+  character.expedition.log.unshift(`${module.zh || module.name} ${module.active ? '设为自动循环' : '停止自动循环'}。`);
+  character.markModified('ship');
+  await character.save();
+  res.json({ ok: true, module, fitting: fittingSummary(character), character: publicCharacter(character) });
 }));
 
 apiRoutes.post('/hangar/activate', asyncHandler(async (req, res) => {
@@ -191,8 +207,9 @@ apiRoutes.post('/hangar/activate', asyncHandler(async (req, res) => {
   character.expedition.state = 'idle';
   character.locationState = 'docked';
   character.expedition.log.unshift(`切换当前舰船为 ${nextShip.zh || nextShip.name}。`);
+  character.markModified('ship');
   await character.save();
-  res.json({ ok: true, character: publicCharacter(character) });
+  res.json({ ok: true, character: publicCharacter(character), fitting: fittingSummary(character) });
 }));
 
 apiRoutes.post('/refine', asyncHandler(async (req, res) => {
@@ -202,12 +219,13 @@ apiRoutes.post('/refine', asyncHandler(async (req, res) => {
   const stack = character.warehouse.items.find(s => String(s.typeId) === typeId && Number(s.quantity || 0) >= quantity);
   if (!stack || stack.kind !== 'ore') throw new Error('只能精炼矿石，且库存需足够');
   removeStackQuantity(character.warehouse.items, typeId, quantity);
-  const efficiency = 0.45 + Number(character.skills.industry || 1) * 0.025;
+  const industryLevel = Number(character.skills?.industry || 0);
+  const efficiency = 0.45 + industryLevel * 0.025;
   const trit = Math.round(quantity * 4 * efficiency);
   const pye = Math.round(quantity * 1.6 * efficiency);
   mergeStack(character.warehouse.items, { typeId: '34', name: 'Tritanium', zh: '三钛合金', kind: 'mineral', quantity: trit, volume: 0.01, basePrice: 6, source: 'refine' });
   mergeStack(character.warehouse.items, { typeId: '35', name: 'Pyerite', zh: '类晶体胶矿', kind: 'mineral', quantity: pye, volume: 0.01, basePrice: 12, source: 'refine' });
-  character.skills.industry += 0.005;
+  character.skillpoints += 0.4;
   character.expedition.log.unshift(`精炼 ${stack.zh || stack.name} × ${quantity}，产出矿物 ${trit + pye}。`);
   await character.save();
   res.json({ ok: true, character: publicCharacter(character) });
@@ -258,17 +276,7 @@ apiRoutes.get('/sde/search', asyncHandler(async (req, res) => {
 apiRoutes.post('/fleet/create', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const name = safeText(req.body.name || `${character.name} 的远征队`, 40);
-  const fleet = await Fleet.create({
-    name,
-    commanderId: character._id,
-    systemId: character.currentSystemId,
-    activity: safeText(req.body.activity || 'nullsec-raid', 40),
-    status: 'forming',
-    members: [{ characterId: character._id, role: 'commander', joinedAt: new Date() }],
-    objective: { tier: Math.max(1, Math.min(10, Number(req.body.tier || 3))), progress: 0 },
-    lootPool: { credits: 0, items: [] },
-    log: [`${character.name} 创建舰队。`]
-  });
+  const fleet = await Fleet.create({ name, commanderId: character._id, systemId: character.currentSystemId, activity: safeText(req.body.activity || 'nullsec-raid', 40), status: 'forming', members: [{ characterId: character._id, role: 'commander', joinedAt: new Date() }], objective: { tier: Math.max(1, Math.min(10, Number(req.body.tier || 3))), progress: 0 }, lootPool: { credits: 0, items: [] }, log: [`${character.name} 创建舰队。`] });
   character.fleetId = fleet._id;
   await character.save();
   req.app.get('io')?.to('global').emit('fleet:update', fleet);
@@ -279,10 +287,7 @@ apiRoutes.post('/fleet/join', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const fleet = await Fleet.findById(req.body.fleetId);
   if (!fleet || !['forming', 'running'].includes(fleet.status)) throw new Error('舰队不可加入');
-  if (!fleet.members.some(m => String(m.characterId) === String(character._id))) {
-    fleet.members.push({ characterId: character._id, role: 'member', joinedAt: new Date() });
-    fleet.log.unshift(`${character.name} 加入舰队。`);
-  }
+  if (!fleet.members.some(m => String(m.characterId) === String(character._id))) { fleet.members.push({ characterId: character._id, role: 'member', joinedAt: new Date() }); fleet.log.unshift(`${character.name} 加入舰队。`); }
   character.fleetId = fleet._id;
   await Promise.all([fleet.save(), character.save()]);
   req.app.get('io')?.to('global').emit('fleet:update', fleet);
@@ -303,9 +308,9 @@ apiRoutes.post('/fleet/start', asyncHandler(async (req, res) => {
 }));
 
 apiRoutes.get('/leaderboard', asyncHandler(async (req, res) => {
-  const richest = await Character.find({}).sort({ credits: -1 }).limit(20).select('name corp credits stats currentSystemId').lean();
-  const earned = await Character.find({}).sort({ 'stats.totalEarned': -1 }).limit(20).select('name corp credits stats currentSystemId').lean();
-  const kills = await Character.find({}).sort({ 'stats.kills': -1 }).limit(20).select('name corp credits stats currentSystemId').lean();
+  const richest = await Character.find({}).sort({ credits: -1 }).limit(20).select('name corp race credits stats currentSystemId').lean();
+  const earned = await Character.find({}).sort({ 'stats.totalEarned': -1 }).limit(20).select('name corp race credits stats currentSystemId').lean();
+  const kills = await Character.find({}).sort({ 'stats.kills': -1 }).limit(20).select('name corp race credits stats currentSystemId').lean();
   res.json({ ok: true, richest, earned, kills });
 }));
 
