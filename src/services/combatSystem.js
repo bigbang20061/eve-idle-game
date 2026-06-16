@@ -1,7 +1,7 @@
 import { getCombatRules, pickDamageProfile, pickPriority, pickStance } from './combatRules.js';
-import { chooseWeighted, clamp } from './formulas.js';
+import { clamp } from './formulas.js';
+import { processActiveModules } from './fitting.js';
 
-function clone(value) { return JSON.parse(JSON.stringify(value)); }
 function sum(values) { return Object.values(values || {}).reduce((s, v) => s + Number(v || 0), 0); }
 function normaliseProfile(profile) { const total = sum(profile); if (total <= 0) return { balanced: 1 }; return Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, Number(v || 0) / total])); }
 function layerHp(stats) { return { shield: Number(stats.shield || 1), armor: Number(stats.armor || 1), hull: Number(stats.hull || 1) }; }
@@ -49,21 +49,8 @@ export function ensureCombat(site, stats, character, rng = Math.random) {
   const faction = pickFaction(site, rng);
   const waveDefs = rules.wavesByActivity[site.activity] || rules.wavesByActivity.combat;
   const waveCount = clamp(Math.ceil(Number(site.tier || 1) / 3), 1, waveDefs.length);
-  const waves = waveDefs.slice(0, waveCount).map((roles, waveIndex) => ({
-    index: waveIndex,
-    enemies: roles.map((role, i) => makeEnemy(role, site, faction, `${waveIndex}-${i}`))
-  }));
-  site.combat = {
-    version: rules.version,
-    faction,
-    factionLabel: rules.factions[faction]?.label || faction,
-    currentWave: 0,
-    waves,
-    log: [],
-    totals: { dealt: 0, taken: 0, bounty: 0 },
-    effects: { scrammed: false, ewar: 0 },
-    completed: false
-  };
+  const waves = waveDefs.slice(0, waveCount).map((roles, waveIndex) => ({ index: waveIndex, enemies: roles.map((role, i) => makeEnemy(role, site, faction, `${waveIndex}-${i}`)) }));
+  site.combat = { version: rules.version, faction, factionLabel: rules.factions[faction]?.label || faction, currentWave: 0, waves, log: [], totals: { dealt: 0, taken: 0, bounty: 0 }, effects: { scrammed: false, ewar: 0 }, completed: false };
   site.enemyEhp = activeEnemies(site.combat).reduce((s, e) => s + e.hp, 0);
   if (!site.hp) site.hp = layerHp(stats);
   return site.combat;
@@ -108,15 +95,14 @@ export function resolveCombatRound({ site, character, stats, dt, rng = Math.rand
   const rules = getCombatRules();
   const pref = character.autopilot?.combat || {};
   const stance = pickStance(pref.stance || 'standard');
+  const roundSeconds = Math.min(Number(dt || 1), Number(rules.engine.maxRoundSeconds || 20));
+  const moduleResult = processActiveModules({ character, site, stats, dt: roundSeconds });
+  for (const line of moduleResult.logs || []) combat.log.unshift(line);
   const profileObj = stats.damageProfile ? { damage: stats.damageProfile } : pickDamageProfile(pref.damageProfile || 'balanced');
   const playerProfile = profileObj.damage || profileObj;
   const npcProfile = pickDamageProfile(rules.factions[combat.faction]?.damageProfile || 'balanced').damage;
-  const roundSeconds = Math.min(Number(dt || 1), Number(rules.engine.maxRoundSeconds || 20));
   const target = selectTarget(combat, pref.targetPriority || 'scramblers_first');
-  if (!target) {
-    combat.completed = true;
-    return { outcome: 'won', dealt: 0, taken: 0, bounty: 0, activeEnemies: 0 };
-  }
+  if (!target) { combat.completed = true; return { outcome: 'won', dealt: 0, taken: 0, bounty: 0, activeEnemies: 0 }; }
 
   const ewarLoad = aliveInWave(combat).reduce((s, e) => s + Number(e.ewar || 0), 0);
   const ewarPenalty = clamp(ewarLoad - Number(stance.ewarResist || 0), 0, 0.7);
@@ -137,12 +123,8 @@ export function resolveCombatRound({ site, character, stats, dt, rng = Math.rand
   }
 
   if (!aliveInWave(combat).length) {
-    if (combat.currentWave < combat.waves.length - 1) {
-      combat.currentWave += 1;
-      combat.log.unshift(`敌方第 ${combat.currentWave + 1} 波跃迁入场。`);
-    } else {
-      combat.completed = true;
-    }
+    if (combat.currentWave < combat.waves.length - 1) { combat.currentWave += 1; combat.log.unshift(`敌方第 ${combat.currentWave + 1} 波跃迁入场。`); }
+    else combat.completed = true;
   }
 
   const incoming = aliveInWave(combat).reduce((s, e) => s + Number(e.dps || 0), 0) * roundSeconds * Number(stance.incomingMultiplier || 1);
@@ -164,14 +146,5 @@ export function resolveCombatRound({ site, character, stats, dt, rng = Math.rand
 export function combatSnapshot(site) {
   const combat = site?.combat;
   if (!combat) return null;
-  return {
-    version: combat.version,
-    faction: combat.factionLabel || combat.faction,
-    currentWave: combat.currentWave,
-    waves: combat.waves?.length || 0,
-    enemies: aliveInWave(combat).map(e => ({ id: e.id, role: e.role, label: e.label, hp: Math.round(e.hp), maxHp: e.maxHp })),
-    effects: combat.effects,
-    totals: combat.totals,
-    log: combat.log?.slice(0, 8) || []
-  };
+  return { version: combat.version, faction: combat.factionLabel || combat.faction, currentWave: combat.currentWave, waves: combat.waves?.length || 0, enemies: aliveInWave(combat).map(e => ({ id: e.id, role: e.role, label: e.label, hp: Math.round(e.hp), maxHp: e.maxHp })), effects: combat.effects, totals: combat.totals, log: combat.log?.slice(0, 8) || [] };
 }
