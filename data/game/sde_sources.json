@@ -1,0 +1,19 @@
+{
+  "version": "sde-sources-v1",
+  "sources": {
+    "eveChinaGithub": {
+      "label": "EVE-China/sde",
+      "url": "https://github.com/EVE-China/sde",
+      "description": "公开 SDE 自动化仓库，README 指向官方 latest build、JSONL ZIP、YAML ZIP 和 changes 入口。"
+    },
+    "officialLatestJsonl": {
+      "label": "Official latest JSON Lines SDE ZIP",
+      "url": "https://developers.eveonline.com/static-data/eve-online-static-data-latest-jsonl.zip"
+    },
+    "officialLatestYaml": {
+      "label": "Official latest YAML SDE ZIP",
+      "url": "https://developers.eveonline.com/static-data/eve-online-static-data-latest-yaml.zip"
+    }
+  },
+  "runtimePolicy": "游戏运行时读取 MongoDB 与本地配置；SDE 同步由导入脚本执行，避免战斗 tick 直接依赖外部网络。"
+}
