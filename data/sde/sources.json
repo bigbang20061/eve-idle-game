@@ -1,0 +1,39 @@
+{
+  "version": "sde-sources-v1",
+  "preferredFormat": "jsonl",
+  "sources": {
+    "eveChinaGitHub": {
+      "label": "EVE-China/sde public mirror",
+      "repository": "https://github.com/EVE-China/sde",
+      "notes": "Public SDE automation/mirror repository. Use this as a discoverable public source; game importer still prefers JSON Lines for streaming imports."
+    },
+    "officialLatestJsonl": {
+      "label": "Official latest JSON Lines ZIP",
+      "url": "https://developers.eveonline.com/static-data/eve-online-static-data-latest-jsonl.zip",
+      "format": "jsonl.zip"
+    },
+    "officialLatestYaml": {
+      "label": "Official latest YAML ZIP",
+      "url": "https://developers.eveonline.com/static-data/eve-online-static-data-latest-yaml.zip",
+      "format": "yaml.zip"
+    },
+    "officialLatestBuild": {
+      "label": "Official latest build metadata",
+      "url": "https://developers.eveonline.com/static-data/tranquility/latest.jsonl",
+      "format": "jsonl"
+    }
+  },
+  "requiredJsonlFiles": [
+    "categories.jsonl",
+    "groups.jsonl",
+    "marketGroups.jsonl",
+    "types.jsonl",
+    "mapSolarSystems.jsonl",
+    "blueprints.jsonl"
+  ],
+  "recommendedJsonlFiles": [
+    "typeDogma.jsonl",
+    "dogmaAttributes.jsonl",
+    "dogmaEffects.jsonl"
+  ]
+}
