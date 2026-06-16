@@ -1,0 +1,114 @@
+{
+  "version": "starter-loadouts-v1",
+  "defaultRace": "caldari",
+  "races": {
+    "amarr": {
+      "label": "艾玛帝国",
+      "corp": "艾玛皇家海军预备役",
+      "credits": 28000,
+      "homeSystemQuery": ["Amarr", "艾玛"],
+      "shipQuery": ["Impairor", "Punisher", "艾玛", "惩罚者"],
+      "fallbackShip": {
+        "typeId": "starter-amarr-corvette",
+        "name": "Impairor Training Corvette",
+        "zh": "艾玛训练护卫舰",
+        "groupName": "Frigate",
+        "role": "combat",
+        "stats": { "shield": 95, "armor": 145, "hull": 100, "dps": 9, "mining": 2, "scan": 4, "hack": 2, "salvage": 1, "cargo": 130, "oreHold": 0, "extract": 4, "warpStability": 0, "cpu": 125, "powergrid": 52, "capacitor": 285, "turretHardpoints": 2, "launcherHardpoints": 0 },
+        "slots": { "high": 2, "mid": 2, "low": 2, "rig": 1 }
+      },
+      "skills": { "gunnery": 2, "shield_operation": 1, "armor_operation": 2, "engineering": 2, "capacitor_systems": 2, "navigation": 1, "amarr_frigate": 2, "trade": 1 },
+      "fitQueries": ["Civilian Gatling Pulse Laser", "Small Armor Repairer", "Damage Control", "Core Scanner Probe Launcher"],
+      "fallbackModules": [
+        { "typeId": "starter-amarr-laser", "name": "Civilian Gatling Pulse Laser", "zh": "民用小型脉冲激光器", "role": "weapon_laser", "slot": "high", "activeEffects": { "dps": 8, "damageProfile": { "em": 0.75, "thermal": 0.25 } }, "activation": { "autoCycle": true, "cycleSeconds": 5, "capacitorCost": 7, "chargeGroup": "frequency_crystal", "chargesPerCycle": 0 }, "cpu": 18, "powergrid": 8 },
+        { "typeId": "starter-armor-repairer", "name": "Civilian Armor Repairer", "zh": "民用装甲维修器", "role": "armor_repairer", "slot": "low", "activeEffects": { "armorRepair": 18 }, "activation": { "autoCycle": true, "cycleSeconds": 7, "capacitorCost": 14 }, "cpu": 12, "powergrid": 6 },
+        { "typeId": "starter-damage-control", "name": "Civilian Damage Control", "zh": "民用损伤控制", "role": "damage_control", "slot": "low", "passiveEffects": { "shieldResist": 0.025, "armorResist": 0.035, "hullMultiplier": 0.04 }, "cpu": 8, "powergrid": 1 }
+      ],
+      "inventory": [
+        { "typeId": "starter-frequency-crystal", "name": "Multifrequency Training Crystal", "zh": "训练用多频晶体", "kind": "charge", "chargeGroup": "frequency_crystal", "quantity": 2, "volume": 0.01, "basePrice": 120, "source": "starter" },
+        { "typeId": "34", "name": "Tritanium", "zh": "三钛合金", "kind": "mineral", "quantity": 850, "volume": 0.01, "basePrice": 6, "source": "starter" }
+      ]
+    },
+    "caldari": {
+      "label": "加达里合众国",
+      "corp": "加达里海军承包人",
+      "credits": 26000,
+      "homeSystemQuery": ["Jita", "吉他"],
+      "shipQuery": ["Ibis", "Kestrel", "Merlin", "茶隼", "小鹰"],
+      "fallbackShip": {
+        "typeId": "starter-caldari-corvette",
+        "name": "Ibis Training Corvette",
+        "zh": "加达里训练护卫舰",
+        "groupName": "Frigate",
+        "role": "combat",
+        "stats": { "shield": 150, "armor": 80, "hull": 95, "dps": 8, "mining": 2, "scan": 5, "hack": 2, "salvage": 1, "cargo": 145, "oreHold": 0, "extract": 4, "warpStability": 0, "cpu": 150, "powergrid": 42, "capacitor": 250, "turretHardpoints": 1, "launcherHardpoints": 2 },
+        "slots": { "high": 3, "mid": 3, "low": 1, "rig": 1 }
+      },
+      "skills": { "missiles": 2, "gunnery": 1, "shield_operation": 2, "engineering": 2, "capacitor_systems": 1, "navigation": 1, "caldari_frigate": 2, "trade": 1 },
+      "fitQueries": ["Civilian Light Missile Launcher", "Small Shield Booster", "Core Scanner Probe Launcher"],
+      "fallbackModules": [
+        { "typeId": "starter-light-launcher", "name": "Civilian Light Missile Launcher", "zh": "民用轻型导弹发射器", "role": "weapon_launcher", "slot": "high", "activeEffects": { "dps": 7, "damageProfile": { "kinetic": 0.65, "explosive": 0.35 } }, "activation": { "autoCycle": true, "cycleSeconds": 6, "capacitorCost": 0, "chargeGroup": "missile_charge", "chargesPerCycle": 1 }, "cpu": 22, "powergrid": 5 },
+        { "typeId": "starter-shield-booster", "name": "Civilian Shield Booster", "zh": "民用护盾回充器", "role": "shield_booster", "slot": "mid", "activeEffects": { "shieldBoost": 20 }, "activation": { "autoCycle": true, "cycleSeconds": 6, "capacitorCost": 15 }, "cpu": 18, "powergrid": 4 }
+      ],
+      "inventory": [
+        { "typeId": "starter-light-missile", "name": "Training Light Missile", "zh": "训练轻型导弹", "kind": "charge", "chargeGroup": "missile_charge", "quantity": 300, "volume": 0.015, "basePrice": 90, "source": "starter" },
+        { "typeId": "34", "name": "Tritanium", "zh": "三钛合金", "kind": "mineral", "quantity": 1000, "volume": 0.01, "basePrice": 6, "source": "starter" }
+      ]
+    },
+    "gallente": {
+      "label": "盖伦特联邦",
+      "corp": "联邦自由打捞队",
+      "credits": 27000,
+      "homeSystemQuery": ["Dodixie", "多迪谢"],
+      "shipQuery": ["Velator", "Tristan", "Incursus", "特里斯坦"],
+      "fallbackShip": {
+        "typeId": "starter-gallente-corvette",
+        "name": "Velator Training Corvette",
+        "zh": "盖伦特训练护卫舰",
+        "groupName": "Frigate",
+        "role": "explorer",
+        "stats": { "shield": 105, "armor": 105, "hull": 135, "dps": 7, "mining": 2, "scan": 6, "hack": 3, "salvage": 2, "cargo": 165, "oreHold": 0, "extract": 4, "warpStability": 0, "cpu": 135, "powergrid": 45, "capacitor": 260, "turretHardpoints": 2, "launcherHardpoints": 0 },
+        "slots": { "high": 2, "mid": 3, "low": 2, "rig": 1 }
+      },
+      "skills": { "gunnery": 2, "drones": 2, "shield_operation": 1, "armor_operation": 1, "engineering": 1, "scanning": 2, "salvage": 2, "navigation": 1, "gallente_frigate": 2 },
+      "fitQueries": ["Civilian Light Electron Blaster", "Data Analyzer", "Salvager", "Expanded Cargohold"],
+      "fallbackModules": [
+        { "typeId": "starter-blaster", "name": "Civilian Light Electron Blaster", "zh": "民用轻型电子疾速炮", "role": "weapon_turret", "slot": "high", "activeEffects": { "dps": 8, "damageProfile": { "thermal": 0.55, "kinetic": 0.45 } }, "activation": { "autoCycle": true, "cycleSeconds": 5, "capacitorCost": 4, "chargeGroup": "hybrid_charge", "chargesPerCycle": 1 }, "cpu": 18, "powergrid": 7 },
+        { "typeId": "starter-data-analyzer", "name": "Civilian Data Analyzer", "zh": "民用数据分析仪", "role": "scanner", "slot": "mid", "passiveEffects": { "hack": 2, "scan": 1 }, "cpu": 20, "powergrid": 1 },
+        { "typeId": "starter-cargo-expander", "name": "Civilian Expanded Cargohold", "zh": "民用扩展货柜", "role": "cargo_expander", "slot": "low", "passiveEffects": { "cargo": 45 }, "cpu": 6, "powergrid": 1 }
+      ],
+      "inventory": [
+        { "typeId": "starter-hybrid-charge", "name": "Training Antimatter Charge", "zh": "训练反物质弹", "kind": "charge", "chargeGroup": "hybrid_charge", "quantity": 400, "volume": 0.01, "basePrice": 65, "source": "starter" },
+        { "typeId": "35", "name": "Pyerite", "zh": "类晶体胶矿", "kind": "mineral", "quantity": 550, "volume": 0.01, "basePrice": 12, "source": "starter" }
+      ]
+    },
+    "minmatar": {
+      "label": "米玛塔尔共和国",
+      "corp": "共和国边境打捞队",
+      "credits": 25000,
+      "homeSystemQuery": ["Rens", "伦斯"],
+      "shipQuery": ["Reaper", "Rifter", "Slasher", "裂谷"],
+      "fallbackShip": {
+        "typeId": "starter-minmatar-corvette",
+        "name": "Reaper Training Corvette",
+        "zh": "米玛塔尔训练护卫舰",
+        "groupName": "Frigate",
+        "role": "hauler",
+        "stats": { "shield": 115, "armor": 90, "hull": 115, "dps": 8, "mining": 3, "scan": 5, "hack": 2, "salvage": 2, "cargo": 180, "oreHold": 0, "extract": 5, "warpStability": 0.2, "cpu": 125, "powergrid": 48, "capacitor": 230, "turretHardpoints": 2, "launcherHardpoints": 1 },
+        "slots": { "high": 3, "mid": 2, "low": 2, "rig": 1 }
+      },
+      "skills": { "gunnery": 2, "navigation": 2, "shield_operation": 1, "armor_operation": 1, "engineering": 1, "salvage": 1, "mining": 1, "minmatar_frigate": 2, "trade": 1 },
+      "fitQueries": ["Civilian Autocannon", "Civilian Miner", "Afterburner", "Expanded Cargohold"],
+      "fallbackModules": [
+        { "typeId": "starter-autocannon", "name": "Civilian Autocannon", "zh": "民用自动加农炮", "role": "weapon_projectile", "slot": "high", "activeEffects": { "dps": 7, "damageProfile": { "explosive": 0.55, "kinetic": 0.35, "thermal": 0.1 } }, "activation": { "autoCycle": true, "cycleSeconds": 5, "capacitorCost": 0, "chargeGroup": "projectile_ammo", "chargesPerCycle": 1 }, "cpu": 15, "powergrid": 6 },
+        { "typeId": "starter-miner", "name": "Civilian Miner", "zh": "民用采矿器", "role": "miner", "slot": "high", "activeEffects": { "mining": 5 }, "activation": { "autoCycle": true, "cycleSeconds": 8, "capacitorCost": 5 }, "cpu": 18, "powergrid": 4 },
+        { "typeId": "starter-afterburner", "name": "Civilian Afterburner", "zh": "民用加力燃烧器", "role": "afterburner", "slot": "mid", "activeEffects": { "extract": 2, "warpStability": 0.25 }, "activation": { "autoCycle": true, "cycleSeconds": 10, "capacitorCost": 8 }, "cpu": 16, "powergrid": 3 }
+      ],
+      "inventory": [
+        { "typeId": "starter-projectile-ammo", "name": "Training EMP Ammo", "zh": "训练型EMP弹", "kind": "charge", "chargeGroup": "projectile_ammo", "quantity": 450, "volume": 0.01, "basePrice": 55, "source": "starter" },
+        { "typeId": "34", "name": "Tritanium", "zh": "三钛合金", "kind": "mineral", "quantity": 700, "volume": 0.01, "basePrice": 6, "source": "starter" },
+        { "typeId": "35", "name": "Pyerite", "zh": "类晶体胶矿", "kind": "mineral", "quantity": 300, "volume": 0.01, "basePrice": 12, "source": "starter" }
+      ]
+    }
+  }
+}
