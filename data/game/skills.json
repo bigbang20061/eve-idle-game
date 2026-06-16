@@ -1,0 +1,27 @@
+{
+  "version": "skills-v1",
+  "training": { "baseSeconds": 900, "levelExponent": 1.55, "queueLimit": 5 },
+  "skills": {
+    "combat": { "label": "通用战斗理论", "category": "combat", "rank": 1, "maxLevel": 5, "description": "提升所有武器输出。", "effects": { "dps": { "op": "mult", "perLevel": 0.045 } } },
+    "weaponSystems": { "label": "武器系统操作", "category": "combat", "rank": 2, "maxLevel": 5, "description": "提升主动武器效率并降低电容消耗。", "effects": { "dps": { "op": "mult", "perLevel": 0.025 }, "activeModuleCapCost": { "op": "mult", "perLevel": -0.035 } } },
+    "gunnery": { "label": "炮台学", "category": "combat", "rank": 2, "maxLevel": 5, "description": "提升炮台类高槽武器效果。", "effects": { "turretDamage": { "op": "mult", "perLevel": 0.04 } } },
+    "missiles": { "label": "导弹发射器操作", "category": "combat", "rank": 2, "maxLevel": 5, "description": "提升导弹和发射器效果。", "effects": { "launcherDamage": { "op": "mult", "perLevel": 0.04 } } },
+    "drones": { "label": "无人机概论", "category": "combat", "rank": 2, "maxLevel": 5, "description": "提升无人机和辅助火力。", "effects": { "dps": { "op": "add", "perLevel": 1.2 } } },
+    "shieldOperation": { "label": "护盾操作", "category": "defense", "rank": 1, "maxLevel": 5, "description": "提升护盾容量。", "effects": { "shield": { "op": "mult", "perLevel": 0.05 } } },
+    "armorRepairSystems": { "label": "装甲维修系统", "category": "defense", "rank": 1, "maxLevel": 5, "description": "提升装甲容量和维修模块。", "effects": { "armor": { "op": "mult", "perLevel": 0.04 }, "armorRepair": { "op": "mult", "perLevel": 0.05 } } },
+    "capacitorManagement": { "label": "电容管理", "category": "engineering", "rank": 2, "maxLevel": 5, "description": "提升电容容量与回复。", "effects": { "capacitor": { "op": "mult", "perLevel": 0.05 }, "capacitorRecharge": { "op": "mult", "perLevel": 0.04 } } },
+    "weaponUpgrades": { "label": "武器升级研究", "category": "engineering", "rank": 2, "maxLevel": 5, "description": "提升 CPU 与能栅。", "effects": { "fittingCpu": { "op": "add", "perLevel": 4 }, "fittingPowergrid": { "op": "add", "perLevel": 3 } } },
+    "mining": { "label": "采矿", "category": "industry", "rank": 1, "maxLevel": 5, "description": "提升采矿效率。", "effects": { "mining": { "op": "mult", "perLevel": 0.05 } } },
+    "industry": { "label": "工业理论", "category": "industry", "rank": 1, "maxLevel": 5, "description": "提升制造和精炼。", "effects": { "industry": { "op": "mult", "perLevel": 0.04 } } },
+    "scanning": { "label": "扫描定位", "category": "exploration", "rank": 1, "maxLevel": 5, "description": "提升扫描和黑客。", "effects": { "scan": { "op": "mult", "perLevel": 0.045 }, "hack": { "op": "add", "perLevel": 0.8 } } },
+    "salvage": { "label": "打捞", "category": "exploration", "rank": 1, "maxLevel": 5, "description": "提升打捞收益。", "effects": { "salvage": { "op": "mult", "perLevel": 0.035 } } },
+    "trade": { "label": "贸易学", "category": "economy", "rank": 1, "maxLevel": 5, "description": "降低交易损耗。", "effects": { "trade": { "op": "mult", "perLevel": 0.035 } } },
+    "command": { "label": "指挥学", "category": "command", "rank": 1, "maxLevel": 5, "description": "提升离线成长。", "effects": { "skillpointGain": { "op": "mult", "perLevel": 0.01 } } },
+    "security": { "label": "安全规程", "category": "navigation", "rank": 1, "maxLevel": 5, "description": "提升撤离效率。", "effects": { "extract": { "op": "mult", "perLevel": 0.03 } } },
+    "navigation": { "label": "导航学", "category": "navigation", "rank": 1, "maxLevel": 5, "description": "提升推进和撤离。", "effects": { "extract": { "op": "add", "perLevel": 0.7 }, "propulsionBoost": { "op": "mult", "perLevel": 0.04 } } },
+    "caldariFrigate": { "label": "加达里护卫舰", "category": "race", "rank": 2, "maxLevel": 5, "description": "加达里护盾与导弹专精。", "effects": { "shield": { "op": "mult", "perLevel": 0.025 }, "launcherDamage": { "op": "mult", "perLevel": 0.025 } } },
+    "gallenteFrigate": { "label": "盖伦特护卫舰", "category": "race", "rank": 2, "maxLevel": 5, "description": "盖伦特装甲与无人机专精。", "effects": { "armor": { "op": "mult", "perLevel": 0.02 }, "droneDamage": { "op": "mult", "perLevel": 0.03 } } },
+    "amarrFrigate": { "label": "艾玛护卫舰", "category": "race", "rank": 2, "maxLevel": 5, "description": "艾玛电容与激光专精。", "effects": { "capacitor": { "op": "mult", "perLevel": 0.025 }, "turretDamage": { "op": "mult", "perLevel": 0.025 } } },
+    "minmatarFrigate": { "label": "米玛塔尔护卫舰", "category": "race", "rank": 2, "maxLevel": 5, "description": "米玛塔尔机动与弹丸专精。", "effects": { "extract": { "op": "add", "perLevel": 0.4 }, "turretDamage": { "op": "mult", "perLevel": 0.02 } } }
+  }
+}
