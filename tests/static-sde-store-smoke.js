@@ -4,6 +4,7 @@ import path from 'path';
 import { StaticSdeStore } from '../src/services/staticSdeStore.js';
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'eve-static-sde-'));
+const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'eve-static-sde-cache-'));
 
 function write(name, content) {
   fs.writeFileSync(path.join(dir, name), content.trimStart());
@@ -125,7 +126,7 @@ write('races.yaml', `
     en: Caldari State
 `);
 
-const store = new StaticSdeStore({ sourceDir: dir, logger: null });
+const store = new StaticSdeStore({ sourceDir: dir, cacheDir, logger: null, autoBuild: true });
 if (!store.available()) throw new Error('static SDE should be available');
 
 const skill = await store.getType('3300');
@@ -142,6 +143,14 @@ if (!dogma?.dogmaAttributes?.length) throw new Error('typeDogma lookup failed');
 
 const status = await store.status({ loadCore: true });
 if (!status.loadedCollections.includes('types')) throw new Error('status did not load core collections');
+if (!status.loadedHotCollections.includes('types')) throw new Error('hot cache did not load types');
+if (!status.hotCache.valid) throw new Error('hot cache should be valid');
+
+const warmStore = new StaticSdeStore({ sourceDir: dir, cacheDir, logger: null });
+const warmStatus = await warmStore.status();
+if (!warmStatus.hotCache.valid) throw new Error('existing hot cache should be reusable');
+const warmResults = await warmStore.searchTypes({ q: 'railgun', kind: 'module', limit: 5 });
+if (warmResults.length !== 1 || warmResults[0].typeId !== '12344') throw new Error('warm cache module search failed');
 
 console.log('static SDE store smoke ok', {
   sourceDir: status.sourceDir,

@@ -6,3 +6,4 @@ coverage/
 sde-jsonl/
 uploads/
 data/static-sde-cache/
+data/static-sde-cache.tmp-*/

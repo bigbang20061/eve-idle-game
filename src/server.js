@@ -42,16 +42,11 @@ async function maybeCreateDemoUsers() {
 
 async function main() {
   await connectDatabase();
-  if (env.sdeCacheAutoBuild) {
-    try {
-      const store = getStaticSdeStore({ cacheDir: env.sdeCacheDir });
-      if (store.available()) console.log('[static-sde]', await store.ensureCache(env.sdeCacheDir));
-    } catch (err) {
-      console.warn('[static-sde] 紧凑缓存构建跳过：', err.message);
-    }
-  }
   if (env.autoSeed) console.log('[catalog]', await ensureCatalogSeeded());
   await maybeCreateDemoUsers();
+  const staticSdeStore = getStaticSdeStore({ sourceDir: env.sdeStaticDir });
+  await staticSdeStore.buildHotCache();
+  await staticSdeStore.preloadHotData();
 
   const app = express();
   const server = http.createServer(app);

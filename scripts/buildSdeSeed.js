@@ -24,6 +24,8 @@ const [types, typeMaterials, systems] = await Promise.all([
   store.loadCollection('mapSolarSystems')
 ]);
 if (!types.size) throw new Error(`SDE/cache unavailable (0 types from ${store.sourceDir}); refusing to overwrite seed`);
+// Build + load the hot cache so store.getTypeDogma() can resolve dogma per type.
+await store.preloadHotData({ allowBuild: true });
 await initDogmaMapper();
 
 let shipsMerged = 0, modulesMerged = 0, oresMerged = 0, systemsMerged = 0, blueprintsMerged = 0, skipped = 0;
