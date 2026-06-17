@@ -11,6 +11,7 @@
     "seed": "node scripts/seedDatabase.js",
     "fetch:sde": "node scripts/fetchSde.js",
     "import:sde": "node scripts/importSde.js",
+    "build:sde-cache": "node scripts/buildStaticSdeCache.js",
     "scan:sde": "node scripts/scanSdeDictionary.js",
     "sde:dictionary": "node scripts/scanSdeDictionary.js",
     "sde:skills": "node scripts/extractSdeSkills.js",

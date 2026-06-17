@@ -19,6 +19,7 @@ import { staticSdeRoutes } from './routes/staticSdeRoutes.js';
 import { createSocketServer } from './socket/index.js';
 import { ensureCatalogSeeded } from './services/catalog.js';
 import { startGameLoop } from './services/gameEngine.js';
+import { getStaticSdeStore } from './services/staticSdeStore.js';
 import { User } from './models/User.js';
 import { createStarterCharacter } from './services/characterFactory.js';
 
@@ -43,6 +44,9 @@ async function main() {
   await connectDatabase();
   if (env.autoSeed) console.log('[catalog]', await ensureCatalogSeeded());
   await maybeCreateDemoUsers();
+  const staticSdeStore = getStaticSdeStore({ sourceDir: env.sdeStaticDir });
+  await staticSdeStore.buildHotCache();
+  await staticSdeStore.preloadHotData();
 
   const app = express();
   const server = http.createServer(app);
