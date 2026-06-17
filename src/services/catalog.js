@@ -65,6 +65,11 @@ export function normalizeSeedType(value, fallbackKind) {
     tier: deriveTier(value),
     slot: value.slot,
     role: value.role || value.class,
+    cpu: value.cpu,
+    powergrid: value.powergrid,
+    calibration: value.calibration,
+    requirements: value.requirements,
+    chargeGroup: value.chargeGroup,
     slots: value.slots,
     effects: value.effects || {},
     stats,
@@ -207,7 +212,7 @@ export async function seedDefaultSde({ reset = false } = {}) {
 export async function seedNpcMarketOrders() {
   const systems = await SdeSystem.find({ hub: true }).lean();
   const hubs = systems.length ? systems : await SdeSystem.find({}).limit(3).lean();
-  const types = await SdeType.find({ kind: { $in: ['ship', 'module', 'ore', 'mineral', 'salvage', 'data', 'commodity'] } }).limit(300).lean();
+  const types = await SdeType.find({ kind: { $in: ['ship', 'module', 'charge', 'ore', 'mineral', 'salvage', 'data', 'commodity'] } }).limit(300).lean();
   const ops = [];
   for (const system of hubs) {
     for (const type of types) {
@@ -235,7 +240,7 @@ export async function getPublicCatalog() {
     SdeType.find({ kind: 'module' }).sort({ tier: 1, basePrice: 1 }).limit(200).lean(),
     SdeSystem.find({}).sort({ security: -1, name: 1 }).limit(300).lean(),
     SdeBlueprint.find({}).sort({ time: 1 }).limit(200).lean(),
-    SdeType.find({ kind: { $in: ['ore', 'mineral', 'salvage', 'data', 'commodity', 'item'] } }).sort({ kind: 1, basePrice: 1 }).limit(300).lean()
+    SdeType.find({ kind: { $in: ['charge', 'ore', 'mineral', 'salvage', 'data', 'commodity', 'item'] } }).sort({ kind: 1, basePrice: 1 }).limit(300).lean()
   ]);
   return { ships, modules, systems, blueprints, resources };
 }

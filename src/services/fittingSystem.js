@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import { loadJsonConfig } from './jsonConfig.js';
 import { hasSkillRequirements, deriveSkillModifiers } from './skillSystem.js';
 import { mergeStack, removeStackQuantity } from './formulas.js';
+import { t, label } from './i18n.js';
 
 export function getFittingRules() {
   return loadJsonConfig('data/game/fitting_rules.json');
@@ -50,6 +51,8 @@ export function moduleInstanceFromType(type = {}, { instanceId = crypto.randomUU
     slot,
     kind: type.kind || 'module',
     role,
+    // Same-group cap keys on the role; rigs distinguish by type so different rigs can coexist (EVE: per rig group).
+    groupKey: type.groupKey || (role === 'rig' ? `rig:${type.kind || type.typeId}` : role),
     tier: Number(type.tier || 1),
     mode,
     cpu: moduleResource(type, slot, 'cpu'),
@@ -97,23 +100,31 @@ export function validateModuleFit(character, module) {
   const slot = module.slot || 'high';
   const slotState = summary.slots[slot] || { used: 0, max: 0 };
   const errors = [];
-  if (slotState.used >= slotState.max) errors.push(`${slot} 槽位不足`);
+  if (slotState.used >= slotState.max) errors.push(t('fit.err.slotFull', { slot: label('slot', slot) }));
   for (const [key, res] of Object.entries(summary.resources || {})) {
-    if (Number(res.used || 0) + Number(module[key] || 0) > Number(res.max || 0)) errors.push(`${key} 装配资源不足`);
+    if (Number(res.used || 0) + Number(module[key] || 0) > Number(res.max || 0)) errors.push(t('fit.err.resource', { resource: label('res', key) }));
   }
   const hardpoint = module.requirements?.hardpoint;
   if (hardpoint) {
     const hp = summary.hardpoints?.[hardpoint] || { used: 0, max: 0 };
-    if (hp.used >= hp.max) errors.push(`${hardpoint} 挂点不足`);
+    if (hp.used >= hp.max) errors.push(t('fit.err.hardpoint', { hardpoint: label('hardpoint', hardpoint) }));
+  }
+  // Same-group cap: weapons are bounded by hardpoints instead, so only limit utility/rig modules.
+  const groupKey = module.groupKey || module.role;
+  if (module.mode !== 'weapon' && groupKey) {
+    const rules = getFittingRules();
+    const sameGroup = (character.ship?.fittedModules || []).filter(m => (m.groupKey || m.role) === groupKey).length;
+    const maxSame = module.slot === 'rig' ? Number(rules.limits?.rigSameGroup ?? 1) : Number(rules.limits?.sameGroup ?? 2);
+    if (sameGroup >= maxSame) errors.push(t('fit.err.sameGroup', { group: label('role', groupKey), max: maxSame }));
   }
   const skills = hasSkillRequirements(character, module.requirements?.skills || {});
-  if (!skills.ok) errors.push(`技能不足：${skills.missing.map(s => `${s.label} ${s.have}/${s.need}`).join('、')}`);
+  if (!skills.ok) errors.push(t('fit.err.skill', { detail: skills.missing.map(s => `${s.label} ${s.have}/${s.need}`).join('、') }));
   return { ok: errors.length === 0, errors, summary };
 }
 
 export function fitModuleFromType(character, type) {
   const stack = character.warehouse?.items?.find(s => String(s.typeId) === String(type.typeId) && Number(s.quantity || 0) > 0 && !s.locked);
-  if (!stack) throw new Error('仓库里没有这件装备，或装备已锁仓');
+  if (!stack) throw new Error(t('fit.err.noStack'));
   const module = moduleInstanceFromType(type);
   const validation = validateModuleFit(character, module);
   if (!validation.ok) throw new Error(validation.errors.join('；'));
@@ -126,7 +137,7 @@ export function fitModuleFromType(character, type) {
 export function unfitModuleToWarehouse(character, instanceId, type = {}) {
   const modules = character.ship?.fittedModules || [];
   const idx = modules.findIndex(m => String(m.instanceId) === String(instanceId));
-  if (idx < 0) throw new Error('装备不存在');
+  if (idx < 0) throw new Error(t('fit.err.noModule'));
   const mod = modules.splice(idx, 1)[0];
   mergeStack(character.warehouse.items, {
     typeId: String(mod.typeId),
@@ -144,8 +155,8 @@ export function unfitModuleToWarehouse(character, instanceId, type = {}) {
 
 export function setModuleActive(character, instanceId, active) {
   const mod = (character.ship?.fittedModules || []).find(m => String(m.instanceId) === String(instanceId));
-  if (!mod) throw new Error('装备不存在');
-  if (mod.mode === 'passive') throw new Error('被动装备不能主动开关');
+  if (!mod) throw new Error(t('fit.err.noModule'));
+  if (mod.mode === 'passive') throw new Error(t('fit.err.passiveToggle'));
   mod.active = Boolean(active);
   return mod;
 }
@@ -230,8 +241,8 @@ export function fittingUiOptions() {
   const rules = getFittingRules();
   return {
     version: rules.version,
-    moduleRoles: Object.fromEntries(Object.entries(rules.moduleRoles || {}).map(([id, role]) => [id, { label: role.label || id, slot: role.slot, mode: role.mode }])),
-    chargeGroups: rules.chargeGroups || {},
+    moduleRoles: Object.fromEntries(Object.entries(rules.moduleRoles || {}).map(([id, role]) => [id, { label: label('role', id), slot: role.slot, mode: role.mode }])),
+    chargeGroups: Object.fromEntries(Object.entries(rules.chargeGroups || {}).map(([id, cg]) => [id, { ...cg, label: label('charge', id) }])),
     resources: rules.resources || []
   };
 }

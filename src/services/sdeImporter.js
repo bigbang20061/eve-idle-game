@@ -243,6 +243,11 @@ async function importTypes(dir, { limit = 0 } = {}) {
       if (derived.effects) type.effects = derived.effects;
       if (derived.slot) type.slot = derived.slot;
       if (derived.role) type.role = derived.role;
+      // SDE-sourced module fitting costs + requirements (so the importer path matches the seed path).
+      if (Number.isFinite(Number(derived.cpu))) type.cpu = Number(derived.cpu);
+      if (Number.isFinite(Number(derived.powergrid))) type.powergrid = Number(derived.powergrid);
+      if (Number.isFinite(Number(derived.calibration))) type.calibration = Number(derived.calibration);
+      if (derived.requirements) type.requirements = derived.requirements;
     } else {
       type.stats = kind === 'ship' ? deriveShipStats(type, attributes, tier) : {};
       type.effects = effectsFromType(type, kind);

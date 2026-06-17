@@ -1,5 +1,5 @@
 {
-  "version": "fitting-rules-v1",
+  "version": "fitting-rules-v2-sde-fitting",
   "engine": {
     "capacitorRegenPerSecond": 0.018,
     "defaultCycleSeconds": 6
@@ -14,6 +14,10 @@
   },
   "resources": ["cpu", "powergrid", "calibration"],
   "stackingPenalty": [1, 0.87, 0.57, 0.28, 0.1],
+  "limits": {
+    "sameGroup": 2,
+    "rigSameGroup": 1
+  },
   "moduleDefaultsBySlot": {
     "high": { "cpu": 18, "powergrid": 8, "calibration": 0 },
     "mid": { "cpu": 20, "powergrid": 5, "calibration": 0 },
@@ -22,7 +26,6 @@
   },
   "moduleRoles": {
     "weapon_turret": {
-      "label": "炮台武器",
       "slot": "high",
       "hardpoint": "turret",
       "mode": "weapon",
@@ -30,7 +33,6 @@
       "activation": { "autoCycle": true, "cycleSeconds": 5, "capacitorCost": 4, "chargeGroup": "hybrid_charge", "chargesPerCycle": 1 }
     },
     "weapon_laser": {
-      "label": "激光武器",
       "slot": "high",
       "hardpoint": "turret",
       "mode": "weapon",
@@ -38,7 +40,6 @@
       "activation": { "autoCycle": true, "cycleSeconds": 5, "capacitorCost": 7, "chargeGroup": "frequency_crystal", "chargesPerCycle": 0 }
     },
     "weapon_projectile": {
-      "label": "射弹武器",
       "slot": "high",
       "hardpoint": "turret",
       "mode": "weapon",
@@ -46,7 +47,6 @@
       "activation": { "autoCycle": true, "cycleSeconds": 5, "capacitorCost": 0, "chargeGroup": "projectile_ammo", "chargesPerCycle": 1 }
     },
     "weapon_launcher": {
-      "label": "导弹发射器",
       "slot": "high",
       "hardpoint": "launcher",
       "mode": "weapon",
@@ -54,59 +54,78 @@
       "activation": { "autoCycle": true, "cycleSeconds": 6, "capacitorCost": 0, "chargeGroup": "missile_charge", "chargesPerCycle": 1 }
     },
     "miner": {
-      "label": "采矿器",
       "slot": "high",
-      "mode": "active",
-      "requiredSkills": { "mining": 1 },
-      "activation": { "autoCycle": true, "cycleSeconds": 8, "capacitorCost": 5 }
+      "mode": "passive",
+      "requiredSkills": { "mining": 1 }
+    },
+    "salvager": {
+      "slot": "high",
+      "mode": "passive",
+      "requiredSkills": { "salvage": 1 }
     },
     "shield_booster": {
-      "label": "护盾回充器",
       "slot": "mid",
       "mode": "active",
       "requiredSkills": { "shield_operation": 1 },
       "activation": { "autoCycle": true, "cycleSeconds": 6, "capacitorCost": 16 }
     },
     "armor_repairer": {
-      "label": "装甲维修器",
       "slot": "low",
       "mode": "active",
       "requiredSkills": { "armor_operation": 1 },
       "activation": { "autoCycle": true, "cycleSeconds": 7, "capacitorCost": 14 }
     },
-    "afterburner": {
-      "label": "加力燃烧器",
+    "shield_extender": {
       "slot": "mid",
-      "mode": "active",
-      "requiredSkills": { "navigation": 1 },
-      "activation": { "autoCycle": true, "cycleSeconds": 10, "capacitorCost": 8 }
+      "mode": "passive",
+      "requiredSkills": { "shield_operation": 1 }
     },
-    "scanner": {
-      "label": "扫描设备",
+    "afterburner": {
+      "slot": "mid",
+      "mode": "passive",
+      "requiredSkills": { "navigation": 1 }
+    },
+    "analyzer": {
       "slot": "mid",
       "mode": "passive",
       "requiredSkills": { "scanning": 1 }
     },
-    "damage_control": {
-      "label": "损伤控制",
-      "slot": "low",
+    "scanner": {
+      "slot": "mid",
       "mode": "passive",
-      "requiredSkills": { "engineering": 1 }
+      "requiredSkills": { "scanning": 1 }
     },
     "cargo_expander": {
-      "label": "货柜扩展",
       "slot": "low",
       "mode": "passive",
       "requiredSkills": {}
     },
+    "warp_stabilizer": {
+      "slot": "low",
+      "mode": "passive",
+      "requiredSkills": { "navigation": 1 }
+    },
+    "nanofiber": {
+      "slot": "low",
+      "mode": "passive",
+      "requiredSkills": { "navigation": 1 }
+    },
+    "drone": {
+      "slot": "low",
+      "mode": "passive",
+      "requiredSkills": { "drones": 1 }
+    },
+    "damage_control": {
+      "slot": "low",
+      "mode": "passive",
+      "requiredSkills": { "engineering": 1 }
+    },
     "rig": {
-      "label": "改装件",
       "slot": "rig",
       "mode": "passive",
       "requiredSkills": { "engineering": 1 }
     },
     "general": {
-      "label": "通用模块",
       "slot": "high",
       "mode": "passive",
       "requiredSkills": {}
@@ -115,22 +134,28 @@
   "roleKeywords": {
     "weapon_laser": ["laser", "beam", "pulse", "激光", "脉冲", "集束"],
     "weapon_projectile": ["projectile", "autocannon", "artillery", "射弹", "自动加农", "火炮"],
-    "weapon_launcher": ["launcher", "missile", "rocket", "导弹", "火箭"],
+    "weapon_launcher": ["missile launcher", "rocket launcher", "torpedo", "导弹发射", "火箭发射"],
     "weapon_turret": ["blaster", "railgun", "turret", "疾速炮", "磁轨炮", "炮台"],
-    "miner": ["miner", "mining", "采矿器", "矿枪"],
-    "shield_booster": ["shield booster", "shield", "护盾"],
-    "armor_repairer": ["armor repair", "repairer", "装甲维修"],
-    "afterburner": ["afterburner", "microwarpdrive", "推进", "加力"],
-    "scanner": ["scanner", "probe", "analyzer", "扫描", "分析仪"],
-    "damage_control": ["damage control", "损伤控制"],
+    "miner": ["miner", "mining laser", "采矿器", "矿枪"],
+    "salvager": ["salvager", "salvage", "打捞", "回收"],
+    "shield_extender": ["shield extender", "shield amplifier", "护盾扩展", "护盾增幅"],
+    "shield_booster": ["shield booster", "护盾回充", "护盾增能"],
+    "armor_repairer": ["armor repairer", "armor repair", "repairer", "装甲维修"],
+    "afterburner": ["afterburner", "microwarpdrive", "propulsion", "推进", "加力"],
+    "analyzer": ["data analyzer", "relic analyzer", "analyzer", "分析仪", "解析"],
+    "scanner": ["probe launcher", "scanner", "probe", "survey", "勘测", "扫描", "探针"],
+    "warp_stabilizer": ["warp core stabilizer", "warp stabilizer", "跃迁核心稳定", "跃迁稳定"],
+    "nanofiber": ["nanofiber", "overdrive", "纳米纤维", "超速"],
+    "drone": ["drone damage", "drone link", "omnidirectional", "无人机"],
     "cargo_expander": ["cargo", "expanded", "货柜", "扩展货柜"],
+    "damage_control": ["damage control", "损伤控制"],
     "rig": ["rig", "改装件", "校准"]
   },
   "chargeGroups": {
-    "frequency_crystal": { "label": "频率晶体", "damageProfile": { "em": 0.75, "thermal": 0.25 }, "bonusDpsMultiplier": 1.05 },
-    "hybrid_charge": { "label": "混合弹药", "damageProfile": { "thermal": 0.55, "kinetic": 0.45 }, "bonusDpsMultiplier": 1 },
-    "projectile_ammo": { "label": "射弹弹药", "damageProfile": { "explosive": 0.55, "kinetic": 0.35, "thermal": 0.1 }, "bonusDpsMultiplier": 0.95 },
-    "missile_charge": { "label": "导弹弹药", "damageProfile": { "kinetic": 0.65, "explosive": 0.35 }, "bonusDpsMultiplier": 1.08 },
-    "cap_booster": { "label": "电容注电器装药", "capacitorRestore": 80 }
+    "frequency_crystal": { "damageProfile": { "em": 0.75, "thermal": 0.25 }, "bonusDpsMultiplier": 1.05 },
+    "hybrid_charge": { "damageProfile": { "thermal": 0.55, "kinetic": 0.45 }, "bonusDpsMultiplier": 1 },
+    "projectile_ammo": { "damageProfile": { "explosive": 0.55, "kinetic": 0.35, "thermal": 0.1 }, "bonusDpsMultiplier": 0.95 },
+    "missile_charge": { "damageProfile": { "kinetic": 0.65, "explosive": 0.35 }, "bonusDpsMultiplier": 1.08 },
+    "cap_booster": { "capacitorRestore": 80 }
   }
 }
