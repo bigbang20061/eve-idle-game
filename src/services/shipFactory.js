@@ -22,7 +22,8 @@ export function shipFromType(type = {}, { race = 'independent', skin = 'sde-impo
     capacitor: Number(type.stats?.capacitor || defaults.capacitor || 240),
     turretHardpoints: Number(type.stats?.turretHardpoints || type.raw?.slots?.turret || defaults.turretHardpoints || 0),
     launcherHardpoints: Number(type.stats?.launcherHardpoints || type.raw?.slots?.launcher || defaults.launcherHardpoints || 0),
-    calibration: Number(type.stats?.calibration || defaults.calibration || 100)
+    calibration: Number(type.stats?.calibration || defaults.calibration || 100),
+    ...(type.stats?.resists ? { resists: type.stats.resists } : {})
   };
   return {
     instanceId: crypto.randomUUID(),

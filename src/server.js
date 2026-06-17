@@ -19,6 +19,7 @@ import { staticSdeRoutes } from './routes/staticSdeRoutes.js';
 import { createSocketServer } from './socket/index.js';
 import { ensureCatalogSeeded } from './services/catalog.js';
 import { startGameLoop } from './services/gameEngine.js';
+import { getStaticSdeStore } from './services/staticSdeStore.js';
 import { User } from './models/User.js';
 import { createStarterCharacter } from './services/characterFactory.js';
 
@@ -41,6 +42,14 @@ async function maybeCreateDemoUsers() {
 
 async function main() {
   await connectDatabase();
+  if (env.sdeCacheAutoBuild) {
+    try {
+      const store = getStaticSdeStore({ cacheDir: env.sdeCacheDir });
+      if (store.available()) console.log('[static-sde]', await store.ensureCache(env.sdeCacheDir));
+    } catch (err) {
+      console.warn('[static-sde] 紧凑缓存构建跳过：', err.message);
+    }
+  }
   if (env.autoSeed) console.log('[catalog]', await ensureCatalogSeeded());
   await maybeCreateDemoUsers();
 

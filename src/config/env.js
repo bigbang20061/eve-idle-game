@@ -20,5 +20,7 @@ export const env = Object.freeze({
   autoSeed: process.env.AUTO_SEED !== 'false',
   createDemoUsers: process.env.CREATE_DEMO_USERS !== 'false',
   adminInviteCode: process.env.ADMIN_INVITE_CODE || '',
-  sdeStaticDir: process.env.SDE_STATIC_DIR || process.env.SDE_DIR || './sde/yaml'
+  sdeStaticDir: process.env.SDE_STATIC_DIR || process.env.SDE_DIR || './sde/yaml',
+  sdeCacheDir: process.env.SDE_CACHE_DIR || './data/static-sde-cache',
+  sdeCacheAutoBuild: process.env.SDE_CACHE_AUTOBUILD !== 'false'
 });

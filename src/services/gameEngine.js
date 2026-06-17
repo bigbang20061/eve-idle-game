@@ -69,7 +69,7 @@ function transferCargoToWarehouse(character) {
   return { count, value };
 }
 
-async function sellExcess(character, system) {
+export async function sellExcess(character, system) {
   if (!character.autopilot?.sellExcess) return { sold: 0, value: 0 };
   const warehouse = mutableWarehouse(character);
   const reserveMap = character.warehouse?.reserve || new Map();
@@ -115,7 +115,8 @@ async function startNewSite(character, system, stats, rng) {
   addLog(character, `扫描到 ${system.name} 的 ${site.name} T${site.tier}。`);
 }
 
-function shouldExtract(character, stats) {
+export function shouldExtract(character, stats, site = character.expedition?.site) {
+  if (site?.combat?.effects?.scrammed) return '遭到反跳，强制撤离';
   const cap = cargoCapacity(character, stats);
   const used = cargoVolume(character.cargo || []);
   const hpPct = hpPercent(character, stats);
@@ -160,7 +161,7 @@ async function tickStep(character, dt, now, io) {
   if (!character.expedition.site) { resetExpedition(character, 'idle'); return; }
 
   const site = character.expedition.site;
-  const extractionReason = shouldExtract(character, stats);
+  const extractionReason = shouldExtract(character, stats, site);
   if (extractionReason && !['extracting', 'looting'].includes(state)) { character.expedition.state = 'extracting'; character.expedition.progress = 0; addLog(character, `${extractionReason}，开始撤离。`); return; }
 
   if (state === 'scanning') {
@@ -205,7 +206,7 @@ async function tickStep(character, dt, now, io) {
       character.cargo = [];
       character.locationState = 'docked';
       resetExpedition(character, 'repairing');
-      addLog(character, `舰船被击毁，保险赔付后仍损失 ${lossCost} ISK。`);
+      addLog(character, `舰船被击毁，远征中止，货舱损毁，保险赔付后仍损失 ${lossCost} ISK。`);
       await pushEvent({ scope: 'global', characterId: character._id, systemId: system.systemId, severity: 'danger', title: '舰船损失', message: `${character.name} 在 ${system.name} 损失舰船，克隆体回站。` }, io);
       return;
     }
