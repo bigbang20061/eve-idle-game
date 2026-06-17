@@ -7,6 +7,8 @@ import { cargoVolume, marketPrice, mergeStack, removeStackQuantity, safeText } f
 import { shipFromType } from '../services/shipFactory.js';
 import { fitModuleFromType, fittingSummary, setModuleActive, unfitModuleToWarehouse } from '../services/fittingSystem.js';
 import { publicSkillState, skillOptions, startSkillTraining } from '../services/skillSystem.js';
+import { computeRefineYield } from '../services/industry.js';
+import { getStaticSdeStore } from '../services/staticSdeStore.js';
 
 export const apiRoutes = express.Router();
 apiRoutes.use(requireAuth);
@@ -93,6 +95,18 @@ apiRoutes.post('/warehouse/reserve', asyncHandler(async (req, res) => {
   character.warehouse.reserve.set(typeId, quantity);
   await character.save();
   res.json({ ok: true, reserve: Object.fromEntries(character.warehouse.reserve) });
+}));
+
+apiRoutes.post('/warehouse/lock', asyncHandler(async (req, res) => {
+  const character = await getCharacterDoc(req);
+  const typeId = String(req.body.typeId || '');
+  const locked = ['1', 'true', true].includes(req.body.locked);
+  if (!typeId) throw new Error('缺少 typeId');
+  const stack = character.warehouse.items.find(s => String(s.typeId) === typeId);
+  if (!stack) throw new Error('库存中找不到该物品');
+  stack.locked = locked;
+  await character.save();
+  res.json({ ok: true, character: publicCharacter(character) });
 }));
 
 apiRoutes.post('/sell-excess', asyncHandler(async (req, res) => {
@@ -218,18 +232,51 @@ apiRoutes.post('/refine', asyncHandler(async (req, res) => {
   const quantity = Math.max(1, Number(req.body.quantity || 1));
   const stack = character.warehouse.items.find(s => String(s.typeId) === typeId && Number(s.quantity || 0) >= quantity);
   if (!stack || stack.kind !== 'ore') throw new Error('只能精炼矿石，且库存需足够');
-  removeStackQuantity(character.warehouse.items, typeId, quantity);
+  if (stack.locked) throw new Error('该矿石已锁仓，请先解锁再精炼');
+  const oreType = await resolveOreRefineType(typeId);
   const industryLevel = Number(character.skills?.industry || 0);
   const efficiency = 0.45 + industryLevel * 0.025;
-  const trit = Math.round(quantity * 4 * efficiency);
-  const pye = Math.round(quantity * 1.6 * efficiency);
-  mergeStack(character.warehouse.items, { typeId: '34', name: 'Tritanium', zh: '三钛合金', kind: 'mineral', quantity: trit, volume: 0.01, basePrice: 6, source: 'refine' });
-  mergeStack(character.warehouse.items, { typeId: '35', name: 'Pyerite', zh: '类晶体胶矿', kind: 'mineral', quantity: pye, volume: 0.01, basePrice: 12, source: 'refine' });
+  const result = computeRefineYield(oreType, quantity, efficiency);
+  if (!result.consumed || !result.outputs.length) throw new Error('精炼数量过少，未产出矿物');
+  removeStackQuantity(character.warehouse.items, typeId, result.consumed);
+  let produced = 0;
+  for (const out of result.outputs) {
+    const mineral = await SdeType.findOne({ typeId: out.typeId }).select('basePrice zh name volume').lean();
+    mergeStack(character.warehouse.items, { typeId: out.typeId, name: mineral?.name || out.name, zh: mineral?.zh || out.name, kind: 'mineral', quantity: out.quantity, volume: Number(mineral?.volume || 0.01), basePrice: Number(mineral?.basePrice || out.basePrice || 1), source: 'refine' });
+    produced += out.quantity;
+  }
   character.skillpoints += 0.4;
-  character.expedition.log.unshift(`精炼 ${stack.zh || stack.name} × ${quantity}，产出矿物 ${trit + pye}。`);
+  const detail = result.outputs.map(o => `${o.name}×${o.quantity}`).join('，');
+  character.expedition.log.unshift(`精炼 ${stack.zh || stack.name} × ${result.consumed}，产出 ${detail}（共 ${produced}）。`);
   await character.save();
   res.json({ ok: true, character: publicCharacter(character) });
 }));
+
+// Resolve an ore's reprocessing recipe: prefer the seeded SdeType doc, fall back
+// to the static SDE store's typeMaterials (+ getType for portionSize/names).
+async function resolveOreRefineType(typeId) {
+  const doc = await SdeType.findOne({ typeId }).lean();
+  if (doc && Array.isArray(doc.materials) && doc.materials.length) {
+    return { typeId, name: doc.zh || doc.name, materials: doc.materials, portionSize: Number(doc.portionSize || 1) };
+  }
+  const store = getStaticSdeStore();
+  const typeMaterials = await store.loadCollection('typeMaterials');
+  const raw = typeMaterials?.get(String(typeId));
+  const list = raw?.materials || raw?._value?.materials || (Array.isArray(raw) ? raw : []);
+  if (Array.isArray(list) && list.length) {
+    const oreType = await store.getType(typeId).catch(() => null);
+    const materials = [];
+    for (const m of list) {
+      const mid = String(m.materialTypeID ?? m.typeID ?? m.typeId ?? '');
+      const qty = Number(m.quantity || 0);
+      if (!mid || qty <= 0) continue;
+      const mt = await store.getType(mid).catch(() => null);
+      materials.push({ typeId: mid, name: mt?.zh || mt?.name || `Type ${mid}`, quantity: qty });
+    }
+    if (materials.length) return { typeId, name: oreType?.zh || oreType?.name || `Type ${typeId}`, materials, portionSize: Number(oreType?.portionSize || 1) };
+  }
+  throw new Error('该矿石暂无精炼配方');
+}
 
 apiRoutes.post('/industry/start', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);

@@ -2,14 +2,37 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getFittingRules, inferModuleRole } from './fittingSystem.js';
+import { getStaticSdeStore } from './staticSdeStore.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const mappingPath = path.join(root, 'data/sde/dogma_mapping.json');
 let cached;
+let attrIdToName = null;
 
 export function dogmaAttributeMap() {
   if (!cached) cached = JSON.parse(fs.readFileSync(mappingPath, 'utf8'));
   return cached;
+}
+
+export async function initDogmaMapper() {
+  if (attrIdToName) return;
+  const store = getStaticSdeStore();
+  const attrs = await store.loadCollection('dogmaAttributes');
+  attrIdToName = {};
+  for (const [id, a] of attrs) {
+    if (a?.name) attrIdToName[String(id)] = a.name;
+  }
+}
+
+export function defaultResists() {
+  const layer = () => ({ em: 0, thermal: 0, kinetic: 0, explosive: 0 });
+  return { shield: layer(), armor: layer(), hull: layer() };
+}
+
+function resistFrom(attrs, aliases) {
+  const resonance = valueFor(attrs, aliases);
+  if (resonance === undefined) return undefined;
+  return Math.max(0, Math.min(0.9, 1 - resonance));
 }
 
 function valueFor(attrs, aliases) {
@@ -27,7 +50,9 @@ function extractAttributes(raw = {}) {
   }
   const dogmaAttributes = Array.isArray(raw.dogmaAttributes) ? raw.dogmaAttributes : [];
   for (const attr of dogmaAttributes) {
-    const key = attr.attributeName || attr.name || attr.attributeID || attr.attributeId;
+    const id = attr.attributeID ?? attr.attributeId;
+    const resolved = id !== undefined && attrIdToName ? attrIdToName[String(id)] : undefined;
+    const key = attr.attributeName || attr.name || resolved || id;
     const value = attr.value ?? attr.defaultValue;
     if (key !== undefined && value !== undefined) out[String(key)] = value;
   }
@@ -94,6 +119,15 @@ export function deriveDogmaTypeData({ type = {}, raw = {}, kind = type.kind, tie
       low: Math.max(0, Math.round(valueFor(attrs, a.lowSlots) ?? map.defaults.slots.low)),
       rig: map.defaults.slots.rig
     };
+    const resists = defaultResists();
+    for (const layer of ['shield', 'armor']) {
+      for (const dmg of ['Em', 'Thermal', 'Kinetic', 'Explosive']) {
+        const r = resistFrom(attrs, a[`${layer}${dmg}Resonance`]);
+        if (r !== undefined) resists[layer][dmg.toLowerCase()] = r;
+      }
+    }
+    resists.hull = { em: 0.33, thermal: 0.33, kinetic: 0.33, explosive: 0.33 };
+    stats.resists = resists;
     result.stats = stats;
     result.slots = slots;
     result.role = inferRole(type.name || type.zh, type.groupName);

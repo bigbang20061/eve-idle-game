@@ -30,20 +30,22 @@ function deriveTier(value) {
 export function normalizeSeedType(value, fallbackKind) {
   const typeId = idOf(value);
   const kind = value.kind || fallbackKind || inferKindFromNames(value.group, value.category, value.name);
+  const seedStats = value.stats || {};
   const stats = kind === 'ship' ? {
-    shield: value.shield ?? 100,
-    armor: value.armor ?? 80,
-    hull: value.hull ?? 90,
-    dps: value.dps ?? 6,
-    mining: value.mining ?? 0,
-    hack: value.hack ?? 0,
-    scan: value.scan ?? 0,
-    salvage: value.salvage ?? 0,
-    cargo: value.cargo ?? value.capacity ?? 100,
-    oreHold: value.oreHold ?? 0,
-    extract: value.extract ?? 2,
-    warpStability: value.warpStability ?? 0
-  } : (value.stats || {});
+    shield: seedStats.shield ?? value.shield ?? 100,
+    armor: seedStats.armor ?? value.armor ?? 80,
+    hull: seedStats.hull ?? value.hull ?? 90,
+    dps: seedStats.dps ?? value.dps ?? 6,
+    mining: seedStats.mining ?? value.mining ?? 0,
+    hack: seedStats.hack ?? value.hack ?? 0,
+    scan: seedStats.scan ?? value.scan ?? 0,
+    salvage: seedStats.salvage ?? value.salvage ?? 0,
+    cargo: seedStats.cargo ?? value.cargo ?? value.capacity ?? 100,
+    oreHold: seedStats.oreHold ?? value.oreHold ?? 0,
+    extract: seedStats.extract ?? value.extract ?? 2,
+    warpStability: seedStats.warpStability ?? value.warpStability ?? 0,
+    ...seedStats
+  } : seedStats;
   return {
     typeId,
     name: value.name || value.zh || `Type ${typeId}`,
@@ -63,9 +65,13 @@ export function normalizeSeedType(value, fallbackKind) {
     tier: deriveTier(value),
     slot: value.slot,
     role: value.role || value.class,
+    slots: value.slots,
     effects: value.effects || {},
     stats,
+    materials: value.materials,
+    portionSize: value.portionSize ?? (value.materials ? 1 : undefined),
     attributes: value.attributes || {},
+    dogma: value.dogma,
     source: value.source || 'default-seed',
     raw: value
   };

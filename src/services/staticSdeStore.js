@@ -330,6 +330,7 @@ function compactTypeRecord(typeId, raw = {}, indexes = {}) {
     capacity: Number(raw.capacity ?? 0),
     mass: Number(raw.mass ?? 0),
     basePrice: Number(raw.basePrice ?? 0),
+    portionSize: Number(raw.portionSize ?? 1) || 1,
     iconId: asId(raw.iconID ?? raw.iconId),
     graphicId: asId(raw.graphicID ?? raw.graphicId),
     source: 'static-sde-cache'

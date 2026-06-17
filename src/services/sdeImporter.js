@@ -4,6 +4,7 @@ import readline from 'readline';
 import { SdeType, SdeGroup, SdeCategory, SdeMarketGroup, SdeSystem, SdeBlueprint } from '../models/index.js';
 import { inferKindFromNames, seedNpcMarketOrders } from './catalog.js';
 import { hashString } from './formulas.js';
+import { deriveDogmaTypeData, initDogmaMapper } from './dogmaMapper.js';
 
 function asId(value) {
   return value === undefined || value === null ? '' : String(value);
@@ -165,13 +166,35 @@ function deriveShipStats(obj, attr, tier) {
   };
 }
 
+async function loadTypeDogmaMap(dir) {
+  const map = new Map();
+  await readJsonl(path.join(dir, 'type-dogma.jsonl'), obj => {
+    const typeId = asId(obj._key ?? obj.typeID ?? obj.typeId);
+    if (typeId) map.set(typeId, obj);
+  });
+  return map;
+}
+
+async function loadTypeMaterialsMap(dir) {
+  const map = new Map();
+  await readJsonl(path.join(dir, 'typeMaterials.jsonl'), obj => {
+    const typeId = asId(obj._key ?? obj.typeID ?? obj.typeId);
+    const materials = obj.materials || obj._value?.materials || [];
+    if (typeId && Array.isArray(materials)) map.set(typeId, materials);
+  });
+  return map;
+}
+
 async function importTypes(dir, { limit = 0 } = {}) {
+  await initDogmaMapper();
   const groups = await SdeGroup.find({}).lean();
   const categories = await SdeCategory.find({}).lean();
   const marketGroups = await SdeMarketGroup.find({}).lean();
   const groupById = new Map(groups.map(g => [String(g.groupId), g]));
   const catById = new Map(categories.map(c => [String(c.categoryId), c]));
   const mgById = new Map(marketGroups.map(m => [String(m.marketGroupId), m]));
+  const typeDogmaById = await loadTypeDogmaMap(dir);
+  const typeMaterialsById = await loadTypeMaterialsMap(dir);
   const ops = [];
   await readJsonl(path.join(dir, 'types.jsonl'), obj => {
     const typeId = asId(obj._key ?? obj.typeID ?? obj.typeId);
@@ -210,11 +233,28 @@ async function importTypes(dir, { limit = 0 } = {}) {
       source: 'sde-jsonl',
       raw: obj
     };
-    type.stats = kind === 'ship' ? deriveShipStats(type, attributes, tier) : {};
-    type.effects = effectsFromType(type, kind);
-    if (kind === 'module') {
-      const text = `${type.groupName} ${type.marketGroupName} ${type.name}`.toLowerCase();
-      type.slot = /rig/.test(text) ? 'rig' : /armor|damage control|stabilizer/.test(text) ? 'low' : /shield|scanner|analyzer|afterburner|propulsion/.test(text) ? 'mid' : 'high';
+    const dogmaRaw = typeDogmaById.get(typeId) || obj;
+    const hasDogma = Array.isArray(dogmaRaw.dogmaAttributes) && dogmaRaw.dogmaAttributes.length > 0;
+    if ((kind === 'ship' || kind === 'module') && hasDogma) {
+      const derived = deriveDogmaTypeData({ type, raw: dogmaRaw, kind, tier });
+      if (derived.stats) type.stats = derived.stats;
+      if (derived.slots) type.slots = derived.slots;
+      if (derived.dogma) type.dogma = derived.dogma;
+      if (derived.effects) type.effects = derived.effects;
+      if (derived.slot) type.slot = derived.slot;
+      if (derived.role) type.role = derived.role;
+    } else {
+      type.stats = kind === 'ship' ? deriveShipStats(type, attributes, tier) : {};
+      type.effects = effectsFromType(type, kind);
+      if (kind === 'module') {
+        const text = `${type.groupName} ${type.marketGroupName} ${type.name}`.toLowerCase();
+        type.slot = /rig/.test(text) ? 'rig' : /armor|damage control|stabilizer/.test(text) ? 'low' : /shield|scanner|analyzer|afterburner|propulsion/.test(text) ? 'mid' : 'high';
+      }
+    }
+    const materials = typeMaterialsById.get(typeId);
+    if (Array.isArray(materials) && materials.length) {
+      type.materials = materials.map(m => ({ typeId: asId(m.materialTypeID ?? m.typeID ?? m.typeId), name: asId(m.name), quantity: Number(m.quantity || 0) })).filter(m => m.typeId && m.quantity > 0);
+      type.portionSize = Number(obj.portionSize ?? attributes['1281'] ?? 1) || 1;
     }
     ops.push({ updateOne: { filter: { typeId }, update: { $set: type }, upsert: true } });
   }, { limit, logEvery: 25000 });

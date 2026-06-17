@@ -42,15 +42,22 @@ export function removeStackQuantity(stacks, typeId, quantity) {
   return quantity - need;
 }
 
-export function marketPrice(type, system, side = 'sell', date = new Date()) { const day = Math.floor(date.getTime() / 86400000); const base = Math.max(1, Number(type.basePrice || type.baseValue || 10)); const sec = Number(system?.security ?? 0.5); const scarcity = clamp(1.35 - sec * 0.45 + Number(type.rarity || 1) * 0.025, 0.75, 2.2); const rand = seededRandom(`${type.typeId || type.id}:${system?.systemId || system?.id || 'hub'}:${day}`)(); return Math.round(base * scarcity * (0.88 + rand * 0.28) * (side === 'buy' ? 0.92 : 1.08)); }
+export function marketPrice(type, system, side = 'sell', date = new Date()) { const day = Math.floor(date.getTime() / 86400000); const base = Math.max(1, Number(type.basePrice || type.baseValue || 10)); const sec = Number(system?.security ?? 0.5); const richness = Number(system?.richness ?? 1); const scarcity = clamp(1.35 - sec * 0.45 + Number(type.rarity || 1) * 0.025 - (richness - 1) * 0.06, 0.75, 2.2); const rand = seededRandom(`${type.typeId || type.id}:${system?.systemId || system?.id || 'hub'}:${day}`)(); return Math.round(base * scarcity * (0.88 + rand * 0.28) * (side === 'buy' ? 0.92 : 1.08)); }
 
 function defaultResists() {
   return { shield: {}, armor: {}, hull: {} };
 }
 
 function addResist(stats, layer, value) {
+  const types = ['em', 'thermal', 'kinetic', 'explosive'];
+  const apply = (type, amount) => { stats.resists[layer][type] = clamp(Number(stats.resists[layer][type] || 0) + Number(amount || 0), 0, 0.9); };
+  if (value && typeof value === 'object') { for (const type of types) if (value[type] !== undefined) apply(type, value[type]); return; }
   const amount = Number(value || 0);
-  for (const type of ['em', 'thermal', 'kinetic', 'explosive']) stats.resists[layer][type] = clamp(Number(stats.resists[layer][type] || 0) + amount, 0, 0.85);
+  for (const type of types) apply(type, amount);
+}
+
+function addResists(stats, value = {}) {
+  for (const layer of ['shield', 'armor', 'hull']) if (value[layer]) addResist(stats, layer, value[layer]);
 }
 
 function addEffect(stats, key, value) {
@@ -59,6 +66,7 @@ function addEffect(stats, key, value) {
   if (key === 'shieldResist') return addResist(stats, 'shield', value);
   if (key === 'armorResist') return addResist(stats, 'armor', value);
   if (key === 'hullResist') return addResist(stats, 'hull', value);
+  if (key === 'resists') return addResists(stats, value);
   if (key.endsWith('Multiplier')) return;
   stats[key] = Number(stats[key] || 0) + Number(value || 0);
 }
@@ -105,6 +113,17 @@ export function deriveEffectiveStats(character) {
     turretHardpoints: Number(shipStats.turretHardpoints || 0), launcherHardpoints: Number(shipStats.launcherHardpoints || 0),
     trade: 1, industry: 1, resists: defaultResists()
   };
+  const shipResists = shipStats.resists;
+  if (shipResists) {
+    for (const layer of ['shield', 'armor', 'hull']) {
+      const src = shipResists[layer];
+      if (!src) continue;
+      for (const type of ['em', 'thermal', 'kinetic', 'explosive']) {
+        const v = src[type];
+        if (v !== undefined && v !== null) stats.resists[layer][type] = clamp(Number(v), 0, 0.9);
+      }
+    }
+  }
   for (const module of fitted) {
     if (module.online === false) continue;
     const passive = module.passiveEffects || (!module.mode && module.effects) || {};

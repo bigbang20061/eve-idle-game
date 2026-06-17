@@ -26,6 +26,8 @@ const sdeTypeSchema = new mongoose.Schema({
   stats: mongoose.Schema.Types.Mixed,
   attributes: mongoose.Schema.Types.Mixed,
   dogma: mongoose.Schema.Types.Mixed,
+  materials: mongoose.Schema.Types.Mixed,
+  portionSize: { type: Number, default: 1 },
   source: String,
   raw: mongoose.Schema.Types.Mixed
 }, { timestamps: true });

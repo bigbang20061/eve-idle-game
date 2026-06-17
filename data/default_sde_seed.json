@@ -34,7 +34,7 @@
       "volume": 0.01,
       "baseValue": 6,
       "basePrice": 6,
-      "rarity": 1.0,
+      "rarity": 1,
       "tier": 1,
       "group": "Mineral",
       "category": "Material",
@@ -146,7 +146,7 @@
       "volume": 0.01,
       "baseValue": 980,
       "basePrice": 980,
-      "rarity": 8.0,
+      "rarity": 8,
       "tier": 6,
       "group": "Mineral",
       "category": "Material",
@@ -162,12 +162,20 @@
       "volume": 0.1,
       "baseValue": 9,
       "basePrice": 9,
-      "rarity": 1.0,
+      "rarity": 1,
       "tier": 1,
       "group": "Veldspar",
       "category": "Asteroid",
       "marketGroup": "Standard Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "34",
+          "name": "三钛合金",
+          "quantity": 400
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "1228",
@@ -183,7 +191,20 @@
       "group": "Scordite",
       "category": "Asteroid",
       "marketGroup": "Standard Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "34",
+          "name": "三钛合金",
+          "quantity": 150
+        },
+        {
+          "typeId": "35",
+          "name": "类晶体胶矿",
+          "quantity": 110
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "1224",
@@ -199,7 +220,20 @@
       "group": "Pyroxeres",
       "category": "Asteroid",
       "marketGroup": "Standard Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "35",
+          "name": "类晶体胶矿",
+          "quantity": 90
+        },
+        {
+          "typeId": "36",
+          "name": "类银超金属",
+          "quantity": 30
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "18",
@@ -215,7 +249,20 @@
       "group": "Plagioclase",
       "category": "Asteroid",
       "marketGroup": "Standard Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "34",
+          "name": "三钛合金",
+          "quantity": 175
+        },
+        {
+          "typeId": "36",
+          "name": "类银超金属",
+          "quantity": 70
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "1227",
@@ -231,7 +278,20 @@
       "group": "Omber",
       "category": "Asteroid",
       "marketGroup": "Standard Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "35",
+          "name": "类晶体胶矿",
+          "quantity": 90
+        },
+        {
+          "typeId": "37",
+          "name": "同位聚合体",
+          "quantity": 75
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "20",
@@ -242,12 +302,25 @@
       "volume": 1.2,
       "baseValue": 145,
       "basePrice": 145,
-      "rarity": 3.0,
+      "rarity": 3,
       "tier": 3,
       "group": "Kernite",
       "category": "Asteroid",
       "marketGroup": "Standard Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "36",
+          "name": "类银超金属",
+          "quantity": 60
+        },
+        {
+          "typeId": "37",
+          "name": "同位聚合体",
+          "quantity": 120
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "1226",
@@ -255,7 +328,7 @@
       "name": "Jaspet",
       "zh": "杰斯贝矿",
       "kind": "ore",
-      "volume": 2.0,
+      "volume": 2,
       "baseValue": 230,
       "basePrice": 230,
       "rarity": 3.8,
@@ -263,7 +336,20 @@
       "group": "Jaspet",
       "category": "Asteroid",
       "marketGroup": "Standard Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "36",
+          "name": "类银超金属",
+          "quantity": 150
+        },
+        {
+          "typeId": "38",
+          "name": "超新星诺克石",
+          "quantity": 50
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "1232",
@@ -271,7 +357,7 @@
       "name": "Hemorphite",
       "zh": "希莫非特",
       "kind": "ore",
-      "volume": 3.0,
+      "volume": 3,
       "baseValue": 310,
       "basePrice": 310,
       "rarity": 4.5,
@@ -279,7 +365,25 @@
       "group": "Hemorphite",
       "category": "Asteroid",
       "marketGroup": "Standard Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "36",
+          "name": "类银超金属",
+          "quantity": 1360
+        },
+        {
+          "typeId": "37",
+          "name": "同位聚合体",
+          "quantity": 1200
+        },
+        {
+          "typeId": "38",
+          "name": "超新星诺克石",
+          "quantity": 320
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "21",
@@ -287,7 +391,7 @@
       "name": "Hedbergite",
       "zh": "赫莫戈石",
       "kind": "ore",
-      "volume": 3.0,
+      "volume": 3,
       "baseValue": 360,
       "basePrice": 360,
       "rarity": 4.8,
@@ -295,7 +399,20 @@
       "group": "Hedbergite",
       "category": "Asteroid",
       "marketGroup": "Standard Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "35",
+          "name": "类晶体胶矿",
+          "quantity": 450
+        },
+        {
+          "typeId": "38",
+          "name": "超新星诺克石",
+          "quantity": 120
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "1229",
@@ -303,7 +420,7 @@
       "name": "Gneiss",
       "zh": "片麻岩",
       "kind": "ore",
-      "volume": 5.0,
+      "volume": 5,
       "baseValue": 520,
       "basePrice": 520,
       "rarity": 5.4,
@@ -311,7 +428,25 @@
       "group": "Gneiss",
       "category": "Asteroid",
       "marketGroup": "Nullsec Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "35",
+          "name": "类晶体胶矿",
+          "quantity": 2000
+        },
+        {
+          "typeId": "36",
+          "name": "类银超金属",
+          "quantity": 1500
+        },
+        {
+          "typeId": "37",
+          "name": "同位聚合体",
+          "quantity": 800
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "1231",
@@ -319,7 +454,7 @@
       "name": "Dark Ochre",
       "zh": "黑赭石",
       "kind": "ore",
-      "volume": 8.0,
+      "volume": 8,
       "baseValue": 760,
       "basePrice": 760,
       "rarity": 6.3,
@@ -327,7 +462,20 @@
       "group": "Dark Ochre",
       "category": "Asteroid",
       "marketGroup": "Nullsec Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "37",
+          "name": "同位聚合体",
+          "quantity": 240
+        },
+        {
+          "typeId": "38",
+          "name": "超新星诺克石",
+          "quantity": 90
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "22",
@@ -335,7 +483,7 @@
       "name": "Arkonor",
       "zh": "艾克诺岩",
       "kind": "ore",
-      "volume": 16.0,
+      "volume": 16,
       "baseValue": 1400,
       "basePrice": 1400,
       "rarity": 7.6,
@@ -343,7 +491,25 @@
       "group": "Arkonor",
       "category": "Asteroid",
       "marketGroup": "Nullsec Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "35",
+          "name": "类晶体胶矿",
+          "quantity": 3200
+        },
+        {
+          "typeId": "36",
+          "name": "类银超金属",
+          "quantity": 1200
+        },
+        {
+          "typeId": "40",
+          "name": "超噬矿",
+          "quantity": 120
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "1225",
@@ -351,7 +517,7 @@
       "name": "Bistot",
       "zh": "双多特石",
       "kind": "ore",
-      "volume": 16.0,
+      "volume": 16,
       "baseValue": 1320,
       "basePrice": 1320,
       "rarity": 7.3,
@@ -359,7 +525,25 @@
       "group": "Bistot",
       "category": "Asteroid",
       "marketGroup": "Nullsec Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "35",
+          "name": "类晶体胶矿",
+          "quantity": 800
+        },
+        {
+          "typeId": "36",
+          "name": "类银超金属",
+          "quantity": 2000
+        },
+        {
+          "typeId": "38",
+          "name": "超新星诺克石",
+          "quantity": 800
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "1223",
@@ -367,15 +551,33 @@
       "name": "Crokite",
       "zh": "克洛基石",
       "kind": "ore",
-      "volume": 16.0,
+      "volume": 16,
       "baseValue": 1260,
       "basePrice": 1260,
-      "rarity": 7.0,
+      "rarity": 7,
       "tier": 6,
       "group": "Crokite",
       "category": "Asteroid",
       "marketGroup": "Nullsec Ores",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "materials": [
+        {
+          "typeId": "35",
+          "name": "类晶体胶矿",
+          "quantity": 3200
+        },
+        {
+          "typeId": "36",
+          "name": "类银超金属",
+          "quantity": 1200
+        },
+        {
+          "typeId": "39",
+          "name": "晶状石英核岩",
+          "quantity": 160
+        }
+      ],
+      "portionSize": 100
     },
     {
       "id": "25619",
@@ -402,7 +604,7 @@
       "volume": 0.01,
       "baseValue": 90,
       "basePrice": 90,
-      "rarity": 2.0,
+      "rarity": 2,
       "tier": 2,
       "group": "Salvaged Materials",
       "category": "Material",
@@ -498,7 +700,7 @@
       "volume": 0.01,
       "baseValue": 410,
       "basePrice": 410,
-      "rarity": 5.0,
+      "rarity": 5,
       "tier": 4,
       "group": "Salvaged Materials",
       "category": "Material",
@@ -514,7 +716,7 @@
       "volume": 0.01,
       "baseValue": 720,
       "basePrice": 720,
-      "rarity": 6.0,
+      "rarity": 6,
       "tier": 5,
       "group": "Salvaged Materials",
       "category": "Material",
@@ -671,7 +873,7 @@
       "name": "Fullerite-C28",
       "zh": "富勒烯-C28",
       "kind": "gas",
-      "volume": 10.0,
+      "volume": 10,
       "baseValue": 140,
       "basePrice": 140,
       "rarity": 3.1,
@@ -687,10 +889,10 @@
       "name": "Fullerite-C32",
       "zh": "富勒烯-C32",
       "kind": "gas",
-      "volume": 10.0,
+      "volume": 10,
       "baseValue": 210,
       "basePrice": 210,
-      "rarity": 4.0,
+      "rarity": 4,
       "tier": 4,
       "group": "Harvestable Cloud",
       "category": "Gas Cloud",
@@ -703,10 +905,10 @@
       "name": "Fullerite-C50",
       "zh": "富勒烯-C50",
       "kind": "gas",
-      "volume": 10.0,
+      "volume": 10,
       "baseValue": 360,
       "basePrice": 360,
-      "rarity": 5.0,
+      "rarity": 5,
       "tier": 5,
       "group": "Harvestable Cloud",
       "category": "Gas Cloud",
@@ -719,7 +921,7 @@
       "name": "Cytoserocin",
       "zh": "细胞丝胶质",
       "kind": "gas",
-      "volume": 10.0,
+      "volume": 10,
       "baseValue": 90,
       "basePrice": 90,
       "rarity": 2.5,
@@ -735,7 +937,7 @@
       "name": "Mykoserocin",
       "zh": "菌丝胶质",
       "kind": "gas",
-      "volume": 10.0,
+      "volume": 10,
       "baseValue": 80,
       "basePrice": 80,
       "rarity": 2.2,
@@ -837,7 +1039,7 @@
       "id": "30002187",
       "name": "Amarr",
       "zh": "艾玛",
-      "security": 1.0,
+      "security": 1,
       "region": "Domain",
       "x": 78,
       "y": 60,
@@ -937,7 +1139,7 @@
       "id": "30045344",
       "name": "M-OEE8",
       "zh": "M-OEE8",
-      "security": 0.0,
+      "security": 0,
       "region": "Tribute",
       "x": 70,
       "y": 22,
@@ -985,7 +1187,7 @@
       "id": "31002345",
       "name": "J-Space C3 Pocket",
       "zh": "C3虫洞口袋",
-      "security": -1.0,
+      "security": -1,
       "region": "Anoikis",
       "x": 60,
       "y": 86,
@@ -1020,7 +1222,29 @@
       },
       "group": "Mining Frigate",
       "category": "Ship",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "stats": {
+        "resists": {
+          "shield": {
+            "em": 0,
+            "thermal": 0.19999999999999996,
+            "kinetic": 0.4,
+            "explosive": 0.5
+          },
+          "armor": {
+            "em": 0.6,
+            "thermal": 0.35,
+            "kinetic": 0.25,
+            "explosive": 0.09999999999999998
+          },
+          "hull": {
+            "em": 0.33,
+            "thermal": 0.33,
+            "kinetic": 0.33,
+            "explosive": 0.33
+          }
+        }
+      }
     },
     {
       "id": "603",
@@ -1046,7 +1270,29 @@
       },
       "group": "Frigate",
       "category": "Ship",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "stats": {
+        "resists": {
+          "shield": {
+            "em": 0,
+            "thermal": 0.19999999999999996,
+            "kinetic": 0.4,
+            "explosive": 0.5
+          },
+          "armor": {
+            "em": 0.5,
+            "thermal": 0.44999999999999996,
+            "kinetic": 0.25,
+            "explosive": 0.09999999999999998
+          },
+          "hull": {
+            "em": 0.33,
+            "thermal": 0.33,
+            "kinetic": 0.33,
+            "explosive": 0.33
+          }
+        }
+      }
     },
     {
       "id": "586",
@@ -1072,7 +1318,29 @@
       },
       "group": "Frigate",
       "category": "Ship",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "stats": {
+        "resists": {
+          "shield": {
+            "em": 0,
+            "thermal": 0.19999999999999996,
+            "kinetic": 0.4,
+            "explosive": 0.5
+          },
+          "armor": {
+            "em": 0.6,
+            "thermal": 0.35,
+            "kinetic": 0.25,
+            "explosive": 0.09999999999999998
+          },
+          "hull": {
+            "em": 0.33,
+            "thermal": 0.33,
+            "kinetic": 0.33,
+            "explosive": 0.33
+          }
+        }
+      }
     },
     {
       "id": "587",
@@ -1098,7 +1366,29 @@
       },
       "group": "Frigate",
       "category": "Ship",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "stats": {
+        "resists": {
+          "shield": {
+            "em": 0,
+            "thermal": 0.19999999999999996,
+            "kinetic": 0.4,
+            "explosive": 0.5
+          },
+          "armor": {
+            "em": 0.6,
+            "thermal": 0.35,
+            "kinetic": 0.25,
+            "explosive": 0.09999999999999998
+          },
+          "hull": {
+            "em": 0.33,
+            "thermal": 0.33,
+            "kinetic": 0.33,
+            "explosive": 0.33
+          }
+        }
+      }
     },
     {
       "id": "593",
@@ -1124,7 +1414,29 @@
       },
       "group": "Frigate",
       "category": "Ship",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "stats": {
+        "resists": {
+          "shield": {
+            "em": 0,
+            "thermal": 0.19999999999999996,
+            "kinetic": 0.4,
+            "explosive": 0.5
+          },
+          "armor": {
+            "em": 0.5,
+            "thermal": 0.35,
+            "kinetic": 0.35,
+            "explosive": 0.09999999999999998
+          },
+          "hull": {
+            "em": 0.33,
+            "thermal": 0.33,
+            "kinetic": 0.33,
+            "explosive": 0.33
+          }
+        }
+      }
     },
     {
       "id": "16238",
@@ -1150,7 +1462,29 @@
       },
       "group": "Destroyer",
       "category": "Ship",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "stats": {
+        "resists": {
+          "shield": {
+            "em": 0,
+            "thermal": 0.19999999999999996,
+            "kinetic": 0.4,
+            "explosive": 0.5
+          },
+          "armor": {
+            "em": 0.5,
+            "thermal": 0.44999999999999996,
+            "kinetic": 0.25,
+            "explosive": 0.09999999999999998
+          },
+          "hull": {
+            "em": 0.33,
+            "thermal": 0.33,
+            "kinetic": 0.33,
+            "explosive": 0.33
+          }
+        }
+      }
     },
     {
       "id": "16240",
@@ -1176,7 +1510,29 @@
       },
       "group": "Destroyer",
       "category": "Ship",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "stats": {
+        "resists": {
+          "shield": {
+            "em": 0,
+            "thermal": 0.19999999999999996,
+            "kinetic": 0.4,
+            "explosive": 0.5
+          },
+          "armor": {
+            "em": 0.5,
+            "thermal": 0.35,
+            "kinetic": 0.35,
+            "explosive": 0.09999999999999998
+          },
+          "hull": {
+            "em": 0.33,
+            "thermal": 0.33,
+            "kinetic": 0.33,
+            "explosive": 0.33
+          }
+        }
+      }
     },
     {
       "id": "626",
@@ -1202,7 +1558,29 @@
       },
       "group": "Cruiser",
       "category": "Ship",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "stats": {
+        "resists": {
+          "shield": {
+            "em": 0,
+            "thermal": 0.19999999999999996,
+            "kinetic": 0.4,
+            "explosive": 0.5
+          },
+          "armor": {
+            "em": 0.5,
+            "thermal": 0.35,
+            "kinetic": 0.35,
+            "explosive": 0.09999999999999998
+          },
+          "hull": {
+            "em": 0.33,
+            "thermal": 0.33,
+            "kinetic": 0.33,
+            "explosive": 0.33
+          }
+        }
+      }
     },
     {
       "id": "17478",
@@ -1229,7 +1607,29 @@
       },
       "group": "Mining Barge",
       "category": "Ship",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "stats": {
+        "resists": {
+          "shield": {
+            "em": 0,
+            "thermal": 0.19999999999999996,
+            "kinetic": 0.4,
+            "explosive": 0.5
+          },
+          "armor": {
+            "em": 0.6,
+            "thermal": 0.35,
+            "kinetic": 0.25,
+            "explosive": 0.09999999999999998
+          },
+          "hull": {
+            "em": 0.33,
+            "thermal": 0.33,
+            "kinetic": 0.33,
+            "explosive": 0.33
+          }
+        }
+      }
     },
     {
       "id": "33697",
@@ -1256,7 +1656,29 @@
       },
       "group": "Expedition Frigate",
       "category": "Ship",
-      "source": "seed-sde-lite"
+      "source": "seed-sde-lite",
+      "stats": {
+        "resists": {
+          "shield": {
+            "em": 0,
+            "thermal": 0.19999999999999996,
+            "kinetic": 0.4,
+            "explosive": 0.5
+          },
+          "armor": {
+            "em": 0.6,
+            "thermal": 0.35,
+            "kinetic": 0.25,
+            "explosive": 0.09999999999999998
+          },
+          "hull": {
+            "em": 0.33,
+            "thermal": 0.33,
+            "kinetic": 0.33,
+            "explosive": 0.33
+          }
+        }
+      }
     }
   ],
   "modules": [
@@ -1273,7 +1695,8 @@
       "cost": 800,
       "tier": 1,
       "group": "Mining Laser",
-      "category": "Module"
+      "category": "Module",
+      "role": "weapon_laser"
     },
     {
       "id": "salvager_i",
@@ -1289,7 +1712,8 @@
       "cost": 1200,
       "tier": 1,
       "group": "Salvager",
-      "category": "Module"
+      "category": "Module",
+      "role": "general"
     },
     {
       "id": "railgun_i",
@@ -1304,7 +1728,8 @@
       "cost": 1600,
       "tier": 1,
       "group": "Hybrid Weapon",
-      "category": "Module"
+      "category": "Module",
+      "role": "weapon_turret"
     },
     {
       "id": "blaster_i",
@@ -1320,7 +1745,8 @@
       "cost": 1700,
       "tier": 1,
       "group": "Hybrid Weapon",
-      "category": "Module"
+      "category": "Module",
+      "role": "weapon_turret"
     },
     {
       "id": "analyzer_data",
@@ -1336,7 +1762,8 @@
       "cost": 2500,
       "tier": 1,
       "group": "Data Miners",
-      "category": "Module"
+      "category": "Module",
+      "role": "miner"
     },
     {
       "id": "analyzer_relic",
@@ -1352,7 +1779,8 @@
       "cost": 2500,
       "tier": 1,
       "group": "Relic Analyzer",
-      "category": "Module"
+      "category": "Module",
+      "role": "scanner"
     },
     {
       "id": "afterburner",
@@ -1368,7 +1796,8 @@
       "cost": 2200,
       "tier": 1,
       "group": "Afterburner",
-      "category": "Module"
+      "category": "Module",
+      "role": "afterburner"
     },
     {
       "id": "shield_extender",
@@ -1383,7 +1812,8 @@
       "cost": 5200,
       "tier": 2,
       "group": "Shield Extender",
-      "category": "Module"
+      "category": "Module",
+      "role": "shield_booster"
     },
     {
       "id": "shield_booster",
@@ -1399,7 +1829,8 @@
       "cost": 3400,
       "tier": 1,
       "group": "Shield Booster",
-      "category": "Module"
+      "category": "Module",
+      "role": "shield_booster"
     },
     {
       "id": "survey_scanner",
@@ -1415,7 +1846,8 @@
       "cost": 2600,
       "tier": 1,
       "group": "Survey Scanner",
-      "category": "Module"
+      "category": "Module",
+      "role": "scanner"
     },
     {
       "id": "cargo_expander",
@@ -1431,7 +1863,8 @@
       "cost": 1800,
       "tier": 1,
       "group": "Cargo Enhancer",
-      "category": "Module"
+      "category": "Module",
+      "role": "cargo_expander"
     },
     {
       "id": "warp_core",
@@ -1448,7 +1881,8 @@
       "cost": 4600,
       "tier": 2,
       "group": "Warp Core Stabilizer",
-      "category": "Module"
+      "category": "Module",
+      "role": "general"
     },
     {
       "id": "nanofiber",
@@ -1465,7 +1899,8 @@
       "cost": 3200,
       "tier": 1,
       "group": "Hull Upgrades",
-      "category": "Module"
+      "category": "Module",
+      "role": "general"
     },
     {
       "id": "drone_amp",
@@ -1481,7 +1916,8 @@
       "cost": 5600,
       "tier": 2,
       "group": "Drone Upgrade",
-      "category": "Module"
+      "category": "Module",
+      "role": "general"
     },
     {
       "id": "probe_launcher",
@@ -1497,7 +1933,8 @@
       "cost": 3000,
       "tier": 1,
       "group": "Scan Probe Launcher",
-      "category": "Module"
+      "category": "Module",
+      "role": "weapon_launcher"
     },
     {
       "id": "covert_rig",
@@ -1512,7 +1949,8 @@
       "cost": 8600,
       "tier": 2,
       "group": "Rig",
-      "category": "Module"
+      "category": "Module",
+      "role": "rig"
     },
     {
       "id": "cargo_rig",
@@ -1527,7 +1965,8 @@
       "cost": 9200,
       "tier": 2,
       "group": "Rig",
-      "category": "Module"
+      "category": "Module",
+      "role": "cargo_expander"
     },
     {
       "id": "shield_rig",
@@ -1542,7 +1981,8 @@
       "cost": 11000,
       "tier": 2,
       "group": "Rig",
-      "category": "Module"
+      "category": "Module",
+      "role": "rig"
     }
   ],
   "blueprints": [
