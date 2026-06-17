@@ -9,6 +9,7 @@ import { fitModuleFromType, fittingSummary, setModuleActive, unfitModuleToWareho
 import { publicSkillState, skillOptions, startSkillTraining } from '../services/skillSystem.js';
 import { computeRefineYield } from '../services/industry.js';
 import { getStaticSdeStore } from '../services/staticSdeStore.js';
+import { t, getMessages } from '../services/i18n.js';
 
 export const apiRoutes = express.Router();
 apiRoutes.use(requireAuth);
@@ -50,6 +51,10 @@ apiRoutes.post('/skills/train', asyncHandler(async (req, res) => {
   character.markModified('skillTraining');
   await character.save();
   res.json({ ok: true, training, skills: publicSkillState(character) });
+}));
+
+apiRoutes.get('/i18n', asyncHandler(async (req, res) => {
+  res.json({ ok: true, locale: 'zh-CN', messages: getMessages('zh-CN') });
 }));
 
 apiRoutes.get('/fitting', asyncHandler(async (req, res) => {
@@ -107,6 +112,51 @@ apiRoutes.post('/warehouse/lock', asyncHandler(async (req, res) => {
   stack.locked = locked;
   await character.save();
   res.json({ ok: true, character: publicCharacter(character) });
+}));
+
+apiRoutes.post('/cargo/load', asyncHandler(async (req, res) => {
+  const character = await getCharacterDoc(req);
+  const typeId = String(req.body.typeId || '');
+  const quantity = Math.max(1, Math.floor(Number(req.body.quantity || 1)));
+  if (!typeId) throw new Error(t('cargo.err.missingType'));
+  const stack = (character.warehouse?.items || []).find(s => String(s.typeId) === typeId && Number(s.quantity || 0) > 0 && !s.locked);
+  if (!stack) throw new Error(t('cargo.err.noCharge'));
+  // Clamp to the ship cargo volume the mining/looting paths also enforce.
+  const cap = Number(character.ship?.stats?.cargo || 0);
+  const free = cap > 0 ? Math.max(0, cap - cargoVolume(character.cargo || [])) : Infinity;
+  const vol = Number(stack.volume || 0);
+  const fits = vol > 0 ? Math.floor(free / vol) : Number(stack.quantity || 0);
+  const move = Math.min(quantity, Number(stack.quantity || 0), fits);
+  if (move <= 0) throw new Error(t('cargo.err.full'));
+  const displayName = stack.zh || stack.name;
+  const payload = { typeId, name: stack.name, zh: stack.zh, kind: stack.kind || 'charge', quantity: move, volume: stack.volume, basePrice: stack.basePrice, chargeGroup: stack.chargeGroup || stack.meta?.chargeGroup, source: 'cargo-load', meta: stack.meta ? { ...stack.meta } : {} };
+  removeStackQuantity(character.warehouse.items, typeId, move);
+  if (!Array.isArray(character.cargo)) character.cargo = [];
+  mergeStack(character.cargo, payload);
+  character.expedition.log.unshift(t('cargo.log.loaded', { name: displayName, qty: move }));
+  character.markModified('warehouse');
+  character.markModified('cargo');
+  await character.save();
+  res.json({ ok: true, moved: move, character: publicCharacter(character) });
+}));
+
+apiRoutes.post('/cargo/unload', asyncHandler(async (req, res) => {
+  const character = await getCharacterDoc(req);
+  const typeId = String(req.body.typeId || '');
+  const quantity = Math.max(1, Math.floor(Number(req.body.quantity || 1)));
+  if (!typeId) throw new Error(t('cargo.err.missingType'));
+  const stack = (character.cargo || []).find(s => String(s.typeId) === typeId && Number(s.quantity || 0) > 0);
+  if (!stack) throw new Error(t('cargo.err.notInCargo'));
+  const move = Math.min(quantity, Number(stack.quantity || 0));
+  const displayName = stack.zh || stack.name;
+  const payload = { typeId, name: stack.name, zh: stack.zh, kind: stack.kind, quantity: move, volume: stack.volume, basePrice: stack.basePrice, chargeGroup: stack.chargeGroup || stack.meta?.chargeGroup, source: 'cargo-unload', meta: stack.meta ? { ...stack.meta } : {} };
+  removeStackQuantity(character.cargo, typeId, move);
+  mergeStack(character.warehouse.items, payload);
+  character.expedition.log.unshift(t('cargo.log.unloaded', { name: displayName, qty: move }));
+  character.markModified('warehouse');
+  character.markModified('cargo');
+  await character.save();
+  res.json({ ok: true, moved: move, character: publicCharacter(character) });
 }));
 
 apiRoutes.post('/sell-excess', asyncHandler(async (req, res) => {

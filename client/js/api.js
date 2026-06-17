@@ -4,6 +4,11 @@ export const cn = new Intl.NumberFormat('zh-CN');
 export const isk = n => `${cn.format(Math.round(Number(n || 0)))} ISK`;
 export const escapeHtml = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 export function cargoVolume(stacks = []) { return stacks.reduce((sum, s) => sum + Number(s.quantity || 0) * Number(s.volume || 0), 0); }
+// Client-side i18n: strings come from the server catalog, never hardcoded in views.
+let I18N = {};
+export async function loadI18n() { try { const d = await api('/api/i18n'); I18N = d.messages || {}; } catch { I18N = {}; } return I18N; }
+export function t(key, vars = {}) { const tpl = I18N[key]; const s = tpl === undefined ? key : tpl; return String(s).replace(/\{(\w+)\}/g, (_, k) => (vars[k] !== undefined ? String(vars[k]) : `{${k}}`)); }
+export function tLabel(category, id) { return t(`${category}.${id}`); }
 export async function api(path, options = {}) {
   const res = await fetch(path, { headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, credentials: 'same-origin', ...options, body: options.body && typeof options.body !== 'string' ? JSON.stringify(options.body) : options.body });
   const data = await res.json().catch(() => ({}));

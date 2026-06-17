@@ -171,7 +171,16 @@
       "materials": [
         {
           "typeId": "34",
-          "name": "三钛合金",
+          "name": {
+            "de": "Tritanium",
+            "en": "Tritanium",
+            "es": "Tritanio",
+            "fr": "Tritanium",
+            "ja": "トリタニウム",
+            "ko": "트리타늄",
+            "ru": "Tritanium",
+            "zh": "三钛合金"
+          },
           "quantity": 400
         }
       ],
@@ -195,12 +204,30 @@
       "materials": [
         {
           "typeId": "34",
-          "name": "三钛合金",
+          "name": {
+            "de": "Tritanium",
+            "en": "Tritanium",
+            "es": "Tritanio",
+            "fr": "Tritanium",
+            "ja": "トリタニウム",
+            "ko": "트리타늄",
+            "ru": "Tritanium",
+            "zh": "三钛合金"
+          },
           "quantity": 150
         },
         {
           "typeId": "35",
-          "name": "类晶体胶矿",
+          "name": {
+            "de": "Pyerite",
+            "en": "Pyerite",
+            "es": "Pierita",
+            "fr": "Pyérite",
+            "ja": "パイライト",
+            "ko": "파이어라이트",
+            "ru": "Pyerite",
+            "zh": "类晶体胶矿"
+          },
           "quantity": 110
         }
       ],
@@ -224,12 +251,30 @@
       "materials": [
         {
           "typeId": "35",
-          "name": "类晶体胶矿",
+          "name": {
+            "de": "Pyerite",
+            "en": "Pyerite",
+            "es": "Pierita",
+            "fr": "Pyérite",
+            "ja": "パイライト",
+            "ko": "파이어라이트",
+            "ru": "Pyerite",
+            "zh": "类晶体胶矿"
+          },
           "quantity": 90
         },
         {
           "typeId": "36",
-          "name": "类银超金属",
+          "name": {
+            "de": "Mexallon",
+            "en": "Mexallon",
+            "es": "Mexalón",
+            "fr": "Mexallon",
+            "ja": "メクサロン",
+            "ko": "멕살론",
+            "ru": "Mexallon",
+            "zh": "类银超金属"
+          },
           "quantity": 30
         }
       ],
@@ -253,12 +298,30 @@
       "materials": [
         {
           "typeId": "34",
-          "name": "三钛合金",
+          "name": {
+            "de": "Tritanium",
+            "en": "Tritanium",
+            "es": "Tritanio",
+            "fr": "Tritanium",
+            "ja": "トリタニウム",
+            "ko": "트리타늄",
+            "ru": "Tritanium",
+            "zh": "三钛合金"
+          },
           "quantity": 175
         },
         {
           "typeId": "36",
-          "name": "类银超金属",
+          "name": {
+            "de": "Mexallon",
+            "en": "Mexallon",
+            "es": "Mexalón",
+            "fr": "Mexallon",
+            "ja": "メクサロン",
+            "ko": "멕살론",
+            "ru": "Mexallon",
+            "zh": "类银超金属"
+          },
           "quantity": 70
         }
       ],
@@ -282,12 +345,30 @@
       "materials": [
         {
           "typeId": "35",
-          "name": "类晶体胶矿",
+          "name": {
+            "de": "Pyerite",
+            "en": "Pyerite",
+            "es": "Pierita",
+            "fr": "Pyérite",
+            "ja": "パイライト",
+            "ko": "파이어라이트",
+            "ru": "Pyerite",
+            "zh": "类晶体胶矿"
+          },
           "quantity": 90
         },
         {
           "typeId": "37",
-          "name": "同位聚合体",
+          "name": {
+            "de": "Isogen",
+            "en": "Isogen",
+            "es": "Isogen",
+            "fr": "Isogène",
+            "ja": "アイソゲン",
+            "ko": "이소젠",
+            "ru": "Isogen",
+            "zh": "同位聚合体"
+          },
           "quantity": 75
         }
       ],
@@ -311,12 +392,30 @@
       "materials": [
         {
           "typeId": "36",
-          "name": "类银超金属",
+          "name": {
+            "de": "Mexallon",
+            "en": "Mexallon",
+            "es": "Mexalón",
+            "fr": "Mexallon",
+            "ja": "メクサロン",
+            "ko": "멕살론",
+            "ru": "Mexallon",
+            "zh": "类银超金属"
+          },
           "quantity": 60
         },
         {
           "typeId": "37",
-          "name": "同位聚合体",
+          "name": {
+            "de": "Isogen",
+            "en": "Isogen",
+            "es": "Isogen",
+            "fr": "Isogène",
+            "ja": "アイソゲン",
+            "ko": "이소젠",
+            "ru": "Isogen",
+            "zh": "同位聚合体"
+          },
           "quantity": 120
         }
       ],
@@ -340,12 +439,30 @@
       "materials": [
         {
           "typeId": "36",
-          "name": "类银超金属",
+          "name": {
+            "de": "Mexallon",
+            "en": "Mexallon",
+            "es": "Mexalón",
+            "fr": "Mexallon",
+            "ja": "メクサロン",
+            "ko": "멕살론",
+            "ru": "Mexallon",
+            "zh": "类银超金属"
+          },
           "quantity": 150
         },
         {
           "typeId": "38",
-          "name": "超新星诺克石",
+          "name": {
+            "de": "Nocxium",
+            "en": "Nocxium",
+            "es": "Nocxium",
+            "fr": "Nocxium",
+            "ja": "ノキシウム",
+            "ko": "녹시움",
+            "ru": "Nocxium",
+            "zh": "超新星诺克石"
+          },
           "quantity": 50
         }
       ],
@@ -369,17 +486,44 @@
       "materials": [
         {
           "typeId": "36",
-          "name": "类银超金属",
+          "name": {
+            "de": "Mexallon",
+            "en": "Mexallon",
+            "es": "Mexalón",
+            "fr": "Mexallon",
+            "ja": "メクサロン",
+            "ko": "멕살론",
+            "ru": "Mexallon",
+            "zh": "类银超金属"
+          },
           "quantity": 1360
         },
         {
           "typeId": "37",
-          "name": "同位聚合体",
+          "name": {
+            "de": "Isogen",
+            "en": "Isogen",
+            "es": "Isogen",
+            "fr": "Isogène",
+            "ja": "アイソゲン",
+            "ko": "이소젠",
+            "ru": "Isogen",
+            "zh": "同位聚合体"
+          },
           "quantity": 1200
         },
         {
           "typeId": "38",
-          "name": "超新星诺克石",
+          "name": {
+            "de": "Nocxium",
+            "en": "Nocxium",
+            "es": "Nocxium",
+            "fr": "Nocxium",
+            "ja": "ノキシウム",
+            "ko": "녹시움",
+            "ru": "Nocxium",
+            "zh": "超新星诺克石"
+          },
           "quantity": 320
         }
       ],
@@ -403,12 +547,30 @@
       "materials": [
         {
           "typeId": "35",
-          "name": "类晶体胶矿",
+          "name": {
+            "de": "Pyerite",
+            "en": "Pyerite",
+            "es": "Pierita",
+            "fr": "Pyérite",
+            "ja": "パイライト",
+            "ko": "파이어라이트",
+            "ru": "Pyerite",
+            "zh": "类晶体胶矿"
+          },
           "quantity": 450
         },
         {
           "typeId": "38",
-          "name": "超新星诺克石",
+          "name": {
+            "de": "Nocxium",
+            "en": "Nocxium",
+            "es": "Nocxium",
+            "fr": "Nocxium",
+            "ja": "ノキシウム",
+            "ko": "녹시움",
+            "ru": "Nocxium",
+            "zh": "超新星诺克石"
+          },
           "quantity": 120
         }
       ],
@@ -432,17 +594,44 @@
       "materials": [
         {
           "typeId": "35",
-          "name": "类晶体胶矿",
+          "name": {
+            "de": "Pyerite",
+            "en": "Pyerite",
+            "es": "Pierita",
+            "fr": "Pyérite",
+            "ja": "パイライト",
+            "ko": "파이어라이트",
+            "ru": "Pyerite",
+            "zh": "类晶体胶矿"
+          },
           "quantity": 2000
         },
         {
           "typeId": "36",
-          "name": "类银超金属",
+          "name": {
+            "de": "Mexallon",
+            "en": "Mexallon",
+            "es": "Mexalón",
+            "fr": "Mexallon",
+            "ja": "メクサロン",
+            "ko": "멕살론",
+            "ru": "Mexallon",
+            "zh": "类银超金属"
+          },
           "quantity": 1500
         },
         {
           "typeId": "37",
-          "name": "同位聚合体",
+          "name": {
+            "de": "Isogen",
+            "en": "Isogen",
+            "es": "Isogen",
+            "fr": "Isogène",
+            "ja": "アイソゲン",
+            "ko": "이소젠",
+            "ru": "Isogen",
+            "zh": "同位聚合体"
+          },
           "quantity": 800
         }
       ],
@@ -466,12 +655,30 @@
       "materials": [
         {
           "typeId": "37",
-          "name": "同位聚合体",
+          "name": {
+            "de": "Isogen",
+            "en": "Isogen",
+            "es": "Isogen",
+            "fr": "Isogène",
+            "ja": "アイソゲン",
+            "ko": "이소젠",
+            "ru": "Isogen",
+            "zh": "同位聚合体"
+          },
           "quantity": 240
         },
         {
           "typeId": "38",
-          "name": "超新星诺克石",
+          "name": {
+            "de": "Nocxium",
+            "en": "Nocxium",
+            "es": "Nocxium",
+            "fr": "Nocxium",
+            "ja": "ノキシウム",
+            "ko": "녹시움",
+            "ru": "Nocxium",
+            "zh": "超新星诺克石"
+          },
           "quantity": 90
         }
       ],
@@ -495,17 +702,44 @@
       "materials": [
         {
           "typeId": "35",
-          "name": "类晶体胶矿",
+          "name": {
+            "de": "Pyerite",
+            "en": "Pyerite",
+            "es": "Pierita",
+            "fr": "Pyérite",
+            "ja": "パイライト",
+            "ko": "파이어라이트",
+            "ru": "Pyerite",
+            "zh": "类晶体胶矿"
+          },
           "quantity": 3200
         },
         {
           "typeId": "36",
-          "name": "类银超金属",
+          "name": {
+            "de": "Mexallon",
+            "en": "Mexallon",
+            "es": "Mexalón",
+            "fr": "Mexallon",
+            "ja": "メクサロン",
+            "ko": "멕살론",
+            "ru": "Mexallon",
+            "zh": "类银超金属"
+          },
           "quantity": 1200
         },
         {
           "typeId": "40",
-          "name": "超噬矿",
+          "name": {
+            "de": "Megacyte",
+            "en": "Megacyte",
+            "es": "Megacita",
+            "fr": "Mégacyte",
+            "ja": "メガサイト",
+            "ko": "메가사이트",
+            "ru": "Megacyte",
+            "zh": "超噬矿"
+          },
           "quantity": 120
         }
       ],
@@ -529,17 +763,44 @@
       "materials": [
         {
           "typeId": "35",
-          "name": "类晶体胶矿",
+          "name": {
+            "de": "Pyerite",
+            "en": "Pyerite",
+            "es": "Pierita",
+            "fr": "Pyérite",
+            "ja": "パイライト",
+            "ko": "파이어라이트",
+            "ru": "Pyerite",
+            "zh": "类晶体胶矿"
+          },
           "quantity": 800
         },
         {
           "typeId": "36",
-          "name": "类银超金属",
+          "name": {
+            "de": "Mexallon",
+            "en": "Mexallon",
+            "es": "Mexalón",
+            "fr": "Mexallon",
+            "ja": "メクサロン",
+            "ko": "멕살론",
+            "ru": "Mexallon",
+            "zh": "类银超金属"
+          },
           "quantity": 2000
         },
         {
           "typeId": "38",
-          "name": "超新星诺克石",
+          "name": {
+            "de": "Nocxium",
+            "en": "Nocxium",
+            "es": "Nocxium",
+            "fr": "Nocxium",
+            "ja": "ノキシウム",
+            "ko": "녹시움",
+            "ru": "Nocxium",
+            "zh": "超新星诺克石"
+          },
           "quantity": 800
         }
       ],
@@ -563,17 +824,44 @@
       "materials": [
         {
           "typeId": "35",
-          "name": "类晶体胶矿",
+          "name": {
+            "de": "Pyerite",
+            "en": "Pyerite",
+            "es": "Pierita",
+            "fr": "Pyérite",
+            "ja": "パイライト",
+            "ko": "파이어라이트",
+            "ru": "Pyerite",
+            "zh": "类晶体胶矿"
+          },
           "quantity": 3200
         },
         {
           "typeId": "36",
-          "name": "类银超金属",
+          "name": {
+            "de": "Mexallon",
+            "en": "Mexallon",
+            "es": "Mexalón",
+            "fr": "Mexallon",
+            "ja": "メクサロン",
+            "ko": "멕살론",
+            "ru": "Mexallon",
+            "zh": "类银超金属"
+          },
           "quantity": 1200
         },
         {
           "typeId": "39",
-          "name": "晶状石英核岩",
+          "name": {
+            "de": "Zydrine",
+            "en": "Zydrine",
+            "es": "Zidrina",
+            "fr": "Zydrine",
+            "ja": "ザイドリン",
+            "ko": "자이드라인",
+            "ru": "Zydrine",
+            "zh": "晶状石英核岩"
+          },
           "quantity": 160
         }
       ],
@@ -994,6 +1282,62 @@
       "category": "Commodity",
       "marketGroup": "Planetary Materials",
       "source": "seed-sde-lite"
+    },
+    {
+      "id": "charge_222",
+      "typeID": 222,
+      "name": "Antimatter Charge S",
+      "zh": "反物质轨道弹 S",
+      "kind": "charge",
+      "chargeGroup": "hybrid_charge",
+      "group": "85",
+      "category": "Charge",
+      "volume": 0.0025,
+      "basePrice": 1000,
+      "tier": 1,
+      "source": "sde-charge"
+    },
+    {
+      "id": "charge_246",
+      "typeID": 246,
+      "name": "Multifrequency S",
+      "zh": "多频晶体 S",
+      "kind": "charge",
+      "chargeGroup": "frequency_crystal",
+      "group": "86",
+      "category": "Charge",
+      "volume": 1,
+      "basePrice": 100,
+      "tier": 1,
+      "source": "sde-charge"
+    },
+    {
+      "id": "charge_183",
+      "typeID": 183,
+      "name": "Fusion S",
+      "zh": "聚变弹 S",
+      "kind": "charge",
+      "chargeGroup": "projectile_ammo",
+      "group": "83",
+      "category": "Charge",
+      "volume": 0.0025,
+      "basePrice": 700,
+      "tier": 1,
+      "source": "sde-charge"
+    },
+    {
+      "id": "charge_266",
+      "typeID": 266,
+      "name": "Scourge Rocket",
+      "zh": "鞭挞火箭",
+      "kind": "charge",
+      "chargeGroup": "missile_charge",
+      "group": "387",
+      "category": "Charge",
+      "volume": 0.005,
+      "basePrice": 240,
+      "tier": 1,
+      "source": "sde-charge"
     }
   ],
   "systems": [
@@ -1215,7 +1559,7 @@
       "extract": 5,
       "cost": 0,
       "slots": {
-        "high": 2,
+        "high": 3,
         "mid": 3,
         "low": 1,
         "rig": 1
@@ -1243,7 +1587,13 @@
             "kinetic": 0.33,
             "explosive": 0.33
           }
-        }
+        },
+        "cpu": 240,
+        "powergrid": 45,
+        "capacitor": 250,
+        "calibration": 400,
+        "turretHardpoints": 2,
+        "launcherHardpoints": 0
       }
     },
     {
@@ -1265,7 +1615,7 @@
       "slots": {
         "high": 3,
         "mid": 4,
-        "low": 2,
+        "low": 3,
         "rig": 1
       },
       "group": "Frigate",
@@ -1291,7 +1641,13 @@
             "kinetic": 0.33,
             "explosive": 0.33
           }
-        }
+        },
+        "cpu": 180,
+        "powergrid": 40,
+        "capacitor": 350,
+        "calibration": 400,
+        "turretHardpoints": 3,
+        "launcherHardpoints": 0
       }
     },
     {
@@ -1314,7 +1670,7 @@
         "high": 3,
         "mid": 4,
         "low": 3,
-        "rig": 2
+        "rig": 1
       },
       "group": "Frigate",
       "category": "Ship",
@@ -1339,7 +1695,13 @@
             "kinetic": 0.33,
             "explosive": 0.33
           }
-        }
+        },
+        "cpu": 240,
+        "powergrid": 25,
+        "capacitor": 235,
+        "calibration": 400,
+        "turretHardpoints": 2,
+        "launcherHardpoints": 2
       }
     },
     {
@@ -1361,8 +1723,8 @@
       "slots": {
         "high": 3,
         "mid": 3,
-        "low": 3,
-        "rig": 2
+        "low": 4,
+        "rig": 1
       },
       "group": "Frigate",
       "category": "Ship",
@@ -1387,7 +1749,13 @@
             "kinetic": 0.33,
             "explosive": 0.33
           }
-        }
+        },
+        "cpu": 130,
+        "powergrid": 41,
+        "capacitor": 250,
+        "calibration": 400,
+        "turretHardpoints": 3,
+        "launcherHardpoints": 2
       }
     },
     {
@@ -1410,7 +1778,7 @@
         "high": 3,
         "mid": 3,
         "low": 3,
-        "rig": 2
+        "rig": 1
       },
       "group": "Frigate",
       "category": "Ship",
@@ -1435,7 +1803,13 @@
             "kinetic": 0.33,
             "explosive": 0.33
           }
-        }
+        },
+        "cpu": 130,
+        "powergrid": 35,
+        "capacitor": 350,
+        "calibration": 400,
+        "turretHardpoints": 2,
+        "launcherHardpoints": 0
       }
     },
     {
@@ -1455,10 +1829,10 @@
       "extract": 0,
       "cost": 7200,
       "slots": {
-        "high": 7,
-        "mid": 4,
+        "high": 8,
+        "mid": 3,
         "low": 2,
-        "rig": 2
+        "rig": 1
       },
       "group": "Destroyer",
       "category": "Ship",
@@ -1483,7 +1857,13 @@
             "kinetic": 0.33,
             "explosive": 0.33
           }
-        }
+        },
+        "cpu": 200,
+        "powergrid": 68,
+        "capacitor": 600,
+        "calibration": 400,
+        "turretHardpoints": 7,
+        "launcherHardpoints": 1
       }
     },
     {
@@ -1503,10 +1883,10 @@
       "extract": -1,
       "cost": 7600,
       "slots": {
-        "high": 7,
+        "high": 8,
         "mid": 2,
-        "low": 4,
-        "rig": 2
+        "low": 3,
+        "rig": 1
       },
       "group": "Destroyer",
       "category": "Ship",
@@ -1531,7 +1911,13 @@
             "kinetic": 0.33,
             "explosive": 0.33
           }
-        }
+        },
+        "cpu": 178,
+        "powergrid": 70,
+        "capacitor": 650,
+        "calibration": 400,
+        "turretHardpoints": 8,
+        "launcherHardpoints": 0
       }
     },
     {
@@ -1554,7 +1940,7 @@
         "high": 4,
         "mid": 4,
         "low": 5,
-        "rig": 3
+        "rig": 1
       },
       "group": "Cruiser",
       "category": "Ship",
@@ -1579,7 +1965,13 @@
             "kinetic": 0.33,
             "explosive": 0.33
           }
-        }
+        },
+        "cpu": 300,
+        "powergrid": 700,
+        "capacitor": 1450,
+        "calibration": 400,
+        "turretHardpoints": 4,
+        "launcherHardpoints": 0
       }
     },
     {
@@ -1601,9 +1993,9 @@
       "cost": 42000,
       "slots": {
         "high": 2,
-        "mid": 3,
-        "low": 2,
-        "rig": 3
+        "mid": 2,
+        "low": 3,
+        "rig": 1
       },
       "group": "Mining Barge",
       "category": "Ship",
@@ -1628,7 +2020,13 @@
             "kinetic": 0.33,
             "explosive": 0.33
           }
-        }
+        },
+        "cpu": 260,
+        "powergrid": 83,
+        "capacitor": 350,
+        "calibration": 400,
+        "turretHardpoints": 0,
+        "launcherHardpoints": 0
       }
     },
     {
@@ -1650,9 +2048,9 @@
       "cost": 68000,
       "slots": {
         "high": 3,
-        "mid": 4,
+        "mid": 3,
         "low": 4,
-        "rig": 2
+        "rig": 1
       },
       "group": "Expedition Frigate",
       "category": "Ship",
@@ -1677,7 +2075,13 @@
             "kinetic": 0.33,
             "explosive": 0.33
           }
-        }
+        },
+        "cpu": 290,
+        "powergrid": 45,
+        "capacitor": 300,
+        "calibration": 400,
+        "turretHardpoints": 2,
+        "launcherHardpoints": 0
       }
     }
   ],
@@ -1696,7 +2100,11 @@
       "tier": 1,
       "group": "Mining Laser",
       "category": "Module",
-      "role": "weapon_laser"
+      "role": "miner",
+      "cpu": 60,
+      "powergrid": 2,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "salvager_i",
@@ -1713,7 +2121,11 @@
       "tier": 1,
       "group": "Salvager",
       "category": "Module",
-      "role": "general"
+      "role": "salvager",
+      "cpu": 20,
+      "powergrid": 1,
+      "calibration": 0,
+      "effectSource": "game-layer"
     },
     {
       "id": "railgun_i",
@@ -1723,13 +2135,17 @@
       "slot": "high",
       "kind": "weapon",
       "effects": {
-        "dps": 14
+        "dps": 15.13
       },
       "cost": 1600,
       "tier": 1,
       "group": "Hybrid Weapon",
       "category": "Module",
-      "role": "weapon_turret"
+      "role": "weapon_turret",
+      "cpu": 24,
+      "powergrid": 9,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "blaster_i",
@@ -1739,14 +2155,18 @@
       "slot": "high",
       "kind": "weapon",
       "effects": {
-        "dps": 18,
-        "extract": -1
+        "extract": -1,
+        "dps": 8.25
       },
       "cost": 1700,
       "tier": 1,
       "group": "Hybrid Weapon",
       "category": "Module",
-      "role": "weapon_turret"
+      "role": "weapon_turret",
+      "cpu": 5,
+      "powergrid": 2,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "analyzer_data",
@@ -1756,14 +2176,18 @@
       "slot": "mid",
       "kind": "hacking",
       "effects": {
-        "hack": 12,
-        "scan": 4
+        "scan": 4,
+        "hack": 12
       },
       "cost": 2500,
       "tier": 1,
       "group": "Data Miners",
       "category": "Module",
-      "role": "miner"
+      "role": "analyzer",
+      "cpu": 20,
+      "powergrid": 1,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "analyzer_relic",
@@ -1773,14 +2197,18 @@
       "slot": "mid",
       "kind": "hacking",
       "effects": {
-        "hack": 10,
-        "salvage": 5
+        "salvage": 5,
+        "hack": 12
       },
       "cost": 2500,
       "tier": 1,
       "group": "Relic Analyzer",
       "category": "Module",
-      "role": "scanner"
+      "role": "analyzer",
+      "cpu": 20,
+      "powergrid": 1,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "afterburner",
@@ -1791,13 +2219,17 @@
       "kind": "propulsion",
       "effects": {
         "extract": 7,
-        "speed": 18
+        "speed": 18.4
       },
       "cost": 2200,
       "tier": 1,
       "group": "Afterburner",
       "category": "Module",
-      "role": "afterburner"
+      "role": "afterburner",
+      "cpu": 15,
+      "powergrid": 10,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "shield_extender",
@@ -1813,7 +2245,11 @@
       "tier": 2,
       "group": "Shield Extender",
       "category": "Module",
-      "role": "shield_booster"
+      "role": "shield_extender",
+      "cpu": 28,
+      "powergrid": 28,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "shield_booster",
@@ -1823,14 +2259,17 @@
       "slot": "mid",
       "kind": "shield",
       "effects": {
-        "regen": 2.5,
-        "shield": 40
+        "shieldBoost": 39
       },
       "cost": 3400,
       "tier": 1,
       "group": "Shield Booster",
       "category": "Module",
-      "role": "shield_booster"
+      "role": "shield_booster",
+      "cpu": 25,
+      "powergrid": 2,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "survey_scanner",
@@ -1847,7 +2286,11 @@
       "tier": 1,
       "group": "Survey Scanner",
       "category": "Module",
-      "role": "scanner"
+      "role": "scanner",
+      "cpu": 8,
+      "powergrid": 1,
+      "calibration": 0,
+      "effectSource": "game-layer"
     },
     {
       "id": "cargo_expander",
@@ -1857,14 +2300,19 @@
       "slot": "low",
       "kind": "cargo",
       "effects": {
-        "cargo": 95,
-        "extract": -2
+        "extract": -2,
+        "cargo": 94.5,
+        "hull": -10
       },
       "cost": 1800,
       "tier": 1,
       "group": "Cargo Enhancer",
       "category": "Module",
-      "role": "cargo_expander"
+      "role": "cargo_expander",
+      "cpu": 10,
+      "powergrid": 3,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "warp_core",
@@ -1875,14 +2323,17 @@
       "kind": "escape",
       "effects": {
         "extract": 14,
-        "warpStrength": 1,
-        "dps": -3
+        "warpStability": 2
       },
       "cost": 4600,
       "tier": 2,
       "group": "Warp Core Stabilizer",
       "category": "Module",
-      "role": "general"
+      "role": "warp_stabilizer",
+      "cpu": 30,
+      "powergrid": 1,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "nanofiber",
@@ -1893,14 +2344,18 @@
       "kind": "speed",
       "effects": {
         "extract": 8,
-        "speed": 15,
+        "speed": 15.2,
         "hull": -10
       },
       "cost": 3200,
       "tier": 1,
       "group": "Hull Upgrades",
       "category": "Module",
-      "role": "general"
+      "role": "nanofiber",
+      "cpu": 10,
+      "powergrid": 3,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "drone_amp",
@@ -1910,14 +2365,18 @@
       "slot": "low",
       "kind": "drone",
       "effects": {
-        "dps": 16,
-        "drone": 1
+        "drone": 1,
+        "dps": 15
       },
       "cost": 5600,
       "tier": 2,
       "group": "Drone Upgrade",
       "category": "Module",
-      "role": "general"
+      "role": "drone",
+      "cpu": 27,
+      "powergrid": 1,
+      "calibration": 0,
+      "effectSource": "sde"
     },
     {
       "id": "probe_launcher",
@@ -1934,7 +2393,11 @@
       "tier": 1,
       "group": "Scan Probe Launcher",
       "category": "Module",
-      "role": "weapon_launcher"
+      "role": "scanner",
+      "cpu": 15,
+      "powergrid": 1,
+      "calibration": 0,
+      "effectSource": "game-layer"
     },
     {
       "id": "covert_rig",
@@ -1950,7 +2413,11 @@
       "tier": 2,
       "group": "Rig",
       "category": "Module",
-      "role": "rig"
+      "role": "rig",
+      "cpu": 0,
+      "powergrid": 0,
+      "calibration": 100,
+      "effectSource": "game-layer"
     },
     {
       "id": "cargo_rig",
@@ -1966,7 +2433,11 @@
       "tier": 2,
       "group": "Rig",
       "category": "Module",
-      "role": "cargo_expander"
+      "role": "rig",
+      "cpu": 0,
+      "powergrid": 0,
+      "calibration": 150,
+      "effectSource": "game-layer"
     },
     {
       "id": "shield_rig",
@@ -1982,7 +2453,11 @@
       "tier": 2,
       "group": "Rig",
       "category": "Module",
-      "role": "rig"
+      "role": "rig",
+      "cpu": 0,
+      "powergrid": 0,
+      "calibration": 50,
+      "effectSource": "game-layer"
     }
   ],
   "blueprints": [

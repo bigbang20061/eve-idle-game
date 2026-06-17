@@ -13,6 +13,7 @@
     "cpu": ["cpuOutput", "cpu"],
     "powergrid": ["powerOutput", "powergrid"],
     "capacitor": ["capacitorCapacity"],
+    "calibrationCapacity": ["upgradeCapacity"],
     "cpuUsage": ["cpu", "cpuNeed"],
     "powergridUsage": ["power", "powergridUsage", "powerNeed"],
     "calibrationUsage": ["upgradeCost"],
@@ -57,5 +58,21 @@
     "explorer": ["probe", "scanner", "exploration", "扫描", "探索"],
     "combat": ["frigate", "destroyer", "cruiser", "battle", "战斗", "护卫", "巡洋"]
   },
-  "scales": { "hp": 1, "cargo": 1, "scan": 0.03, "dpsFloor": 1, "rofMsDivisor": 1000, "mining": 0.08 }
+  "scales": { "hp": 1, "cargo": 1, "scan": 0.03, "dpsFloor": 1, "rofMsDivisor": 1000, "mining": 0.08 },
+  "effectDerivations": [
+    { "effect": "dps", "attrs": ["damageMultiplier"], "scale": 5, "transform": "linear" },
+    { "effect": "dps", "attrs": ["droneDamageBonus"], "scale": 1.0, "transform": "linear" },
+    { "effect": "mining", "attrs": ["miningAmount"], "scale": 0.8, "transform": "linear" },
+    { "effect": "shieldBoost", "attrs": ["shieldBonus", "shieldBoostAmount"], "scale": 1.5, "transform": "linear" },
+    { "effect": "shield", "attrs": ["capacityBonus", "shieldCapacityBonus", "shieldHpBonus"], "scale": 0.15, "transform": "linear" },
+    { "effect": "armor", "attrs": ["armorHpBonus", "armorHPBonus"], "scale": 0.15, "transform": "linear" },
+    { "effect": "armorRepair", "attrs": ["armorDamageAmount", "armorRepairAmount"], "scale": 1.5, "transform": "linear" },
+    { "effect": "hack", "attrs": ["virusStrength"], "scale": 0.6, "transform": "linear" },
+    { "effect": "warpStability", "attrs": ["warpScrambleStrength", "warpCoreStrength"], "scale": 1, "transform": "abs" },
+    { "effect": "speed", "attrs": ["speedFactor"], "scale": 0.16, "transform": "linear" },
+    { "effect": "speed", "attrs": ["implantBonusVelocity"], "scale": 1.6, "transform": "linear" },
+    { "effect": "cargo", "attrs": ["cargoCapacityMultiplier"], "scale": 540, "transform": "multiplierDelta" },
+    { "effect": "hull", "attrs": ["structureHPMultiplier"], "scale": 50, "transform": "multiplierDelta" }
+  ],
+  "gameLayerEffects": ["extract", "lootBonus", "scan", "salvage", "drone"]
 }

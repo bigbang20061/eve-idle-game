@@ -86,6 +86,32 @@ function putIfNumber(out, key, value) {
   if (value !== undefined && Number.isFinite(Number(value))) out[key] = Number(value);
 }
 
+function round2(v) { return Math.round(Number(v) * 100) / 100; }
+
+function applyTransform(value, transform) {
+  const v = Number(value);
+  if (!Number.isFinite(v)) return undefined;
+  if (transform === 'abs') return Math.abs(v);
+  if (transform === 'multiplierDelta') return v - 1;
+  return v; // linear
+}
+
+// Build a module's gameplay effects purely from real SDE dogma attributes × a config scale.
+// Magnitudes come from SDE; only the unit-conversion scale lives in dogma_mapping.effectDerivations.
+export function deriveModuleEffects(attrs = {}, map = dogmaAttributeMap()) {
+  const effects = {};
+  for (const d of map.effectDerivations || []) {
+    const raw = valueFor(attrs, d.attrs);
+    if (raw === undefined) continue;
+    const transformed = applyTransform(raw, d.transform);
+    if (transformed === undefined) continue;
+    const amount = transformed * Number(d.scale ?? 1);
+    if (!amount) continue;
+    effects[d.effect] = round2(Number(effects[d.effect] || 0) + amount);
+  }
+  return effects;
+}
+
 export function deriveDogmaTypeData({ type = {}, raw = {}, kind = type.kind, tier = type.tier || 1 } = {}) {
   const map = dogmaAttributeMap();
   const fitting = getFittingRules();
@@ -111,7 +137,7 @@ export function deriveDogmaTypeData({ type = {}, raw = {}, kind = type.kind, tie
       capacitor: valueFor(attrs, a.capacitor) ?? fitting.shipDefaults.capacitor,
       turretHardpoints: valueFor(attrs, a.turretSlots) ?? fitting.shipDefaults.turretHardpoints,
       launcherHardpoints: valueFor(attrs, a.launcherSlots) ?? fitting.shipDefaults.launcherHardpoints,
-      calibration: fitting.shipDefaults.calibration
+      calibration: valueFor(attrs, a.calibrationCapacity) ?? fitting.shipDefaults.calibration
     };
     const slots = {
       high: Math.max(1, Math.round(valueFor(attrs, a.highSlots) ?? map.defaults.slots.high)),
@@ -133,35 +159,12 @@ export function deriveDogmaTypeData({ type = {}, raw = {}, kind = type.kind, tie
     result.role = inferRole(type.name || type.zh, type.groupName);
   }
   if (kind === 'module') {
-    const baseEffects = {};
-    const damage = {
-      em: valueFor(attrs, a.emDamage) || 0,
-      thermal: valueFor(attrs, a.thermalDamage) || 0,
-      kinetic: valueFor(attrs, a.kineticDamage) || 0,
-      explosive: valueFor(attrs, a.explosiveDamage) || 0
-    };
-    const rawDamage = Object.values(damage).reduce((s, v) => s + v, 0);
-    if (rawDamage > 0) {
-      const rof = Math.max(1, valueFor(attrs, a.rateOfFire) || 4000);
-      const mult = Math.max(1, valueFor(attrs, a.damageMultiplier) || 1);
-      baseEffects.dps = Math.max(map.scales.dpsFloor, (rawDamage * mult) / (rof / map.scales.rofMsDivisor));
-      baseEffects.damageProfile = Object.fromEntries(Object.entries(damage).filter(([, v]) => v > 0));
-    }
-    const mining = valueFor(attrs, a.miningAmount);
-    if (mining) baseEffects.mining = mining * map.scales.mining;
-    putIfNumber(baseEffects, 'shieldBoost', valueFor(attrs, a.shieldBoost));
-    putIfNumber(baseEffects, 'armorRepair', valueFor(attrs, a.armorRepair));
-    putIfNumber(baseEffects, 'shield', valueFor(attrs, a.shieldBonus));
-    putIfNumber(baseEffects, 'armor', valueFor(attrs, a.armorBonus));
-    putIfNumber(baseEffects, 'cargo', valueFor(attrs, a.cargoBonus));
-    const scram = valueFor(attrs, a.warpScrambleStrength);
-    if (scram) baseEffects.warpStability = -Math.abs(scram);
+    // Effects are derived purely from SDE attributes × config scale (no slot-default injection).
+    const baseEffects = deriveModuleEffects(attrs, map);
     const role = inferModuleRole({ ...type, raw, effects: baseEffects });
     const roleDef = roleConfig(role);
     const slot = type.slot || roleDef.slot || inferSlot(type.name || type.zh, type.marketGroupName);
     const mode = roleDef.mode || 'passive';
-    const passiveEffects = mode === 'passive' ? { ...(map.defaults.moduleEffects[slot] || {}), ...baseEffects } : {};
-    const activeEffects = mode === 'passive' ? {} : { ...(map.defaults.moduleEffects[slot] || {}), ...baseEffects };
     result.slot = slot;
     result.role = role;
     result.mode = mode;
@@ -169,9 +172,9 @@ export function deriveDogmaTypeData({ type = {}, raw = {}, kind = type.kind, tie
     result.powergrid = valueFor(attrs, a.powergridUsage) ?? fitting.moduleDefaultsBySlot?.[slot]?.powergrid ?? 0;
     result.calibration = valueFor(attrs, a.calibrationUsage) ?? fitting.moduleDefaultsBySlot?.[slot]?.calibration ?? 0;
     result.requirements = { skills: roleDef.requiredSkills || {}, hardpoint: roleDef.hardpoint };
-    result.passiveEffects = passiveEffects;
-    result.activeEffects = activeEffects;
-    result.effects = { ...passiveEffects, ...activeEffects };
+    result.passiveEffects = mode === 'passive' ? baseEffects : {};
+    result.activeEffects = mode === 'passive' ? {} : baseEffects;
+    result.effects = baseEffects;
     result.activation = { ...(roleDef.activation || {}), mode };
     if (roleDef.activation?.chargeGroup) result.chargeGroup = roleDef.activation.chargeGroup;
   }
