@@ -6,6 +6,7 @@ import { createStarterCharacter } from '../services/characterFactory.js';
 import { starterRaceOptions } from '../services/starterConfig.js';
 import { env } from '../config/env.js';
 import { asyncHandler } from '../middleware/auth.js';
+import { t } from '../services/i18n.js';
 
 export const authApiRoutes = express.Router();
 
@@ -31,13 +32,13 @@ authApiRoutes.post('/register', authLimiter, asyncHandler(async (req, res) => {
   const inviteCode = String(req.body.inviteCode || '').trim();
   const race = String(req.body.race || '').trim().toLowerCase();
   const raceOptions = starterRaceOptions();
-  if (!raceOptions.races[race]) throw new Error('请选择有效的初始势力。');
-  if (!/^[\p{L}\p{N}_-]{3,24}$/u.test(username)) throw new Error('账号只能包含 3-24 位字母/数字/下划线/短横线。');
-  if (characterName.length < 2 || characterName.length > 28) throw new Error('角色名需要 2-28 位。');
-  if (password.length < 6) throw new Error('密码至少 6 位。');
+  if (!raceOptions.races[race]) throw new Error(t('error.invalid_race'));
+  if (!/^[\p{L}\p{N}_-]{3,24}$/u.test(username)) throw new Error(t('error.username_format'));
+  if (characterName.length < 2 || characterName.length > 28) throw new Error(t('error.character_name_length'));
+  if (password.length < 6) throw new Error(t('error.password_too_short'));
   const usernameLower = username.toLowerCase();
   const exists = await User.findOne({ usernameLower });
-  if (exists) throw new Error('账号已存在。');
+  if (exists) throw new Error(t('error.username_taken'));
   const userCount = await User.estimatedDocumentCount();
   const role = userCount === 0 || (env.adminInviteCode && inviteCode === env.adminInviteCode) ? 'admin' : 'player';
   const passwordHash = await bcrypt.hash(password, 12);
@@ -51,9 +52,9 @@ authApiRoutes.post('/login', authLimiter, asyncHandler(async (req, res) => {
   const usernameLower = String(req.body.username || '').trim().toLowerCase();
   const password = String(req.body.password || '');
   const user = await User.findOne({ usernameLower });
-  if (!user || user.banned) return res.status(401).json({ ok: false, error: '账号或密码错误。' });
+  if (!user || user.banned) return res.status(401).json({ ok: false, error: t('error.bad_credentials') });
   const ok = await bcrypt.compare(password, user.passwordHash);
-  if (!ok) return res.status(401).json({ ok: false, error: '账号或密码错误。' });
+  if (!ok) return res.status(401).json({ ok: false, error: t('error.bad_credentials') });
   user.lastLoginAt = new Date();
   user.lastIp = req.ip;
   await user.save();
@@ -67,5 +68,5 @@ authApiRoutes.post('/logout', (req, res) => {
 
 authApiRoutes.use((err, req, res, next) => {
   console.error('[auth-api]', err);
-  res.status(400).json({ ok: false, error: err.message || '请求失败。' });
+  res.status(err.status || 400).json({ ok: false, error: err.message || t('error.generic') });
 });

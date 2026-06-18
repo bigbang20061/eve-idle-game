@@ -202,13 +202,13 @@ export function cycleActiveModules(character, site, dt, baseStats = {}) {
     const capReduction = Number(mods.activeModuleCapReduction || 0) + (module.mode === 'weapon' ? Number(mods.weaponCapReduction || 0) : 0);
     const capCost = Math.max(0, Number(activation.capacitorCost || 0) * (1 - Math.min(0.8, capReduction)) * cycles);
     if (site.capacitor < capCost) {
-      result.logs.push(`${module.zh || module.name} 电容不足，跳过循环。`);
+      result.logs.push(t('module.log.no_cap', { name: module.zh || module.name }));
       continue;
     }
     const chargesNeeded = Number(activation.chargesPerCycle || 0) * cycles;
     const charge = takeCharges(character, activation.chargeGroup || module.chargeGroup, chargesNeeded);
     if (!charge.ok) {
-      result.logs.push(`${module.zh || module.name} 缺少 ${activation.chargeGroup || module.chargeGroup}，停止开火。`);
+      result.logs.push(t('module.log.no_charge', { name: module.zh || module.name, charge: activation.chargeGroup || module.chargeGroup }));
       continue;
     }
     site.capacitor -= capCost;

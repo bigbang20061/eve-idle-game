@@ -16,7 +16,7 @@ apiRoutes.use(requireAuth);
 
 async function getCharacterDoc(req) {
   const character = await Character.findOne({ userId: req.session.userId });
-  if (!character) throw new Error('角色不存在');
+  if (!character) throw new Error(t('error.character_missing'));
   await tickCharacter(character, new Date(), req.app.get('io'));
   return character;
 }
@@ -77,7 +77,7 @@ apiRoutes.post('/autopilot', asyncHandler(async (req, res) => {
   if (body.combatStance) character.autopilot.combat.stance = String(body.combatStance);
   if (body.damageProfile) character.autopilot.combat.damageProfile = String(body.damageProfile);
   if (body.targetPriority) character.autopilot.combat.targetPriority = String(body.targetPriority);
-  character.expedition.log.unshift('调度参数已更新。');
+  character.expedition.log.unshift(t('log.autopilot_updated'));
   character.markModified('autopilot');
   await character.save();
   res.json({ ok: true, character: publicCharacter(character) });
@@ -87,7 +87,7 @@ apiRoutes.post('/dock', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   character.expedition.state = 'extracting';
   character.expedition.progress = Math.max(Number(character.expedition.progress || 0), 45);
-  character.expedition.log.unshift('手动下达撤离命令。');
+  character.expedition.log.unshift(t('log.manual_dock'));
   await character.save();
   res.json({ ok: true, character: publicCharacter(character) });
 }));
@@ -96,7 +96,7 @@ apiRoutes.post('/warehouse/reserve', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const typeId = String(req.body.typeId || '');
   const quantity = Math.max(0, Number(req.body.quantity || 0));
-  if (!typeId) throw new Error('缺少 typeId');
+  if (!typeId) throw new Error(t('error.missing_typeid'));
   character.warehouse.reserve.set(typeId, quantity);
   await character.save();
   res.json({ ok: true, reserve: Object.fromEntries(character.warehouse.reserve) });
@@ -106,9 +106,9 @@ apiRoutes.post('/warehouse/lock', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const typeId = String(req.body.typeId || '');
   const locked = ['1', 'true', true].includes(req.body.locked);
-  if (!typeId) throw new Error('缺少 typeId');
+  if (!typeId) throw new Error(t('error.missing_typeid'));
   const stack = character.warehouse.items.find(s => String(s.typeId) === typeId);
-  if (!stack) throw new Error('库存中找不到该物品');
+  if (!stack) throw new Error(t('error.stack_missing'));
   stack.locked = locked;
   await character.save();
   res.json({ ok: true, character: publicCharacter(character) });
@@ -178,7 +178,7 @@ apiRoutes.post('/sell-excess', asyncHandler(async (req, res) => {
   character.warehouse.items = character.warehouse.items.filter(s => Number(s.quantity || 0) > 0);
   character.credits += Math.round(value);
   character.stats.totalEarned += Math.round(value);
-  character.walletJournal.unshift({ at: new Date(), type: 'manual-sell', amount: Math.round(value), note: `手动卖出 ${sold} 件库存` });
+  character.walletJournal.unshift({ at: new Date(), type: 'manual-sell', amount: Math.round(value), note: t('journal.manual_sell', { count: sold }) });
   await character.save();
   res.json({ ok: true, sold, value: Math.round(value), character: publicCharacter(character) });
 }));
@@ -188,11 +188,11 @@ apiRoutes.post('/market/buy', asyncHandler(async (req, res) => {
   const typeId = String(req.body.typeId || '');
   const quantity = Math.max(1, Math.min(100000, Number(req.body.quantity || 1)));
   const type = await SdeType.findOne({ typeId }).lean();
-  if (!type) throw new Error('物品不存在');
+  if (!type) throw new Error(t('error.type_missing'));
   const system = await SdeSystem.findOne({ systemId: character.currentSystemId }).lean();
   const price = marketPrice(type, system, 'sell');
   const total = Math.round(price * quantity);
-  if (character.credits < total) throw new Error('ISK 不足');
+  if (character.credits < total) throw new Error(t('error.insufficient_isk'));
   character.credits -= total;
   if (type.kind === 'ship') {
     for (let i = 0; i < Math.min(10, quantity); i += 1) character.hangarShips.push(shipFromType(type, { race: character.race || 'market' }));
@@ -200,7 +200,7 @@ apiRoutes.post('/market/buy', asyncHandler(async (req, res) => {
     mergeStack(character.warehouse.items, { typeId, name: type.name, zh: type.zh || type.name, kind: type.kind, quantity, volume: type.volume || 0.01, basePrice: type.basePrice || price, chargeGroup: type.chargeGroup, source: 'market' });
   }
   character.stats.trades += 1;
-  character.walletJournal.unshift({ at: new Date(), type: 'buy', amount: -total, note: `购买 ${type.zh || type.name} × ${quantity}` });
+  character.walletJournal.unshift({ at: new Date(), type: 'buy', amount: -total, note: t('journal.buy', { name: type.zh || type.name, qty: quantity }) });
   await character.save();
   await MarketOrder.updateOne({ typeId, systemId: character.currentSystemId, side: 'sell', npc: true }, { $inc: { remaining: -quantity } });
   res.json({ ok: true, total, price, character: publicCharacter(character) });
@@ -211,7 +211,7 @@ apiRoutes.post('/market/sell', asyncHandler(async (req, res) => {
   const typeId = String(req.body.typeId || '');
   const quantity = Math.max(1, Number(req.body.quantity || 1));
   const stack = character.warehouse.items.find(s => String(s.typeId) === typeId && !s.locked);
-  if (!stack || Number(stack.quantity || 0) < quantity) throw new Error('库存不足或已锁仓');
+  if (!stack || Number(stack.quantity || 0) < quantity) throw new Error(t('error.stock_insufficient_or_locked'));
   const type = await SdeType.findOne({ typeId }).lean() || stack;
   const system = await SdeSystem.findOne({ systemId: character.currentSystemId }).lean();
   const price = marketPrice(type, system, 'buy');
@@ -220,7 +220,7 @@ apiRoutes.post('/market/sell', asyncHandler(async (req, res) => {
   character.credits += total;
   character.stats.totalEarned += total;
   character.stats.trades += 1;
-  character.walletJournal.unshift({ at: new Date(), type: 'sell', amount: total, note: `出售 ${stack.zh || stack.name} × ${quantity}` });
+  character.walletJournal.unshift({ at: new Date(), type: 'sell', amount: total, note: t('journal.sell', { name: stack.zh || stack.name, qty: quantity }) });
   await character.save();
   res.json({ ok: true, total, price, character: publicCharacter(character) });
 }));
@@ -229,9 +229,9 @@ apiRoutes.post('/hangar/equip', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const typeId = String(req.body.typeId || '');
   const type = await SdeType.findOne({ typeId, kind: 'module' }).lean();
-  if (!type) throw new Error('装备不存在');
+  if (!type) throw new Error(t('fit.err.noModule'));
   const module = fitModuleFromType(character, type);
-  character.expedition.log.unshift(`装配 ${module.zh || module.name} 到 ${module.slot} 槽。`);
+  character.expedition.log.unshift(t('log.equip', { name: module.zh || module.name, slot: module.slot }));
   character.markModified('ship');
   character.markModified('warehouse');
   await character.save();
@@ -244,7 +244,7 @@ apiRoutes.post('/hangar/unfit', asyncHandler(async (req, res) => {
   const mod = (character.ship?.fittedModules || []).find(m => String(m.instanceId) === instanceId);
   const type = mod ? await SdeType.findOne({ typeId: String(mod.typeId) }).lean() : null;
   const removed = unfitModuleToWarehouse(character, instanceId, type || {});
-  character.expedition.log.unshift(`卸下 ${removed.zh || removed.name}。`);
+  character.expedition.log.unshift(t('log.unfit', { name: removed.zh || removed.name }));
   character.markModified('ship');
   character.markModified('warehouse');
   await character.save();
@@ -254,7 +254,7 @@ apiRoutes.post('/hangar/unfit', asyncHandler(async (req, res) => {
 apiRoutes.post('/hangar/module/active', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const module = setModuleActive(character, String(req.body.instanceId || ''), bool(req.body.active));
-  character.expedition.log.unshift(`${module.zh || module.name} ${module.active ? '设为自动循环' : '停止自动循环'}。`);
+  character.expedition.log.unshift(module.active ? t('log.cycle_on', { name: module.zh || module.name }) : t('log.cycle_off', { name: module.zh || module.name }));
   character.markModified('ship');
   await character.save();
   res.json({ ok: true, module, fitting: fittingSummary(character), character: publicCharacter(character) });
@@ -264,13 +264,13 @@ apiRoutes.post('/hangar/activate', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const instanceId = String(req.body.instanceId || '');
   const idx = (character.hangarShips || []).findIndex(s => String(s.instanceId) === instanceId);
-  if (idx < 0) throw new Error('舰船不存在');
+  if (idx < 0) throw new Error(t('error.ship_missing'));
   const nextShip = character.hangarShips.splice(idx, 1)[0];
   if (character.ship) character.hangarShips.push(character.ship);
   character.ship = nextShip;
   character.expedition.state = 'idle';
   character.locationState = 'docked';
-  character.expedition.log.unshift(`切换当前舰船为 ${nextShip.zh || nextShip.name}。`);
+  character.expedition.log.unshift(t('log.switch_ship', { name: nextShip.zh || nextShip.name }));
   character.markModified('ship');
   await character.save();
   res.json({ ok: true, character: publicCharacter(character), fitting: fittingSummary(character) });
@@ -281,13 +281,13 @@ apiRoutes.post('/refine', asyncHandler(async (req, res) => {
   const typeId = String(req.body.typeId || '');
   const quantity = Math.max(1, Number(req.body.quantity || 1));
   const stack = character.warehouse.items.find(s => String(s.typeId) === typeId && Number(s.quantity || 0) >= quantity);
-  if (!stack || stack.kind !== 'ore') throw new Error('只能精炼矿石，且库存需足够');
-  if (stack.locked) throw new Error('该矿石已锁仓，请先解锁再精炼');
+  if (!stack || stack.kind !== 'ore') throw new Error(t('error.refine_ore_only'));
+  if (stack.locked) throw new Error(t('error.refine_locked'));
   const oreType = await resolveOreRefineType(typeId);
   const industryLevel = Number(character.skills?.industry || 0);
   const efficiency = 0.45 + industryLevel * 0.025;
   const result = computeRefineYield(oreType, quantity, efficiency);
-  if (!result.consumed || !result.outputs.length) throw new Error('精炼数量过少，未产出矿物');
+  if (!result.consumed || !result.outputs.length) throw new Error(t('error.refine_too_little'));
   removeStackQuantity(character.warehouse.items, typeId, result.consumed);
   let produced = 0;
   for (const out of result.outputs) {
@@ -297,7 +297,7 @@ apiRoutes.post('/refine', asyncHandler(async (req, res) => {
   }
   character.skillpoints += 0.4;
   const detail = result.outputs.map(o => `${o.name}×${o.quantity}`).join('，');
-  character.expedition.log.unshift(`精炼 ${stack.zh || stack.name} × ${result.consumed}，产出 ${detail}（共 ${produced}）。`);
+  character.expedition.log.unshift(t('log.refine', { name: stack.zh || stack.name, consumed: result.consumed, detail, produced }));
   await character.save();
   res.json({ ok: true, character: publicCharacter(character) });
 }));
@@ -325,7 +325,7 @@ async function resolveOreRefineType(typeId) {
     }
     if (materials.length) return { typeId, name: oreType?.zh || oreType?.name || `Type ${typeId}`, materials, portionSize: Number(oreType?.portionSize || 1) };
   }
-  throw new Error('该矿石暂无精炼配方');
+  throw new Error(t('error.refine_no_recipe'));
 }
 
 apiRoutes.post('/industry/start', asyncHandler(async (req, res) => {
@@ -372,8 +372,8 @@ apiRoutes.get('/sde/search', asyncHandler(async (req, res) => {
 
 apiRoutes.post('/fleet/create', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
-  const name = safeText(req.body.name || `${character.name} 的远征队`, 40);
-  const fleet = await Fleet.create({ name, commanderId: character._id, systemId: character.currentSystemId, activity: safeText(req.body.activity || 'nullsec-raid', 40), status: 'forming', members: [{ characterId: character._id, role: 'commander', joinedAt: new Date() }], objective: { tier: Math.max(1, Math.min(10, Number(req.body.tier || 3))), progress: 0 }, lootPool: { credits: 0, items: [] }, log: [`${character.name} 创建舰队。`] });
+  const name = safeText(req.body.name || t('fleet.default_name', { name: character.name }), 40);
+  const fleet = await Fleet.create({ name, commanderId: character._id, systemId: character.currentSystemId, activity: safeText(req.body.activity || 'nullsec-raid', 40), status: 'forming', members: [{ characterId: character._id, role: 'commander', joinedAt: new Date() }], objective: { tier: Math.max(1, Math.min(10, Number(req.body.tier || 3))), progress: 0 }, lootPool: { credits: 0, items: [] }, log: [t('fleet.log.created', { name: character.name })] });
   character.fleetId = fleet._id;
   await character.save();
   req.app.get('io')?.to('global').emit('fleet:update', fleet);
@@ -383,8 +383,8 @@ apiRoutes.post('/fleet/create', asyncHandler(async (req, res) => {
 apiRoutes.post('/fleet/join', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const fleet = await Fleet.findById(req.body.fleetId);
-  if (!fleet || !['forming', 'running'].includes(fleet.status)) throw new Error('舰队不可加入');
-  if (!fleet.members.some(m => String(m.characterId) === String(character._id))) { fleet.members.push({ characterId: character._id, role: 'member', joinedAt: new Date() }); fleet.log.unshift(`${character.name} 加入舰队。`); }
+  if (!fleet || !['forming', 'running'].includes(fleet.status)) throw new Error(t('error.fleet_unjoinable'));
+  if (!fleet.members.some(m => String(m.characterId) === String(character._id))) { fleet.members.push({ characterId: character._id, role: 'member', joinedAt: new Date() }); fleet.log.unshift(t('fleet.log.joined', { name: character.name })); }
   character.fleetId = fleet._id;
   await Promise.all([fleet.save(), character.save()]);
   req.app.get('io')?.to('global').emit('fleet:update', fleet);
@@ -394,11 +394,11 @@ apiRoutes.post('/fleet/join', asyncHandler(async (req, res) => {
 apiRoutes.post('/fleet/start', asyncHandler(async (req, res) => {
   const character = await getCharacterDoc(req);
   const fleet = await Fleet.findById(req.body.fleetId);
-  if (!fleet || String(fleet.commanderId) !== String(character._id)) throw new Error('只有指挥官可以开始');
+  if (!fleet || String(fleet.commanderId) !== String(character._id)) throw new Error(t('error.fleet_commander_only'));
   fleet.status = 'running';
   fleet.startedAt = new Date();
   fleet.readyAt = new Date(Date.now() + Math.max(60, Number(fleet.objective?.tier || 3) * 60) * 1000);
-  fleet.log.unshift('舰队已进入目标星系，战利品池开始累计。');
+  fleet.log.unshift(t('fleet.log.started'));
   await fleet.save();
   req.app.get('io')?.to('global').emit('fleet:update', fleet);
   res.json({ ok: true, fleet });
@@ -413,5 +413,5 @@ apiRoutes.get('/leaderboard', asyncHandler(async (req, res) => {
 
 apiRoutes.use((err, req, res, next) => {
   console.error('[api]', err);
-  res.status(400).json({ ok: false, error: err.message || '请求失败' });
+  res.status(err.status || 400).json({ ok: false, error: err.message || t('error.generic') });
 });

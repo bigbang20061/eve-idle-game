@@ -2,6 +2,7 @@ import express from 'express';
 import { requireAuth, asyncHandler } from '../middleware/auth.js';
 import { getStaticSdeStore } from '../services/staticSdeStore.js';
 import { safeText } from '../services/formulas.js';
+import { t } from '../services/i18n.js';
 
 export const staticSdeRoutes = express.Router();
 staticSdeRoutes.use(requireAuth);
@@ -29,7 +30,7 @@ staticSdeRoutes.get('/search', asyncHandler(async (req, res) => {
 staticSdeRoutes.get('/types/:typeId', asyncHandler(async (req, res) => {
   const store = getStaticSdeStore();
   const type = await store.getType(req.params.typeId);
-  if (!type) return res.status(404).json({ ok: false, error: 'type not found in static SDE' });
+  if (!type) return res.status(404).json({ ok: false, error: t('error.static_type_missing') });
   const dogma = await store.getTypeDogma(req.params.typeId);
   res.json({ ok: true, source: 'static-sde', type, dogma });
 }));
@@ -45,3 +46,8 @@ staticSdeRoutes.get('/dogma-attributes', asyncHandler(async (req, res) => {
   const limit = limitValue(req.query.limit, 100);
   res.json({ ok: true, source: 'static-sde', dogmaAttributes: await store.searchDogmaAttributes({ q, limit }) });
 }));
+
+staticSdeRoutes.use((err, req, res, next) => {
+  console.error('[static-sde-api]', err);
+  res.status(err.status || 400).json({ ok: false, error: err.message || t('error.generic') });
+});

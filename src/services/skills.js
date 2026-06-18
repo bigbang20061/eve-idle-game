@@ -1,4 +1,5 @@
 import { readGameConfig } from './gameConfig.js';
+import { t } from './i18n.js';
 
 export function getSkillRules() {
   return readGameConfig('data/game/skills.json');
@@ -49,9 +50,9 @@ export function applySkillEffects(stats, character) {
 export function trainingSeconds(skillId, fromLevel = 0) {
   const rules = getSkillRules();
   const skill = skillCatalog()[skillId];
-  if (!skill) throw new Error('技能不存在');
+  if (!skill) throw new Error(t('error.skill_missing'));
   const next = Number(fromLevel || 0) + 1;
-  if (next > Number(skill.maxLevel || 5)) throw new Error('技能已达到上限');
+  if (next > Number(skill.maxLevel || 5)) throw new Error(t('error.skill_maxed'));
   return Math.round(Number(rules.training.baseSeconds || 900) * Number(skill.rank || 1) * Math.pow(next, Number(rules.training.levelExponent || 1.55)));
 }
 
@@ -64,12 +65,12 @@ function ensureTraining(character) {
 export function enqueueSkillTraining(character, skillId) {
   const rules = getSkillRules();
   const catalog = skillCatalog();
-  if (!catalog[skillId]) throw new Error('技能不存在');
+  if (!catalog[skillId]) throw new Error(t('error.skill_missing'));
   const q = ensureTraining(character);
-  if (q.length >= Number(rules.training.queueLimit || 5)) throw new Error('训练队列已满');
+  if (q.length >= Number(rules.training.queueLimit || 5)) throw new Error(t('error.skill_queue_full'));
   const current = skillLevel(character, skillId) + q.filter(x => x.skillId === skillId).length;
   const targetLevel = current + 1;
-  if (targetLevel > Number(catalog[skillId].maxLevel || 5)) throw new Error('技能已达到上限');
+  if (targetLevel > Number(catalog[skillId].maxLevel || 5)) throw new Error(t('error.skill_maxed'));
   const seconds = trainingSeconds(skillId, current);
   const job = { skillId, targetLevel, secondsRemaining: seconds, totalSeconds: seconds, queuedAt: new Date() };
   q.push(job);

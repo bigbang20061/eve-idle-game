@@ -4,6 +4,7 @@ import { moduleInstanceFromType, validateModuleFit } from './fittingSystem.js';
 import { mergeStack } from './formulas.js';
 import { ensureSkillState } from './skillSystem.js';
 import { pickStarterRace } from './starterConfig.js';
+import { t } from './i18n.js';
 
 function safeRegex(text) {
   return new RegExp(String(text || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
@@ -79,7 +80,7 @@ export async function createStarterCharacter(user, name, { race = null } = {}) {
     userId: user._id,
     name,
     race: raceId,
-    corp: raceConfig.corp || '自由深空承包人',
+    corp: raceConfig.corp || t('label.default_corp'),
     currentSystemId: systemId,
     homeSystemId: systemId,
     cloneStationId: systemId,
@@ -103,8 +104,8 @@ export async function createStarterCharacter(user, name, { race = null } = {}) {
       combat: { stance: 'standard', damageProfile: 'balanced', targetPriority: 'scramblers_first' },
       loop: true
     },
-    expedition: { state: 'idle', progress: 0, enemyHull: 0, hazard: 0, log: [`克隆体激活，选择 ${raceConfig.label || raceId} 起步包，等待调度。`] },
-    walletJournal: [{ at: new Date(), type: 'grant', amount: Number(raceConfig.credits || 25000), note: `${raceConfig.label || raceId} 新克隆启动资金` }],
+    expedition: { state: 'idle', progress: 0, enemyHull: 0, hazard: 0, log: [t('log.clone_activated', { pack: raceConfig.label || raceId })] },
+    walletJournal: [{ at: new Date(), type: 'grant', amount: Number(raceConfig.credits || 25000), note: t('journal.starter_grant', { pack: raceConfig.label || raceId }) }],
     lastTickAt: new Date()
   });
   ensureSkillState(character);

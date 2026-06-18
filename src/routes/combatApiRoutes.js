@@ -5,13 +5,14 @@ import { combatUiOptions } from '../services/combatRules.js';
 import { dogmaUiSummary } from '../services/dogmaMapper.js';
 import { fittingUiOptions } from '../services/fittingSystem.js';
 import { skillOptions } from '../services/skillSystem.js';
+import { t } from '../services/i18n.js';
 
 export const combatApiRoutes = express.Router();
 combatApiRoutes.use(requireAuth);
 
 async function getCharacter(req) {
   const character = await Character.findOne({ userId: req.session.userId });
-  if (!character) throw new Error('角色不存在');
+  if (!character) throw new Error(t('error.character_missing'));
   return character;
 }
 
@@ -32,4 +33,7 @@ combatApiRoutes.post('/settings', asyncHandler(async (req, res) => {
   res.json({ ok: true, combat: character.autopilot.combat });
 }));
 
-combatApiRoutes.use((err, req, res, next) => res.status(400).json({ ok: false, error: err.message || '战斗设置失败' }));
+combatApiRoutes.use((err, req, res, next) => {
+  console.error('[combat-api]', err);
+  res.status(err.status || 400).json({ ok: false, error: err.message || t('error.combat_settings_failed') });
+});

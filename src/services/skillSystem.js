@@ -1,4 +1,5 @@
 import { loadJsonConfig } from './jsonConfig.js';
+import { t } from './i18n.js';
 
 const LEGACY_DEFAULTS = { combat: 1, mining: 1, scanning: 1, industry: 1, trade: 1, command: 1, salvage: 1, security: 1 };
 
@@ -46,7 +47,7 @@ export function skillLevel(character, skillId) {
 export function trainingSeconds(skillId, targetLevel, character = null) {
   const catalog = getSkillCatalog();
   const def = catalog.skills?.[skillId];
-  if (!def) throw new Error('技能不存在');
+  if (!def) throw new Error(t('error.skill_missing'));
   const target = Math.max(1, Math.min(Number(def.maxLevel || 5), Number(targetLevel || 1)));
   const base = Number(catalog.training?.baseSeconds || 420);
   const exponent = Number(catalog.training?.levelExponent || 2.15);
@@ -85,10 +86,10 @@ export function startSkillTraining(character, skillId, { queue = true, now = new
   ensureSkillState(character);
   const catalog = getSkillCatalog();
   const def = catalog.skills?.[skillId];
-  if (!def) throw new Error('技能不存在');
+  if (!def) throw new Error(t('error.skill_missing'));
   const current = skillLevel(character, skillId);
   const max = Number(def.maxLevel || 5);
-  if (current >= max) throw new Error('技能已满级');
+  if (current >= max) throw new Error(t('error.skill_maxed'));
   const targetLevel = current + 1;
   const secondsRequired = trainingSeconds(skillId, targetLevel, character);
   const plan = { skillId, label: def.label || skillId, targetLevel, secondsRequired };
@@ -96,10 +97,10 @@ export function startSkillTraining(character, skillId, { queue = true, now = new
     character.skillTraining.active = { ...plan, startedAt: now, readyAt: new Date(now.getTime() + secondsRequired * 1000) };
   } else if (queue) {
     const maxQueue = Number(catalog.maxQueue || 12);
-    if (character.skillTraining.queue.length >= maxQueue) throw new Error('训练队列已满');
+    if (character.skillTraining.queue.length >= maxQueue) throw new Error(t('error.skill_queue_full'));
     character.skillTraining.queue.push(plan);
   } else {
-    throw new Error('已有技能正在训练');
+    throw new Error(t('error.skill_already_training'));
   }
   return character.skillTraining;
 }

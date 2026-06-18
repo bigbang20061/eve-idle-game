@@ -3,6 +3,7 @@ import { requireAuth, requireAdmin, asyncHandler } from '../middleware/auth.js';
 import { importSdeDirectory } from '../services/sdeImporter.js';
 import { seedDefaultSde } from '../services/catalog.js';
 import { SdeType, SdeSystem, SdeBlueprint, SdeGroup, SdeCategory, SdeMarketGroup, User, Character } from '../models/index.js';
+import { t } from '../services/i18n.js';
 
 export const adminApiRoutes = express.Router();
 adminApiRoutes.use(requireAuth, requireAdmin);
@@ -14,7 +15,7 @@ adminApiRoutes.get('/sde/counts', asyncHandler(async (req, res) => {
 adminApiRoutes.post('/sde/import', asyncHandler(async (req, res) => {
   const dir = String(req.body.dir || '').trim();
   const limit = Math.max(0, Number(req.body.limit || 0));
-  if (!dir) throw new Error('请填写服务器上的 JSONL SDE 解压目录。');
+  if (!dir) throw new Error(t('error.admin_import_dir'));
   const result = await importSdeDirectory(dir, { limit });
   res.json({ ok: true, counts: await getCounts(), result });
 }));
@@ -31,7 +32,7 @@ adminApiRoutes.get('/ops', asyncHandler(async (req, res) => {
 
 adminApiRoutes.use((err, req, res, next) => {
   console.error('[admin-api]', err);
-  res.status(400).json({ ok: false, error: err.message || '操作失败' });
+  res.status(err.status || 400).json({ ok: false, error: err.message || t('error.operation_failed') });
 });
 
 async function getCounts() {

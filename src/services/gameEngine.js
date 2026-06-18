@@ -2,6 +2,7 @@ import { Character, SdeSystem, SdeType, GameEvent, IndustryJob, SdeBlueprint, Fl
 import { cargoVolume, chooseWeighted, clamp, deriveEffectiveStats, marketPrice, mergeStack, seededRandom, siteTemplate, systemBand } from './formulas.js';
 import { ensureCombat, resolveCombatRound, combatSnapshot } from './combatSystem.js';
 import { ensureSkillState, tickSkillTraining, deriveSkillModifiers, skillLevel } from './skillSystem.js';
+import { t } from './i18n.js';
 
 const MAX_OFFLINE_SECONDS = 12 * 3600;
 const STEP_SECONDS = 20;
@@ -90,7 +91,7 @@ export async function sellExcess(character, system) {
     character.credits += value;
     character.stats.totalEarned += value;
     character.stats.trades += 1;
-    character.walletJournal.unshift({ at: new Date(), type: 'auto-sell', amount: value, note: `自动卖出 ${sold} 件超额库存` });
+    character.walletJournal.unshift({ at: new Date(), type: 'auto-sell', amount: value, note: t('journal.auto_sell', { count: sold }) });
     character.walletJournal = character.walletJournal.slice(0, 80);
   }
   return { sold, value };
@@ -112,17 +113,17 @@ async function startNewSite(character, system, stats, rng) {
   character.expedition.hazard = 0;
   character.expedition.startedAt = new Date();
   character.stats.sorties += 1;
-  addLog(character, `扫描到 ${system.name} 的 ${site.name} T${site.tier}。`);
+  addLog(character, t('log.scan_site', { system: system.name, site: site.name, tier: site.tier }));
 }
 
 export function shouldExtract(character, stats, site = character.expedition?.site) {
-  if (site?.combat?.effects?.scrammed) return '遭到反跳，强制撤离';
+  if (site?.combat?.effects?.scrammed) return t('reason.scrammed');
   const cap = cargoCapacity(character, stats);
   const used = cargoVolume(character.cargo || []);
   const hpPct = hpPercent(character, stats);
-  if (used >= cap * 0.92) return '货舱接近满载';
-  if (hpPct <= Number(character.autopilot?.minShieldPct || 0.35)) return '护盾/结构低于撤离阈值';
-  if (Number(character.expedition.hazard || 0) > Number(character.autopilot?.risk || 0.35) + stats.warpStability * 0.12) return '本地风险超过设定阈值';
+  if (used >= cap * 0.92) return t('reason.cargo_full');
+  if (hpPct <= Number(character.autopilot?.minShieldPct || 0.35)) return t('reason.low_tank');
+  if (Number(character.expedition.hazard || 0) > Number(character.autopilot?.risk || 0.35) + stats.warpStability * 0.12) return t('reason.high_risk');
   return '';
 }
 
@@ -134,9 +135,9 @@ async function tickIndustry(character, now, io) {
     const type = await SdeType.findOne({ typeId: String(job.productTypeId) }).lean();
     mergeStack(warehouse, { typeId: String(job.productTypeId), name: type?.name || job.productName, zh: type?.zh || job.productName, kind: type?.kind || 'item', quantity: Number(job.output?.quantity || job.runs || 1), volume: Number(type?.volume || 0.01), basePrice: Number(type?.basePrice || 1), source: 'industry' });
     character.stats.manufactured += Number(job.output?.quantity || job.runs || 1);
-    addLog(character, `工业线交付：${type?.zh || job.productName} × ${Number(job.output?.quantity || job.runs || 1)}`);
+    addLog(character, t('log.industry_delivered', { name: type?.zh || job.productName, qty: Number(job.output?.quantity || job.runs || 1) }));
     await IndustryJob.updateOne({ _id: job._id }, { $set: { status: 'delivered' } });
-    await pushEvent({ scope: 'character', characterId: character._id, severity: 'success', title: '工业交付', message: `${character.name} 完成 ${type?.zh || job.productName}` }, io);
+    await pushEvent({ scope: 'character', characterId: character._id, severity: 'success', title: t('event.industry_delivery_title'), message: t('event.industry_delivery_msg', { name: character.name, product: type?.zh || job.productName }) }, io);
   }
 }
 
@@ -145,7 +146,7 @@ async function tickStep(character, dt, now, io) {
   const completedSkills = tickSkillTraining(character, now);
   if (completedSkills.length) {
     character.stats.skillsCompleted = Number(character.stats.skillsCompleted || 0) + completedSkills.length;
-    for (const skill of completedSkills) addLog(character, `技能完成：${skill.label} ${skill.level} 级。`);
+    for (const skill of completedSkills) addLog(character, t('log.skill_done', { label: skill.label, level: skill.level }));
   }
   await tickIndustry(character, now, io);
   const skillMods = deriveSkillModifiers(character);
@@ -157,17 +158,17 @@ async function tickStep(character, dt, now, io) {
   character.skillpoints += dt * 0.03 * (1 + Number(skillMods.skillSpeedMultiplier || 0));
 
   if (state === 'idle') return startNewSite(character, system, stats, rng);
-  if (state === 'repairing') { character.expedition.progress += dt * 2; if (character.expedition.progress >= 100) { resetExpedition(character, 'idle'); character.locationState = 'docked'; addLog(character, '维修完成，等待下一轮出站。'); } return; }
+  if (state === 'repairing') { character.expedition.progress += dt * 2; if (character.expedition.progress >= 100) { resetExpedition(character, 'idle'); character.locationState = 'docked'; addLog(character, t('log.repair_done')); } return; }
   if (!character.expedition.site) { resetExpedition(character, 'idle'); return; }
 
   const site = character.expedition.site;
   const extractionReason = shouldExtract(character, stats, site);
-  if (extractionReason && !['extracting', 'looting'].includes(state)) { character.expedition.state = 'extracting'; character.expedition.progress = 0; addLog(character, `${extractionReason}，开始撤离。`); return; }
+  if (extractionReason && !['extracting', 'looting'].includes(state)) { character.expedition.state = 'extracting'; character.expedition.progress = 0; addLog(character, t('log.extract_start', { reason: extractionReason })); return; }
 
   if (state === 'scanning') {
     character.expedition.progress += dt * Math.max(1, stats.scan) * (0.8 + rng() * 0.4);
     if (rng() < site.danger * dt * 0.0015) character.expedition.hazard += 0.03 + rng() * 0.05;
-    if (character.expedition.progress >= site.scanNeed) { character.expedition.state = 'warping'; character.expedition.progress = 0; addLog(character, `锁定 ${site.name}，跃迁进场。`); }
+    if (character.expedition.progress >= site.scanNeed) { character.expedition.state = 'warping'; character.expedition.progress = 0; addLog(character, t('log.lock_warp', { site: site.name })); }
     return;
   }
 
@@ -180,7 +181,7 @@ async function tickStep(character, dt, now, io) {
       const peaceful = ['mining', 'relic', 'data', 'hauling'].includes(site.activity) && rng() > site.danger * 0.5;
       character.expedition.state = peaceful ? 'looting' : 'fighting';
       if (!peaceful) ensureCombat(site, stats, character, rng);
-      addLog(character, peaceful ? `进入 ${site.name}，开始作业。` : `遭遇 ${site.combat?.factionLabel || '敌方'} 守卫，进入战斗。`);
+      addLog(character, peaceful ? t('log.enter_work', { site: site.name }) : t('log.enter_combat', { faction: site.combat?.factionLabel || t('label.enemy') }));
     }
     return;
   }
@@ -197,7 +198,7 @@ async function tickStep(character, dt, now, io) {
       character.credits += result.bounty;
       character.stats.totalEarned += result.bounty;
       character.stats.bountyEarned = Number(character.stats.bountyEarned || 0) + result.bounty;
-      character.walletJournal.unshift({ at: now, type: 'bounty', amount: Math.round(result.bounty), note: `${site.combat?.factionLabel || '敌方'} 赏金` });
+      character.walletJournal.unshift({ at: now, type: 'bounty', amount: Math.round(result.bounty), note: t('journal.bounty', { faction: site.combat?.factionLabel || t('label.enemy') }) });
     }
     if (result.outcome === 'destroyed') {
       const lossCost = Math.round(Math.max(2500, Number(character.ship?.stats?.hull || 100) * 110));
@@ -206,15 +207,15 @@ async function tickStep(character, dt, now, io) {
       character.cargo = [];
       character.locationState = 'docked';
       resetExpedition(character, 'repairing');
-      addLog(character, `舰船被击毁，远征中止，货舱损毁，保险赔付后仍损失 ${lossCost} ISK。`);
-      await pushEvent({ scope: 'global', characterId: character._id, systemId: system.systemId, severity: 'danger', title: '舰船损失', message: `${character.name} 在 ${system.name} 损失舰船，克隆体回站。` }, io);
+      addLog(character, t('log.ship_lost', { loss: lossCost }));
+      await pushEvent({ scope: 'global', characterId: character._id, systemId: system.systemId, severity: 'danger', title: t('event.ship_loss_title'), message: t('event.ship_loss_msg', { name: character.name, system: system.name }) }, io);
       return;
     }
     if (result.outcome === 'won') {
       character.stats.kills += Number(site.combat?.waves || 0) || 1;
       character.expedition.state = 'looting';
       character.expedition.progress = 0;
-      addLog(character, `清理 ${site.combat?.factionLabel || '敌方'} 守卫，开始搜刮/采集。`);
+      addLog(character, t('log.cleared_guards', { faction: site.combat?.factionLabel || t('label.enemy') }));
     }
     return;
   }
@@ -241,7 +242,7 @@ async function tickStep(character, dt, now, io) {
       character.skillpoints += Math.max(1, Number(site.tier || 1)) * 0.18;
       character.expedition.state = 'extracting';
       character.expedition.progress = 0;
-      addLog(character, `获得约 ${Math.round(gainedValue)} ISK 战利品，准备撤离。`);
+      addLog(character, t('log.loot_gained', { value: Math.round(gainedValue) }));
     }
     return;
   }
@@ -256,8 +257,8 @@ async function tickStep(character, dt, now, io) {
       const sold = await sellExcess(character, system);
       character.stats.extractions += 1;
       character.securityStanding += systemBand(system) === 'high' ? 0.001 : -0.002 * Number(site.tier || 1);
-      addLog(character, `成功撤离：入库 ${transferred.count} 件，自动出售 ${sold.sold} 件。`);
-      if (sold.value > 0 || transferred.value > 100000) await pushEvent({ scope: 'system', characterId: character._id, systemId: system.systemId, severity: 'success', title: '搜打撤成功', message: `${character.name} 从 ${system.name} 带回约 ${Math.round(transferred.value)} ISK 货物。` }, io);
+      addLog(character, t('log.extract_success', { count: transferred.count, sold: sold.sold }));
+      if (sold.value > 0 || transferred.value > 100000) await pushEvent({ scope: 'system', characterId: character._id, systemId: system.systemId, severity: 'success', title: t('event.extract_success_title'), message: t('event.extract_success_msg', { name: character.name, system: system.name, value: Math.round(transferred.value) }) }, io);
       resetExpedition(character, 'idle');
     }
   }
@@ -306,13 +307,13 @@ export async function tickFleets(now = new Date(), io = null) {
       for (const memberId of memberIds) {
         const character = await Character.findById(memberId);
         if (!character) continue;
-        character.credits += shared; character.stats.totalEarned += shared; character.walletJournal.unshift({ at: now, type: 'fleet', amount: shared, note: `${fleet.name} 舰队分红` });
+        character.credits += shared; character.stats.totalEarned += shared; character.walletJournal.unshift({ at: now, type: 'fleet', amount: shared, note: t('journal.fleet_dividend', { fleet: fleet.name }) });
         const pick = chooseWeighted(pool, rng)?.item;
         if (pick) mergeStack(character.warehouse.items, { typeId: pick.typeId, name: pick.name, zh: pick.zh || pick.name, kind: pick.kind, quantity: 1 + Math.floor(tier * rng()), volume: pick.volume || 0.01, basePrice: pick.basePrice || 1, source: 'fleet' });
         await character.save(); io?.to(`character:${character._id}`).emit('character:update', publicCharacter(character));
       }
-      fleet.status = 'completed'; fleet.lootPool = { credits: baseReward, items: [] }; fleet.log.unshift(`目标完成，舰队分红 ${baseReward} ISK。`); await fleet.save();
-      await pushEvent({ scope: 'global', fleetId: fleet._id, systemId: fleet.systemId, severity: 'success', title: '舰队凯旋', message: `${fleet.name} 完成 T${tier} 作战，分红 ${baseReward} ISK。` }, io);
+      fleet.status = 'completed'; fleet.lootPool = { credits: baseReward, items: [] }; fleet.log.unshift(t('fleet.log.completed', { reward: baseReward })); await fleet.save();
+      await pushEvent({ scope: 'global', fleetId: fleet._id, systemId: fleet.systemId, severity: 'success', title: t('event.fleet_win_title'), message: t('event.fleet_win_msg', { fleet: fleet.name, tier, reward: baseReward }) }, io);
     } else { await fleet.save(); io?.to('global').emit('fleet:update', fleet.toObject()); }
   }
 }
@@ -325,10 +326,10 @@ export async function startGameLoop(io, { tickMs = 5000 } = {}) {
 
 export async function startIndustryJob(character, blueprintTypeId, runs = 1) {
   const bp = await SdeBlueprint.findOne({ blueprintTypeId: String(blueprintTypeId) }).lean();
-  if (!bp) throw new Error('蓝图不存在');
+  if (!bp) throw new Error(t('error.blueprint_missing'));
   runs = Math.max(1, Math.min(20, Number(runs || 1)));
   const warehouse = mutableWarehouse(character);
-  for (const material of bp.materials) { const have = warehouse.find(s => String(s.typeId) === String(material.typeId)); if (!have || Number(have.quantity || 0) < Number(material.quantity || 0) * runs) throw new Error(`材料不足：${material.name || material.typeId}`); }
+  for (const material of bp.materials) { const have = warehouse.find(s => String(s.typeId) === String(material.typeId)); if (!have || Number(have.quantity || 0) < Number(material.quantity || 0) * runs) throw new Error(t('error.material_insufficient', { name: material.name || material.typeId })); }
   for (const material of bp.materials) { const stack = warehouse.find(s => String(s.typeId) === String(material.typeId)); stack.quantity -= Number(material.quantity || 0) * runs; }
   character.warehouse.items = warehouse.filter(s => Number(s.quantity || 0) > 0);
   const industrySpeed = 1 + Number(deriveSkillModifiers(character).industrySpeedMultiplier || 0) + skillLevel(character, 'industry') * 0.02;

@@ -1,6 +1,7 @@
 import { getCombatRules, pickDamageProfile, pickPriority, pickStance } from './combatRules.js';
 import { clamp } from './formulas.js';
 import { cycleActiveModules } from './fittingSystem.js';
+import { t } from './i18n.js';
 
 function sum(values) { return Object.values(values || {}).reduce((s, v) => s + Number(v || 0), 0); }
 function normaliseProfile(profile) { const total = sum(profile); if (total <= 0) return { balanced: 1 }; return Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, Number(v || 0) / total])); }
@@ -156,7 +157,7 @@ export function resolveCombatRound({ site, character, stats, dt, rng = Math.rand
   if (target.hp <= 0 && !target.dead) {
     target.dead = true;
     bounty += Number(target.bounty || 0);
-    combat.log.unshift(`击毁 ${target.label}，赏金 ${Math.round(target.bounty || 0)} ISK。`);
+    combat.log.unshift(t('combat.log.killed', { target: target.label, bounty: Math.round(target.bounty || 0) }));
   }
 
   for (const repper of aliveInWave(combat).filter(e => e.repair > 0)) {
@@ -167,7 +168,7 @@ export function resolveCombatRound({ site, character, stats, dt, rng = Math.rand
   if (!aliveInWave(combat).length) {
     if (combat.currentWave < combat.waves.length - 1) {
       combat.currentWave += 1;
-      combat.log.unshift(`敌方第 ${combat.currentWave + 1} 波跃迁入场。`);
+      combat.log.unshift(t('combat.log.wave', { wave: combat.currentWave + 1 }));
     } else {
       combat.completed = true;
     }

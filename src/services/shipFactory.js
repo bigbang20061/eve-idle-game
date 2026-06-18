@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { loadJsonConfig } from './jsonConfig.js';
+import { t } from './i18n.js';
 
 export function shipFromType(type = {}, { race = 'independent', skin = 'sde-imported' } = {}) {
   const fitting = loadJsonConfig('data/game/fitting_rules.json');
@@ -29,7 +30,7 @@ export function shipFromType(type = {}, { race = 'independent', skin = 'sde-impo
     instanceId: crypto.randomUUID(),
     typeId: String(type.typeId || `ship-${crypto.randomUUID()}`),
     name: type.name || 'Starter Corvette',
-    zh: type.zh || type.name || '新手轻舟',
+    zh: type.zh || type.name || t('label.default_ship'),
     class: type.groupName || type.class || 'Ship',
     role: type.role || type.raw?.role || 'general',
     race,
